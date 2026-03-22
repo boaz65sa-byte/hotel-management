@@ -1,0 +1,55 @@
+name: hotel_app
+description: Hotel service ticket management
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Backend
+  supabase_flutter: ^2.5.0
+
+  # State management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Navigation
+  go_router: ^14.2.0
+
+  # Local storage
+  sqflite: ^2.3.3
+  path: ^1.9.0
+
+  # Connectivity
+  connectivity_plus: ^6.0.3
+
+  # i18n
+  intl: ^0.19.0
+
+  # Utilities
+  cached_network_image: ^3.3.1
+  image_picker: ^1.1.2
+  excel: ^4.0.3
+  flutter_dotenv: ^5.1.0
+  uuid: ^4.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^2.4.9
+  riverpod_generator: ^2.4.0
+  flutter_lints: ^4.0.0
+  mocktail: ^1.0.4
+  sqflite_common_ffi: ^2.3.3
+
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+    - assets/images/
+    - .env
