@@ -94,7 +94,7 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
   }
 
   Future<void> _submit() async {
-    if (_selectedDept == null || _titleCtrl.text.isEmpty) {
+    if (_selectedRoom == null || _selectedDept == null || _titleCtrl.text.isEmpty) {
       setState(() => _error = 'Please fill all required fields');
       return;
     }
@@ -105,16 +105,16 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
       final repo = TicketRepository(isOnline: () => ref.read(isOnlineProvider));
       // Fetch hotel SLA hours to set sla_deadline
       final hotelRes = await supabase
-        .from('users')
-        .select('hotel:hotels(default_sla_hours)')
-        .eq('id', user.id)
+        .from('hotels')
+        .select('default_sla_hours')
+        .eq('id', hotelId)
         .single();
-      final slaHours = (hotelRes['hotel']?['default_sla_hours'] as int?) ?? 4;
+      final slaHours = (hotelRes['default_sla_hours'] as int?) ?? 4;
       final slaDeadline = DateTime.now().add(Duration(hours: slaHours));
 
       await repo.openTicket(
         hotelId: hotelId,
-        roomId: _selectedRoom ?? '',
+        roomId: _selectedRoom!,
         openedBy: user.id,
         assignedDept: _selectedDept!,
         title: _titleCtrl.text.trim(),
