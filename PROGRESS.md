@@ -1,9 +1,9 @@
 # Hotel Management App - Progress Tracker
 
 ## Current Status
-**Phase**: Brainstorming - Clarifying Questions (Q9 of 9 - waiting for answer)
+**Phase**: Implementation - Plan 1 Complete, Starting Plan 2
 **Date**: 2026-03-22
-**Next Step**: Propose 2-3 architectural approaches after Q9 answer
+**Next Step**: Plan 2 - Flutter Foundation (project setup, i18n, auth, offline)
 
 ---
 
@@ -78,13 +78,33 @@ Hotel service ticket management system:
 ## Implementation Plans
 | Plan | File | Status |
 |------|------|--------|
-| 1 | docs/superpowers/plans/2026-03-22-plan-1-supabase-backend.md | Ready |
-| 2 | docs/superpowers/plans/2026-03-22-plan-2-flutter-foundation.md | Ready |
+| 1 | docs/superpowers/plans/2026-03-22-plan-1-supabase-backend.md | ✅ Done |
+| 2 | docs/superpowers/plans/2026-03-22-plan-2-flutter-foundation.md | 🔄 Next |
 | 3 | docs/superpowers/plans/2026-03-22-plan-3-flutter-tickets.md | Ready |
 | 4 | docs/superpowers/plans/2026-03-22-plan-4-flutter-rooms-analytics-users.md | Ready |
 | 5 | docs/superpowers/plans/2026-03-22-plan-5-nextjs-super-admin.md | Ready |
 
-**Start with Plan 1. Each plan depends on the previous.**
+**Plan 1 complete. Start Plan 2 next.**
+
+## Plan 1 - Completed Migrations (on Supabase: vetwlonyzyzvhrtdwbzj)
+- ✅ 20260322000001 - hotels table
+- ✅ 20260322000002 - users table + is_primary_contact
+- ✅ 20260322000003 - rooms table
+- ✅ 20260322000004 - tickets table
+- ✅ 20260322000005 - ticket_updates (append-only)
+- ✅ 20260322000006 - ticket_photos (append-only)
+- ✅ 20260322000007 - ticket_approvals + view
+- ✅ 20260322000008 - RLS policies (all 7 tables)
+- ✅ 20260322000009 - custom JWT claims function
+- ✅ 20260322000010 - storage bucket (ticket-photos, private)
+- ✅ 20260322000011 - seed test data (Hotel Alpha + Beta)
+- ✅ 20260322000012 - RPCs (claim_ticket, create_approval_request, check_and_close_ticket)
+- ✅ 20260322000013 - tickets trigger repair
+- ✅ Edge Function: export-excel (deployed)
+- ✅ GitHub: https://github.com/boaz65sa-byte/hotel-management
+
+## Added in Plan 1 (beyond original spec)
+- is_primary_contact on users: one primary contact per hotel (support + billing representative)
 
 ## Future Features (V2)
 - WhatsApp Business API notifications
