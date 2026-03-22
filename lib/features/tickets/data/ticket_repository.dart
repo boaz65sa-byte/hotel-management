@@ -4,7 +4,7 @@ import 'package:hotel_app/core/database/sync_queue.dart';
 import '../domain/ticket_model.dart';
 
 class TicketRepository {
-  final bool isOnline;
+  final bool Function() isOnline;
   TicketRepository({required this.isOnline});
 
   static const _select = '''
@@ -61,7 +61,7 @@ class TicketRepository {
       'sla_deadline': slaDeadline?.toIso8601String(),
     };
 
-    if (isOnline) {
+    if (isOnline()) {
       await supabase.from('tickets').insert(payload);
     } else {
       await SyncQueue.enqueue('create_ticket', payload);
@@ -70,6 +70,9 @@ class TicketRepository {
 
   /// Claim a ticket. Requires online connection — uses conditional update.
   Future<bool> claimTicket(String ticketId, String userId) async {
+    if (!isOnline()) {
+      throw StateError('claimTicket requires an active internet connection');
+    }
     final res = await supabase.rpc('claim_ticket', params: {
       'p_ticket_id': ticketId,
       'p_user_id': userId,
@@ -85,7 +88,7 @@ class TicketRepository {
       'message': message,
       'update_type': 'comment',
     };
-    if (isOnline) {
+    if (isOnline()) {
       await supabase.from('ticket_updates').insert(payload);
     } else {
       await SyncQueue.enqueue('add_comment', payload);
@@ -101,7 +104,7 @@ class TicketRepository {
       'resolved_at': now,
       'updated_at': now,
     };
-    if (isOnline) {
+    if (isOnline()) {
       await supabase.from('tickets').update(payload).eq('id', ticketId);
       await supabase.from('ticket_updates').insert({
         'hotel_id': hotelId, 'ticket_id': ticketId,
@@ -116,9 +119,12 @@ class TicketRepository {
         'ticket_id': ticketId, 'hotel_id': hotelId,
         'user_id': userId, 'resolution_type': resolutionType,
       });
+      // Note: when sync worker processes 'resolve_ticket' with resolution_type='room_closed',
+      // it must also call create_approval_request RPC after the ticket update.
     }
   }
 
+  // Hotel isolation enforced by RLS — no hotel_id filter needed here.
   Future<List<TicketUpdate>> fetchUpdates(String ticketId) async {
     final res = await supabase
       .from('ticket_updates')
@@ -128,6 +134,7 @@ class TicketRepository {
     return (res as List).map((j) => TicketUpdate.fromJson(j as Map<String, dynamic>)).toList();
   }
 
+  // Hotel isolation enforced by RLS — no hotel_id filter needed here.
   Future<List<TicketPhoto>> fetchPhotos(String ticketId) async {
     final res = await supabase
       .from('ticket_photos')
