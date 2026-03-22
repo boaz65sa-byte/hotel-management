@@ -43,24 +43,24 @@ class Ticket {
   });
 
   factory Ticket.fromJson(Map<String, dynamic> j) => Ticket(
-    id: j['id'],
-    hotelId: j['hotel_id'],
-    roomId: j['room_id'],
-    openedBy: j['opened_by'],
-    assignedDept: j['assigned_dept'],
-    claimedBy: j['claimed_by'],
-    title: j['title'],
-    description: j['description'],
-    priority: j['priority'],
-    status: j['status'],
-    resolutionType: j['resolution_type'],
-    slaDeadline: j['sla_deadline'] != null ? DateTime.parse(j['sla_deadline']) : null,
-    createdAt: DateTime.parse(j['created_at']),
-    updatedAt: DateTime.parse(j['updated_at']),
-    resolvedAt: j['resolved_at'] != null ? DateTime.parse(j['resolved_at']) : null,
-    roomNumber: j['room']?['room_number'],
-    openerName: j['opener']?['full_name'],
-    claimerName: j['claimer']?['full_name'],
+    id: j['id'] as String,
+    hotelId: j['hotel_id'] as String,
+    roomId: j['room_id'] as String,
+    openedBy: j['opened_by'] as String,
+    assignedDept: j['assigned_dept'] as String,
+    claimedBy: j['claimed_by'] as String?,
+    title: j['title'] as String,
+    description: j['description'] as String?,
+    priority: j['priority'] as String,
+    status: j['status'] as String,
+    resolutionType: j['resolution_type'] as String?,
+    slaDeadline: j['sla_deadline'] != null ? DateTime.parse(j['sla_deadline'] as String) : null,
+    createdAt: DateTime.parse(j['created_at'] as String),
+    updatedAt: DateTime.parse(j['updated_at'] as String),
+    resolvedAt: j['resolved_at'] != null ? DateTime.parse(j['resolved_at'] as String) : null,
+    roomNumber: j['room'] != null ? (j['room'] as Map<String, dynamic>)['room_number'] as String? : null,
+    openerName: j['opener'] != null ? (j['opener'] as Map<String, dynamic>)['full_name'] as String? : null,
+    claimerName: j['claimer'] != null ? (j['claimer'] as Map<String, dynamic>)['full_name'] as String? : null,
   );
 
   bool get isOverSla =>
@@ -87,13 +87,13 @@ class TicketUpdate {
   });
 
   factory TicketUpdate.fromJson(Map<String, dynamic> j) => TicketUpdate(
-    id: j['id'],
-    ticketId: j['ticket_id'],
-    userId: j['user_id'],
-    message: j['message'],
-    updateType: j['update_type'],
-    createdAt: DateTime.parse(j['created_at']),
-    userName: j['user']?['full_name'],
+    id: j['id'] as String,
+    ticketId: j['ticket_id'] as String,
+    userId: j['user_id'] as String,
+    message: j['message'] as String?,
+    updateType: j['update_type'] as String,
+    createdAt: DateTime.parse(j['created_at'] as String),
+    userName: j['user'] != null ? (j['user'] as Map<String, dynamic>)['full_name'] as String? : null,
   );
 }
 
@@ -115,11 +115,11 @@ class TicketPhoto {
   });
 
   factory TicketPhoto.fromJson(Map<String, dynamic> j) => TicketPhoto(
-    id: j['id'],
-    ticketId: j['ticket_id'],
-    photoUrl: j['photo_url'],
-    fileSizeBytes: j['file_size_bytes'],
-    createdAt: DateTime.parse(j['created_at']),
-    uploaderName: j['uploader']?['full_name'],
+    id: j['id'] as String,
+    ticketId: j['ticket_id'] as String,
+    photoUrl: j['photo_url'] as String,
+    fileSizeBytes: j['file_size_bytes'] as int?,
+    createdAt: DateTime.parse(j['created_at'] as String),
+    uploaderName: j['uploader'] != null ? (j['uploader'] as Map<String, dynamic>)['full_name'] as String? : null,
   );
 }
