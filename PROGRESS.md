@@ -1,9 +1,9 @@
 # Hotel Management App - Progress Tracker
 
 ## Current Status
-**Phase**: Implementation - Plan 1 Complete, Starting Plan 2
-**Date**: 2026-03-22
-**Next Step**: Plan 2 - Flutter Foundation (project setup, i18n, auth, offline)
+**Phase**: Implementation - Plan 2 Complete, Starting Plan 3
+**Date**: 2026-03-23
+**Next Step**: Plan 3 - Flutter Tickets (ticket models, screens, photos, approvals)
 
 ---
 
@@ -79,12 +79,23 @@ Hotel service ticket management system:
 | Plan | File | Status |
 |------|------|--------|
 | 1 | docs/superpowers/plans/2026-03-22-plan-1-supabase-backend.md | ✅ Done |
-| 2 | docs/superpowers/plans/2026-03-22-plan-2-flutter-foundation.md | 🔄 Next |
-| 3 | docs/superpowers/plans/2026-03-22-plan-3-flutter-tickets.md | Ready |
+| 2 | docs/superpowers/plans/2026-03-22-plan-2-flutter-foundation.md | ✅ Done |
+| 3 | docs/superpowers/plans/2026-03-22-plan-3-flutter-tickets.md | 🔄 Next |
 | 4 | docs/superpowers/plans/2026-03-22-plan-4-flutter-rooms-analytics-users.md | Ready |
 | 5 | docs/superpowers/plans/2026-03-22-plan-5-nextjs-super-admin.md | Ready |
 
-**Plan 1 complete. Start Plan 2 next.**
+**Plan 2 complete. Start Plan 3 next.**
+
+## Environment
+- **Supabase project**: vetwlonyzyzvhrtdwbzj (account: boaz65sa@icloud.com)
+- **GitHub**: https://github.com/boaz65sa-byte/hotel-management
+- **Flutter**: /Users/boazsaada/flutter/bin/flutter (v3.24.5)
+- **Flutter PATH**: added to ~/.zshrc
+- **Supabase CLI**: linked, push with `supabase db push --include-all`
+
+## Pending Manual Actions
+- [ ] Supabase Dashboard → Authentication → Hooks → Custom Access Token → select `custom_jwt_claims`
+- [ ] Create test auth users in Supabase dashboard for testing login
 
 ## Plan 1 - Completed Migrations (on Supabase: vetwlonyzyzvhrtdwbzj)
 - ✅ 20260322000001 - hotels table
@@ -102,6 +113,18 @@ Hotel service ticket management system:
 - ✅ 20260322000013 - tickets trigger repair
 - ✅ Edge Function: export-excel (deployed)
 - ✅ GitHub: https://github.com/boaz65sa-byte/hotel-management
+
+## Plan 2 - Completed Flutter Foundation
+- ✅ Task 1: Flutter project setup (pubspec.yaml, 170 deps, directory structure)
+- ✅ Task 2: i18n (Hebrew/English/Arabic ARB files, flutter gen-l10n, locale_provider)
+- ✅ Task 3: Supabase client (dotenv init) + HotelTheme engine (fromJson/toThemeData)
+- ✅ Task 4: Connectivity service (StreamProvider) + OfflineBanner widget
+- ✅ Task 5: SQLite local cache (4 tables) + SyncQueue (enqueue/pending/remove)
+- ✅ Task 6: AuthRepository (signIn/signOut/hotelId/role) + LoginScreen + auth_state providers
+- ✅ Task 7: GoRouter with auth guard redirect + HotelApp + main.dart init
+- ✅ Task 8: SessionTimeoutService (resetTimer/dispose) + fetchSessionTimeoutMinutes
+- ✅ All 11 tests passing
+- ✅ flutter analyze: no issues
 
 ## Added in Plan 1 (beyond original spec)
 - is_primary_contact on users: one primary contact per hotel (support + billing representative)
