@@ -33,5 +33,6 @@
   "priority_low": "منخفض",
   "priority_normal": "عادي",
   "priority_high": "مرتفع",
-  "priority_urgent": "عاجل"
+  "priority_urgent": "عاجل",
+  "noTickets": "لا توجد تذاكر"
 }

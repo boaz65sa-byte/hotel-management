@@ -33,5 +33,6 @@
   "priority_low": "נמוך",
   "priority_normal": "רגיל",
   "priority_high": "גבוה",
-  "priority_urgent": "דחוף"
+  "priority_urgent": "דחוף",
+  "noTickets": "אין כרטיסים"
 }

@@ -33,5 +33,6 @@
   "priority_low": "Low",
   "priority_normal": "Normal",
   "priority_high": "High",
-  "priority_urgent": "Urgent"
+  "priority_urgent": "Urgent",
+  "noTickets": "No tickets found"
 }

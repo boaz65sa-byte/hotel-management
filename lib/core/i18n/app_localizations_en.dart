@@ -107,4 +107,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get priority_urgent => 'Urgent';
+
+  @override
+  String get noTickets => 'No tickets found';
 }

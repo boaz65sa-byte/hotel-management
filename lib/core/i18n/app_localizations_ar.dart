@@ -107,4 +107,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get priority_urgent => 'عاجل';
+
+  @override
+  String get noTickets => 'لا توجد تذاكر';
 }

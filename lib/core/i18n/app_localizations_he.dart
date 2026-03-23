@@ -107,4 +107,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get priority_urgent => 'דחוף';
+
+  @override
+  String get noTickets => 'אין כרטיסים';
 }

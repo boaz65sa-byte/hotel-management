@@ -24,7 +24,7 @@ class TicketsListScreen extends ConsumerWidget {
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Center(child: Text(e.toString())),
             data: (tickets) => tickets.isEmpty
-              ? Center(child: Text(l.loading))
+              ? Center(child: Text(l.noTickets))
               : ListView.builder(
                   itemCount: tickets.length,
                   itemBuilder: (_, i) => TicketCard(
