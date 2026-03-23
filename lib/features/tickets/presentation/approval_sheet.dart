@@ -36,7 +36,12 @@ class _ApprovalSheetState extends ConsumerState<ApprovalSheet> {
       }
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      if (mounted) setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
     }
   }
 

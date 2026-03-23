@@ -28,7 +28,7 @@ class TicketDetailScreen extends ConsumerWidget {
       (user?.appMetadata['role'] as String?) ?? 'receptionist');
 
     return Scaffold(
-      appBar: AppBar(title: Text(l.myTickets)),
+      appBar: AppBar(title: Text(ticketAsync.value?.title ?? l.myTickets)),
       body: ticketAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text(e.toString())),
@@ -82,56 +82,62 @@ class TicketDetailScreen extends ConsumerWidget {
             // Resolve buttons (for the claimer while in_progress)
             if (role.canClaimAndUpdate && ticket.claimedBy == user?.id &&
                 ticket.status == 'in_progress') ...[
-              OutlinedButton.icon(
-                onPressed: () async {
-                  final svc = PhotoUploadService(isOnline: isOnline);
-                  final photo = await svc.pickPhoto();
-                  if (photo != null) {
-                    await svc.uploadPhoto(
-                      ticketId: ticket.id,
-                      hotelId: ticket.hotelId,
-                      uploadedBy: user!.id,
-                      photo: photo,
-                    );
-                    ref.invalidate(ticketPhotosProvider(ticketId));
-                  }
-                },
-                icon: const Icon(Icons.camera_alt),
-                label: Text(l.addPhoto),
-              ),
-              const SizedBox(height: 12),
-              Row(children: [
-                Expanded(child: FilledButton.icon(
+              if (isOnline) ...[
+                OutlinedButton.icon(
                   onPressed: () async {
-                    final repo = TicketRepository(isOnline: () => ref.read(isOnlineProvider));
-                    await repo.resolveTicket(ticket.id, ticket.hotelId, user!.id, 'fixed');
-                    ref.invalidate(ticketDetailProvider(ticketId));
+                    final svc = PhotoUploadService(isOnline: isOnline);
+                    final photo = await svc.pickPhoto();
+                    if (photo != null) {
+                      await svc.uploadPhoto(
+                        ticketId: ticket.id,
+                        hotelId: ticket.hotelId,
+                        uploadedBy: user!.id,
+                        photo: photo,
+                      );
+                      ref.invalidate(ticketPhotosProvider(ticketId));
+                    }
                   },
-                  icon: const Icon(Icons.check),
-                  label: Text(l.ticketFixed),
-                )),
-                const SizedBox(width: 8),
-                Expanded(child: OutlinedButton.icon(
-                  onPressed: () async {
-                    final repo = TicketRepository(isOnline: () => ref.read(isOnlineProvider));
-                    await repo.resolveTicket(ticket.id, ticket.hotelId, user!.id, 'on_hold');
-                    ref.invalidate(ticketDetailProvider(ticketId));
-                  },
-                  icon: const Icon(Icons.pause),
-                  label: Text(l.ticketOnHold),
-                )),
-                const SizedBox(width: 8),
-                Expanded(child: OutlinedButton.icon(
-                  onPressed: () async {
-                    final repo = TicketRepository(isOnline: () => ref.read(isOnlineProvider));
-                    await repo.resolveTicket(ticket.id, ticket.hotelId, user!.id, 'room_closed');
-                    ref.invalidate(ticketDetailProvider(ticketId));
-                  },
-                  icon: const Icon(Icons.lock),
-                  label: Text(l.ticketRoomClosed),
-                  style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
-                )),
-              ]),
+                  icon: const Icon(Icons.camera_alt),
+                  label: Text(l.addPhoto),
+                ),
+                const SizedBox(height: 12),
+                Row(children: [
+                  Expanded(child: FilledButton.icon(
+                    onPressed: () async {
+                      final repo = TicketRepository(isOnline: () => ref.read(isOnlineProvider));
+                      await repo.resolveTicket(ticket.id, ticket.hotelId, user!.id, 'fixed');
+                      ref.invalidate(ticketDetailProvider(ticketId));
+                    },
+                    icon: const Icon(Icons.check),
+                    label: Text(l.ticketFixed),
+                  )),
+                  const SizedBox(width: 8),
+                  Expanded(child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final repo = TicketRepository(isOnline: () => ref.read(isOnlineProvider));
+                      await repo.resolveTicket(ticket.id, ticket.hotelId, user!.id, 'on_hold');
+                      ref.invalidate(ticketDetailProvider(ticketId));
+                    },
+                    icon: const Icon(Icons.pause),
+                    label: Text(l.ticketOnHold),
+                  )),
+                  const SizedBox(width: 8),
+                  Expanded(child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final repo = TicketRepository(isOnline: () => ref.read(isOnlineProvider));
+                      await repo.resolveTicket(ticket.id, ticket.hotelId, user!.id, 'room_closed');
+                      ref.invalidate(ticketDetailProvider(ticketId));
+                    },
+                    icon: const Icon(Icons.lock),
+                    label: Text(l.ticketRoomClosed),
+                    style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                  )),
+                ]),
+              ] else
+                Text(
+                  'Connection required to resolve or add photos',
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
             ],
 
             // Approval button for managers
