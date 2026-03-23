@@ -14,4 +14,12 @@ void main() {
     expect(room.isAvailable, true);
     expect(room.isClosed, false);
   });
+
+  test('Room.isOnHold is true for on_hold status', () {
+    final onHoldJson = {...json, 'status': 'on_hold'};
+    final room = Room.fromJson(onHoldJson);
+    expect(room.isOnHold, true);
+    expect(room.isAvailable, false);
+    expect(room.isClosed, false);
+  });
 }

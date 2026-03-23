@@ -1,6 +1,7 @@
 // lib/features/tickets/data/photo_upload_service.dart
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 import 'package:hotel_app/core/supabase/supabase_client.dart';
 import 'package:hotel_app/core/database/sync_queue.dart';
@@ -26,7 +27,7 @@ class PhotoUploadService {
       throw Exception('Photo exceeds 10MB limit');
     }
 
-    final ext = photo.path.split('.').last;
+    final ext = p.extension(photo.path).replaceFirst('.', '');
     final filename = '${const Uuid().v4()}.$ext';
     final storagePath = '$hotelId/$ticketId/$filename';
 

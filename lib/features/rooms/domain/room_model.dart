@@ -20,14 +20,14 @@ class Room {
   });
 
   factory Room.fromJson(Map<String, dynamic> j) => Room(
-    id: j['id'],
-    hotelId: j['hotel_id'],
-    roomNumber: j['room_number'],
-    floor: j['floor'],
-    roomType: j['room_type'],
-    status: j['status'],
-    notes: j['notes'],
-    createdAt: DateTime.parse(j['created_at']),
+    id: j['id'] as String,
+    hotelId: j['hotel_id'] as String,
+    roomNumber: j['room_number'] as String,
+    floor: j['floor'] as int?,
+    roomType: j['room_type'] as String?,
+    status: j['status'] as String,
+    notes: j['notes'] as String?,
+    createdAt: DateTime.parse(j['created_at'] as String),
   );
 
   bool get isAvailable => status == 'available';
