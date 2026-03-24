@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../data/users_repository.dart';
 import '../domain/user_model.dart';
 
@@ -39,7 +40,7 @@ class UsersScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {/* navigate to user form */},
+        onPressed: () => context.push('/users/new'),
         child: const Icon(Icons.person_add),
       ),
     );
