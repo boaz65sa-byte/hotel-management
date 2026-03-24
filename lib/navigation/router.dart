@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hotel_app/core/auth/auth_state.dart';
 import 'package:hotel_app/features/auth/login_screen.dart';
 import 'package:hotel_app/features/home/presentation/home_screen.dart';
+import 'package:hotel_app/features/tickets/presentation/ticket_detail_screen.dart';
+import 'package:hotel_app/features/tickets/presentation/new_ticket_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -22,6 +24,11 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/', builder: (_, __) => const HomeScreen()),
+      GoRoute(path: '/tickets/new', builder: (_, __) => const NewTicketScreen()),
+      GoRoute(
+        path: '/tickets/:id',
+        builder: (_, state) => TicketDetailScreen(ticketId: state.pathParameters['id']!),
+      ),
     ],
   );
 });
