@@ -18,3 +18,7 @@ final myTicketsProvider = FutureProvider<List<Ticket>>((ref) async {
 final deptTicketsProvider = FutureProvider.family<List<Ticket>, String>((ref, dept) async {
   return ref.watch(ticketRepoProvider).fetchForDept(dept);
 });
+
+final roomTicketsProvider = FutureProvider.family<List<Ticket>, String>((ref, roomId) async {
+  return ref.watch(ticketRepoProvider).fetchForRoom(roomId);
+});

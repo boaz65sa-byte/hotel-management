@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hotel_app/core/auth/auth_state.dart';
 import 'package:hotel_app/core/i18n/app_localizations.dart';
 import 'package:hotel_app/features/tickets/domain/ticket_status.dart';
@@ -24,7 +25,7 @@ class RoomsGridScreen extends ConsumerWidget {
           if (role.isManager)
             IconButton(
               icon: const Icon(Icons.settings),
-              onPressed: () {/* navigate to room management */},
+              onPressed: () => context.push('/rooms/manage'),
             ),
         ],
       ),
@@ -55,7 +56,7 @@ class RoomsGridScreen extends ConsumerWidget {
                     itemCount: rooms.length,
                     itemBuilder: (_, i) => RoomTile(
                       room: rooms[i],
-                      onTap: () {/* show room tickets */},
+                      onTap: () => context.push('/rooms/${rooms[i].id}'),
                     ),
                   ),
                 ],

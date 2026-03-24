@@ -16,6 +16,15 @@ class TicketRepository {
     claimer:users!tickets_claimed_by_fkey(full_name)
   ''';
 
+  Future<List<Ticket>> fetchForRoom(String roomId) async {
+    final res = await supabase
+      .from('tickets')
+      .select(_select)
+      .eq('room_id', roomId)
+      .order('created_at', ascending: false);
+    return (res as List).map((j) => Ticket.fromJson(j as Map<String, dynamic>)).toList();
+  }
+
   Future<List<Ticket>> fetchForDept(String dept) async {
     final res = await supabase
       .from('tickets')
