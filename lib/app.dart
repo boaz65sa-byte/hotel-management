@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hotel_app/core/i18n/app_localizations.dart';
 import 'package:hotel_app/core/i18n/locale_provider.dart';
+import 'package:hotel_app/core/sync/sync_worker.dart';
 import 'package:hotel_app/navigation/router.dart';
 
 class HotelApp extends ConsumerWidget {
@@ -13,6 +14,7 @@ class HotelApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(localeProvider);
     final router = ref.watch(routerProvider);
+    ref.watch(syncWorkerProvider); // start sync worker
 
     return MaterialApp.router(
       routerConfig: router,
