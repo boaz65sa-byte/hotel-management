@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { revalidatePath } from 'next/cache'
 
 export default async function UsersPage({
   searchParams,
@@ -49,6 +50,7 @@ export default async function UsersPage({
                     const id = fd.get('id') as string
                     const active = fd.get('active') === 'true'
                     await supabaseAdmin.from('users').update({ is_active: !active }).eq('id', id)
+                    revalidatePath('/dashboard/users')
                   }}>
                     <input type="hidden" name="id" value={user.id} />
                     <input type="hidden" name="active" value={String(user.is_active)} />
