@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { revalidatePath } from 'next/cache'
+import Link from 'next/link'
 
 export default async function UsersPage({
   searchParams,
@@ -19,7 +20,13 @@ export default async function UsersPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">All Users ({users?.length ?? 0})</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">All Users ({users?.length ?? 0})</h1>
+        <Link href="/dashboard/users/new"
+          className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700">
+          + Create User
+        </Link>
+      </div>
       <div className="bg-white rounded-xl border overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
@@ -44,7 +51,9 @@ export default async function UsersPage({
                     {user.is_active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 flex items-center gap-3">
+                  <Link href={`/dashboard/users/${user.id}`}
+                    className="text-sm text-blue-600 hover:underline">Edit</Link>
                   <form action={async (fd: FormData) => {
                     'use server'
                     const id = fd.get('id') as string
@@ -54,7 +63,7 @@ export default async function UsersPage({
                   }}>
                     <input type="hidden" name="id" value={user.id} />
                     <input type="hidden" name="active" value={String(user.is_active)} />
-                    <button type="submit" className="text-sm text-blue-600 hover:underline">
+                    <button type="submit" className="text-sm text-gray-500 hover:underline">
                       {user.is_active ? 'Deactivate' : 'Activate'}
                     </button>
                   </form>
