@@ -26,15 +26,10 @@ export default function LoginPage() {
       if (error) throw error
 
       if (data.session) {
-        const { data: factors } = await supabase.auth.mfa.listFactors()
-        if (!factors?.totp?.length) {
-          // MFA not enrolled — sign them out and show error
-          await supabase.auth.signOut()
-          setError('MFA is required. Please enroll TOTP via Supabase dashboard first.')
-          setLoading(false)
-          return
-        }
-        setStep('mfa')
+        // Store tokens in cookies for server-side auth
+        document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=3600; SameSite=Lax`
+        document.cookie = `sb-refresh-token=${data.session.refresh_token}; path=/; max-age=86400; SameSite=Lax`
+        router.push('/dashboard')
       }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'An error occurred')
