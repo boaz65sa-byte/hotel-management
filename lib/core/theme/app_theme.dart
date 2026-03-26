@@ -1,46 +1,74 @@
 // lib/core/theme/app_theme.dart
 import 'package:flutter/material.dart';
 
-class HotelTheme {
-  final Color primary;
-  final Color secondary;
-  final Color accent;
-  final String? logoUrl;
+class AppTheme {
+  AppTheme._();
 
-  const HotelTheme({
-    required this.primary,
-    required this.secondary,
-    required this.accent,
-    this.logoUrl,
-  });
+  static ThemeData forHotel(String theme) {
+    switch (theme) {
+      case 'luxury':
+        return _luxuryTheme;
+      default:
+        return _cleanBlueTheme;
+    }
+  }
 
-  static const HotelTheme defaultTheme = HotelTheme(
-    primary: Color(0xFF1976D2),
-    secondary: Color(0xFF424242),
-    accent: Color(0xFFFF6F00),
+  static final ThemeData _cleanBlueTheme = ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.light,
+    scaffoldBackgroundColor: const Color(0xFFF0F4FF),
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: const Color(0xFF1E40AF),
+      brightness: Brightness.light,
+    ).copyWith(
+      primary: const Color(0xFF1E40AF),
+      secondary: const Color(0xFF3B82F6),
+      surface: Colors.white,
+    ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Color(0xFF1E40AF),
+      foregroundColor: Colors.white,
+      elevation: 0,
+    ),
+    cardTheme: CardTheme(
+      color: Colors.white,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+    ),
+    navigationBarTheme: const NavigationBarThemeData(
+      backgroundColor: Colors.white,
+      indicatorColor: Color(0xFFDBEAFE),
+    ),
   );
 
-  factory HotelTheme.fromJson(Map<String, dynamic> json, {String? logoUrl}) {
-    return HotelTheme(
-      primary: Color(int.parse((json['primary'] as String).replaceFirst('#', '0xFF'))),
-      secondary: Color(int.parse((json['secondary'] as String).replaceFirst('#', '0xFF'))),
-      accent: Color(int.parse((json['accent'] as String).replaceFirst('#', '0xFF'))),
-      logoUrl: logoUrl,
-    );
-  }
-
-  ThemeData toThemeData({bool isRtl = false}) {
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primary,
-        secondary: secondary,
-        tertiary: accent,
+  static final ThemeData _luxuryTheme = ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.dark,
+    scaffoldBackgroundColor: const Color(0xFF1A1A2E),
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: const Color(0xFFE4B800),
+      brightness: Brightness.dark,
+    ).copyWith(
+      primary: const Color(0xFFE4B800),
+      secondary: const Color(0xFFFFD700),
+      surface: const Color(0xFF16213E),
+    ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Color(0xFF1A1A2E),
+      foregroundColor: Color(0xFFE4B800),
+      elevation: 0,
+    ),
+    cardTheme: CardTheme(
+      color: const Color(0xFF16213E),
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: Color(0x40E4B800)),
       ),
-      appBarTheme: AppBarTheme(
-        backgroundColor: primary,
-        foregroundColor: Colors.white,
-      ),
-    );
-  }
+    ),
+    navigationBarTheme: const NavigationBarThemeData(
+      backgroundColor: Color(0xFF16213E),
+      indicatorColor: Color(0x30E4B800),
+    ),
+  );
 }
