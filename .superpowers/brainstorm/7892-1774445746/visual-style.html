@@ -1,0 +1,132 @@
+<h2>איזה סגנון ויזואלי?</h2>
+<p class="subtitle">בחר את הכיוון העיצובי של האפליקציה</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="luxury" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);padding:20px;min-height:160px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="color:#e4b800;font-weight:bold;font-size:16px">🏨 Grand Hotel</span>
+        <span style="color:#e4b800;font-size:12px">14:32</span>
+      </div>
+      <div style="background:rgba(228,184,0,0.15);border:1px solid #e4b800;border-radius:10px;padding:12px">
+        <div style="color:#e4b800;font-size:11px;font-weight:bold">קריאה דחופה</div>
+        <div style="color:white;font-size:14px;margin-top:4px">חדר 302 — מזגן לא עובד</div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <span style="background:#e4b800;color:#1a1a2e;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:bold">📸</span>
+          <span style="background:#e4b800;color:#1a1a2e;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:bold">▶ התחל</span>
+          <span style="background:rgba(255,255,255,0.1);color:white;padding:3px 10px;border-radius:20px;font-size:11px">✓ סגור</span>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:8px;display:flex;justify-content:space-between">
+        <span style="color:#aaa;font-size:11px">פתוח: 45 דק'</span>
+        <span style="color:#e4b800;font-size:11px">● בטיפול</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Luxury Dark</h3>
+      <p>כהה + זהב. מראה יוקרתי ומקצועי. מתאים למלונות 4-5 כוכבים.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="clean-blue" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f0f4ff;padding:20px;min-height:160px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="color:#1e40af;font-weight:bold;font-size:16px">🏨 ניהול מלון</span>
+        <span style="color:#6b7280;font-size:12px">14:32</span>
+      </div>
+      <div style="background:white;border-radius:12px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#dc2626;font-size:11px;font-weight:bold;background:#fee2e2;padding:2px 8px;border-radius:10px">⚡ דחוף</span>
+          <span style="color:#6b7280;font-size:11px">302</span>
+        </div>
+        <div style="color:#111;font-size:14px;margin-top:6px;font-weight:500">מזגן לא עובד</div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <span style="background:#dbeafe;color:#1d4ed8;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500">📸 תמונה</span>
+          <span style="background:#1e40af;color:white;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500">▶ התחל</span>
+        </div>
+      </div>
+      <div style="background:white;border-radius:8px;padding:8px;display:flex;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+        <span style="color:#6b7280;font-size:11px">45 דקות פתוח</span>
+        <span style="color:#2563eb;font-size:11px;font-weight:500">בטיפול ←</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Clean Blue</h3>
+      <p>לבן ונקי עם כחול. ברור, מהיר לקריאה, מתאים לכל סוגי מלון.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="vibrant" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:20px;min-height:160px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="color:white;font-weight:bold;font-size:16px">🏨 Grand Hotel</span>
+        <div style="background:rgba(255,255,255,0.2);border-radius:20px;padding:2px 10px">
+          <span style="color:white;font-size:12px">3 פתוחות</span>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);border-radius:14px;padding:12px;border:1px solid rgba(255,255,255,0.2)">
+        <div style="color:#ffd700;font-size:11px;font-weight:bold">⚡ URGENT</div>
+        <div style="color:white;font-size:14px;margin-top:4px;font-weight:500">חדר 302 — מזגן</div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <span style="background:rgba(255,255,255,0.25);color:white;padding:4px 12px;border-radius:20px;font-size:11px">📸</span>
+          <span style="background:white;color:#764ba2;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:bold">▶ התחל</span>
+          <span style="background:rgba(255,255,255,0.15);color:white;padding:4px 12px;border-radius:20px;font-size:11px">✓</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1;background:rgba(255,255,255,0.1);border-radius:8px;padding:6px;text-align:center">
+          <div style="color:white;font-size:18px;font-weight:bold">12</div>
+          <div style="color:rgba(255,255,255,0.7);font-size:10px">פתוחות</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,0.1);border-radius:8px;padding:6px;text-align:center">
+          <div style="color:#4ade80;font-size:18px;font-weight:bold">8</div>
+          <div style="color:rgba(255,255,255,0.7);font-size:10px">נסגרו היום</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,0.1);border-radius:8px;padding:6px;text-align:center">
+          <div style="color:#fbbf24;font-size:18px;font-weight:bold">2</div>
+          <div style="color:rgba(255,255,255,0.7);font-size:10px">דחופות</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Vibrant Purple</h3>
+      <p>סגול + גרדיאנט. מודרני, צעיר, בולט. גם KPIs בראש המסך.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="warm-ops" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fffbf5;padding:20px;min-height:160px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="color:#92400e;font-weight:bold;font-size:16px">🏨 Grand Hotel</span>
+        <span style="background:#fef3c7;color:#92400e;padding:2px 10px;border-radius:20px;font-size:12px">משמרת בוקר</span>
+      </div>
+      <div style="background:white;border-radius:12px;padding:12px;border-right:4px solid #f97316;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#f97316;font-size:11px;font-weight:bold">🔴 דחוף</span>
+          <span style="color:#9ca3af;font-size:11px">חדר 302</span>
+        </div>
+        <div style="color:#1f2937;font-size:14px;margin-top:4px;font-weight:600">מזגן לא עובד</div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <span style="background:#fff7ed;color:#ea580c;padding:4px 12px;border-radius:20px;font-size:11px;border:1px solid #fed7aa">📸 לפני</span>
+          <span style="background:#f97316;color:white;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:bold">▶ קח אחריות</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <div style="flex:1;background:#fef3c7;border-radius:8px;padding:6px;text-align:center">
+          <div style="color:#92400e;font-size:16px;font-weight:bold">45 דק'</div>
+          <div style="color:#a16207;font-size:10px">זמן המתנה</div>
+        </div>
+        <div style="flex:1;background:#dcfce7;border-radius:8px;padding:6px;text-align:center">
+          <div style="color:#166534;font-size:16px;font-weight:bold">SLA ✓</div>
+          <div style="color:#15803d;font-size:10px">בזמן</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Warm Operations</h3>
+      <p>כתום + לבן. חם, ידידותי, מדגיש SLA וזמנים. מרגיש "מבצעי".</p>
+    </div>
+  </div>
+
+</div>

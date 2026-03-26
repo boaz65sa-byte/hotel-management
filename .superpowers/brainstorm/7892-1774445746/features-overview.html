@@ -1,0 +1,95 @@
+<h2>מה בונים קודם?</h2>
+<p class="subtitle">בחר את הפיצ'רים שהכי חשובים לך — ניתן לבחור כמה שרוצים</p>
+
+<div class="options" data-multiselect>
+
+  <div class="option" data-choice="proof-of-work" onclick="toggleSelect(this)">
+    <div class="letter">📸</div>
+    <div class="content">
+      <h3>Proof of Work — לפני ואחרי</h3>
+      <p>צילום חובה לפני פתיחת קריאה + צילום אחרי לפני סגירה. הוכחת עבודה מלאה. בלי תמונה — לא אפשר לסגור.</p>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <span style="background:#e3f2fd;color:#1565c0;padding:2px 8px;border-radius:12px;font-size:12px">DB schema</span>
+        <span style="background:#e3f2fd;color:#1565c0;padding:2px 8px;border-radius:12px;font-size:12px">Riverpod logic</span>
+        <span style="background:#e3f2fd;color:#1565c0;padding:2px 8px;border-radius:12px;font-size:12px">Flutter UI</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="time-tracking" onclick="toggleSelect(this)">
+    <div class="letter">⏱️</div>
+    <div class="content">
+      <h3>Time Tracking & SLA</h3>
+      <p>מדידת זמן תגובה + זמן פתרון לכל קריאה. דוח SLA למנהלים: מי איחר, מה הממוצע, איפה הצוואר בקבוק.</p>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:12px;font-size:12px">opened_at / accepted_at / resolved_at</span>
+        <span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:12px;font-size:12px">SQL analytics</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="quick-actions" onclick="toggleSelect(this)">
+    <div class="letter">⚡</div>
+    <div class="content">
+      <h3>Quick Actions — פעולות מהירות</h3>
+      <p>כפתורים על הכרטיסייה בלי להיכנס למסך. [📸 תמונה] [▶️ התחל] [✅ סגור] — פחות חיכוך, יותר מהירות לצוות.</p>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <span style="background:#fff3e0;color:#e65100;padding:2px 8px;border-radius:12px;font-size:12px">UX redesign</span>
+        <span style="background:#fff3e0;color:#e65100;padding:2px 8px;border-radius:12px;font-size:12px">Flutter cards</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="checklists" onclick="toggleSelect(this)">
+    <div class="letter">✅</div>
+    <div class="content">
+      <h3>Audits & Checklists — ביקורות ורשימות</h3>
+      <p>תבניות ביקורת לחדרים: רשימת בדיקה לניקיון רגיל vs VIP, אחזקה שוטפת, ביקורת בטיחות. כל פריט עם סטטוס + חתימה.</p>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <span style="background:#fce4ec;color:#880e4f;padding:2px 8px;border-radius:12px;font-size:12px">טבלאות חדשות</span>
+        <span style="background:#fce4ec;color:#880e4f;padding:2px 8px;border-radius:12px;font-size:12px">Flutter checklist UI</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="tasks-automation" onclick="toggleSelect(this)">
+    <div class="letter">🤖</div>
+    <div class="content">
+      <h3>Tasks & Automations — משימות אוטומטיות</h3>
+      <p>תזמון חוזר: "כל 3 חודשים — החלפת פילטר מזגן חדר 201". יצירת קריאות אוטומטית לפי לוח זמנים. הקצאה חכמה לפי זמינות.</p>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <span style="background:#ede7f6;color:#4527a0;padding:2px 8px;border-radius:12px;font-size:12px">Supabase cron</span>
+        <span style="background:#ede7f6;color:#4527a0;padding:2px 8px;border-radius:12px;font-size:12px">scheduling engine</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="mobile-teams" onclick="toggleSelect(this)">
+    <div class="letter">📱</div>
+    <div class="content">
+      <h3>Mobile Apps — אפליקציות לצוותים</h3>
+      <p>ממשק ייעודי לכל צוות: משק בית רואה רק חדרים לניקיון, אחזקה רואה רק תקלות, קבלה רואה מצב חדרים בזמן אמת.</p>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <span style="background:#e0f2f1;color:#004d40;padding:2px 8px;border-radius:12px;font-size:12px">role-based views</span>
+        <span style="background:#e0f2f1;color:#004d40;padding:2px 8px;border-radius:12px;font-size:12px">Housekeeping module</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="pms-webhooks" onclick="toggleSelect(this)">
+    <div class="letter">🔗</div>
+    <div class="content">
+      <h3>PMS Integration — Optima / Opera</h3>
+      <p>Webhooks לקבלת check-in/check-out מהמערכת של המלון. קריאת ניקיון אוטומטית ביציאה. סנכרון סטטוס חדר.</p>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <span style="background:#e1f5fe;color:#01579b;padding:2px 8px;border-radius:12px;font-size:12px">Edge Functions</span>
+        <span style="background:#e1f5fe;color:#01579b;padding:2px 8px;border-radius:12px;font-size:12px">webhook API</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:24px;padding:16px;background:#f5f5f5;border-radius:8px;font-size:14px;color:#555">
+  💡 <strong>המלצה:</strong> להתחיל עם Proof of Work + Quick Actions + Checklists — הם הכי גלויים לעובדים ומיידית משפרים את היומיום.
+</div>

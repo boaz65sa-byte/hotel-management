@@ -1,0 +1,146 @@
+<h2>תכנית הארכיטקטורה המלאה</h2>
+<p class="subtitle">גישה א — הרחבה הדרגתית. 8 שלבים לפי עדיפות.</p>
+
+<!-- PHASE ORDER -->
+<div class="section">
+<h3>📋 סדר הביצוע</h3>
+<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+
+  <div style="display:flex;align-items:center;gap:12px;background:#f0f4ff;border-radius:10px;padding:10px 14px">
+    <div style="background:#1e40af;color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0">1</div>
+    <div><strong>ערכות עיצוב (Themes)</strong> — Luxury Dark + Clean Blue לפי מלון. שינוי מיידי, נראה מיד.</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;background:#f0f4ff;border-radius:10px;padding:10px 14px">
+    <div style="background:#1e40af;color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0">2</div>
+    <div><strong>מסכי בית לפי תפקיד</strong> — כל צוות רואה רק את שלו. Housekeeping / Maintenance / Reception / Manager.</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;background:#f0f4ff;border-radius:10px;padding:10px 14px">
+    <div style="background:#1e40af;color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0">3</div>
+    <div><strong>Quick Actions</strong> — כפתורים על כרטיסיית קריאה: [📸 לפני] [▶ התחל] [✅ סגור]</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;background:#f0f4ff;border-radius:10px;padding:10px 14px">
+    <div style="background:#1e40af;color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0">4</div>
+    <div><strong>Proof of Work</strong> — תמונה לפני פתיחה + תמונה אחרי חובה לסגירה. שינוי DB + Riverpod logic.</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;background:#f0f4ff;border-radius:10px;padding:10px 14px">
+    <div style="background:#1e40af;color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0">5</div>
+    <div><strong>Time Tracking + SLA</strong> — opened_at / accepted_at / resolved_at. דוח SLA למנהלים.</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;background:#f0f4ff;border-radius:10px;padding:10px 14px">
+    <div style="background:#1e40af;color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0">6</div>
+    <div><strong>Checklists</strong> — תבניות Super Admin, מופעים לחדרים, צ'קליסט ניקיון רגיל / VIP / אחזקה.</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;background:#f0f4ff;border-radius:10px;padding:10px 14px">
+    <div style="background:#1e40af;color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0">7</div>
+    <div><strong>Tasks & Automations</strong> — משימות חוזרות, Supabase pg_cron, הקצאה אוטומטית.</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;background:#f0f4ff;border-radius:10px;padding:10px 14px">
+    <div style="background:#94a3b8;color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0">8</div>
+    <div><strong>PMS Webhooks</strong> — Optima/Opera integration. check-in/out → ניקיון אוטומטי. (roadmap)</div>
+  </div>
+
+</div>
+</div>
+
+<!-- DB CHANGES -->
+<div class="section">
+<h3>🗄️ שינויי DB (Supabase)</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
+
+  <div style="background:#1e1e2e;border-radius:10px;padding:14px;font-family:monospace;font-size:11px;color:#a9b1d6">
+    <div style="color:#7dcfff;margin-bottom:6px">-- tickets (הרחבה)</div>
+    <div style="color:#9ece6a">photo_before_url</div> <div style="color:#bb9af7">text</div>
+    <div style="color:#9ece6a">photo_after_url</div> <div style="color:#bb9af7">text</div>
+    <div style="color:#9ece6a">accepted_at</div> <div style="color:#bb9af7">timestamptz</div>
+    <div style="color:#9ece6a">resolved_at</div> <div style="color:#bb9af7">timestamptz</div>
+    <div style="color:#9ece6a">sla_minutes</div> <div style="color:#bb9af7">int (60/120/240)</div>
+  </div>
+
+  <div style="background:#1e1e2e;border-radius:10px;padding:14px;font-family:monospace;font-size:11px;color:#a9b1d6">
+    <div style="color:#7dcfff;margin-bottom:6px">-- hotels (הרחבה)</div>
+    <div style="color:#9ece6a">theme</div> <div style="color:#bb9af7">text ('luxury'|'clean')</div>
+    <br/>
+    <div style="color:#7dcfff;margin-bottom:6px">-- checklist_templates (חדש)</div>
+    <div style="color:#9ece6a">id, name, type</div>
+    <div style="color:#bb9af7">('housekeeping'|'maintenance')</div>
+    <div style="color:#9ece6a">is_vip</div> <div style="color:#bb9af7">boolean</div>
+  </div>
+
+  <div style="background:#1e1e2e;border-radius:10px;padding:14px;font-family:monospace;font-size:11px;color:#a9b1d6">
+    <div style="color:#7dcfff;margin-bottom:6px">-- checklist_items (חדש)</div>
+    <div style="color:#9ece6a">template_id, order_index</div>
+    <div style="color:#9ece6a">title_he, title_en</div>
+    <div style="color:#9ece6a">requires_photo</div> <div style="color:#bb9af7">boolean</div>
+  </div>
+
+  <div style="background:#1e1e2e;border-radius:10px;padding:14px;font-family:monospace;font-size:11px;color:#a9b1d6">
+    <div style="color:#7dcfff;margin-bottom:6px">-- scheduled_tasks (חדש)</div>
+    <div style="color:#9ece6a">hotel_id, room_id</div>
+    <div style="color:#9ece6a">title, recurrence</div>
+    <div style="color:#bb9af7">('daily'|'weekly'|'monthly')</div>
+    <div style="color:#9ece6a">next_run_at</div> <div style="color:#bb9af7">timestamptz</div>
+    <div style="color:#9ece6a">assigned_role</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ROLE NAVIGATION -->
+<div class="section">
+<h3>📱 ניווט לפי תפקיד</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+
+  <div style="border:2px solid #f9a825;border-radius:10px;padding:12px">
+    <div style="color:#f9a825;font-weight:bold;margin-bottom:6px">🧹 Housekeeping</div>
+    <div style="font-size:12px;color:#555;line-height:1.8">
+      🏠 חדרים לניקיון היום<br/>
+      ✅ צ'קליסט פעיל<br/>
+      📸 Proof of work<br/>
+      👤 פרופיל
+    </div>
+  </div>
+
+  <div style="border:2px solid #ef5350;border-radius:10px;padding:12px">
+    <div style="color:#ef5350;font-weight:bold;margin-bottom:6px">🔧 Maintenance</div>
+    <div style="font-size:12px;color:#555;line-height:1.8">
+      ⚡ תור קריאות (לפי עדיפות)<br/>
+      ⏱️ SLA timer חי<br/>
+      📸 לפני / אחרי<br/>
+      👤 פרופיל
+    </div>
+  </div>
+
+  <div style="border:2px solid #42a5f5;border-radius:10px;padding:12px">
+    <div style="color:#1e40af;font-weight:bold;margin-bottom:6px">🛎️ Reception</div>
+    <div style="font-size:12px;color:#555;line-height:1.8">
+      🏨 גריד חדרים — סטטוס חי<br/>
+      ➕ פתיחת קריאה מהירה<br/>
+      🎫 קריאות שפתחתי<br/>
+      👤 פרופיל
+    </div>
+  </div>
+
+  <div style="border:2px solid #66bb6a;border-radius:10px;padding:12px">
+    <div style="color:#2e7d32;font-weight:bold;margin-bottom:6px">👔 מנהל מלון</div>
+    <div style="font-size:12px;color:#555;line-height:1.8">
+      📊 דשבורד + KPIs<br/>
+      📈 דוח SLA<br/>
+      👥 ניהול צוות<br/>
+      ✅ ניהול צ'קליסטים<br/>
+      🤖 אוטומציות
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div style="background:#dcfce7;border-radius:10px;padding:14px;font-size:13px;margin-top:8px">
+  ✅ <strong>נראה נכון?</strong> אם מאשר — כותב מסמך עיצוב מלא ומתחיל תוכנית עבודה מפורטת.
+</div>
