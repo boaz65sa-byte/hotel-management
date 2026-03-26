@@ -19,7 +19,7 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
       subscription_plan: fd.get('subscription_plan') as string,
       default_sla_hours: Number(fd.get('default_sla_hours')),
       default_language:  fd.get('default_language') as string,
-      theme_colors:      JSON.parse(fd.get('theme_colors') as string),
+      theme:             (fd.get('theme') as string) || 'clean_blue',
       is_active:         fd.get('is_active') === 'on',
     }).eq('id', id)
     redirect('/dashboard/hotels')
@@ -35,7 +35,7 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
         default_sla_hours: hotel.default_sla_hours,
         default_language: hotel.default_language,
         is_active: hotel.is_active,
-        theme_colors: hotel.theme_colors,
+        theme: hotel.theme,
       }} action={updateHotel} />
     </div>
   )

@@ -1,10 +1,11 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import Link from 'next/link'
+import { ThemePicker } from '@/components/theme-picker'
 
 export default async function HotelsPage() {
   const { data: hotels } = await supabaseAdmin
     .from('hotels')
-    .select('id, name, subscription_plan, is_active, created_at')
+    .select('id, name, subscription_plan, is_active, created_at, theme')
     .order('name')
 
   return (
@@ -20,7 +21,7 @@ export default async function HotelsPage() {
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
-              {['Name','Plan','Status','Created','Actions'].map(h => (
+              {['Name', 'Plan', 'Status', 'Theme', 'Created', 'Actions'].map(h => (
                 <th key={h} className="px-4 py-3 text-left text-sm font-medium text-gray-500">{h}</th>
               ))}
             </tr>
@@ -39,6 +40,9 @@ export default async function HotelsPage() {
                     ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                     {hotel.is_active ? 'Active' : 'Inactive'}
                   </span>
+                </td>
+                <td className="px-4 py-3">
+                  <ThemePicker hotel={{ id: hotel.id, theme: hotel.theme }} />
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-500">
                   {new Date(hotel.created_at).toLocaleDateString()}

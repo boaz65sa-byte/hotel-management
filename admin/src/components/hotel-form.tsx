@@ -1,11 +1,10 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ThemePicker } from './theme-picker'
 
 type Hotel = { id?: string; name: string; subscription_plan: string
                default_sla_hours: number; default_language: string
-               is_active: boolean; theme_colors: { primary: string; secondary: string; accent: string } }
+               is_active: boolean; theme?: string | null }
 
 export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormData) => Promise<void> }) {
   const [data, setData] = useState(hotel)
@@ -14,7 +13,6 @@ export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormDa
   return (
     <form action={action} className="space-y-6 bg-white rounded-xl p-6 border max-w-2xl">
       <input type="hidden" name="id" value={data.id ?? ''} />
-      <input type="hidden" name="theme_colors" value={JSON.stringify(data.theme_colors)} />
 
       <div>
         <label className="block text-sm font-medium mb-1">Hotel Name *</label>
@@ -52,9 +50,32 @@ export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormDa
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">Theme Colors</label>
-        <ThemePicker value={data.theme_colors}
-          onChange={colors => setData({...data, theme_colors: colors})} />
+        <label className="block text-sm font-medium mb-2">ערכת עיצוב</label>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setData({...data, theme: 'clean_blue'})}
+            className={`px-3 py-1 rounded-md text-xs font-medium border transition-all ${
+              !data.theme || data.theme === 'clean_blue'
+                ? 'border-blue-600 bg-blue-50 text-blue-700'
+                : 'border-gray-200 text-gray-500 hover:border-blue-300'
+            }`}
+          >
+            ☀️ Clean Blue
+          </button>
+          <button
+            type="button"
+            onClick={() => setData({...data, theme: 'luxury'})}
+            className={`px-3 py-1 rounded-md text-xs font-medium border transition-all ${
+              data.theme === 'luxury'
+                ? 'border-yellow-500 bg-yellow-50 text-yellow-700'
+                : 'border-gray-200 text-gray-500 hover:border-yellow-300'
+            }`}
+          >
+            🌙 Luxury
+          </button>
+        </div>
+        <input type="hidden" name="theme" value={data.theme ?? 'clean_blue'} />
       </div>
 
       <div className="flex items-center gap-3">
