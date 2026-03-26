@@ -1,6 +1,6 @@
 # Hotel Management App — Pro Features Design
 **Date:** 2026-03-25
-**Status:** Approved
+**Status:** Approved (v3 — final)
 **Approach:** A — Incremental extension of existing codebase
 
 ---
@@ -11,153 +11,320 @@ Expanding the hotel management app (Flutter/Supabase/Next.js) from a basic ticke
 
 ---
 
-## Users & Access Levels
+## Users & Role Mapping
 
-| Role | Access |
-|------|--------|
-| Housekeeping | Only today's cleaning tasks + checklists + proof of work |
-| Maintenance | Only repair queue by priority + SLA timer + proof of work |
-| Reception | Room status grid + quick ticket creation |
-| Hotel Manager | Full access — dashboard, SLA reports, team management, automations |
-| Super Admin (app owner) | All hotels + checklist template management |
+11 existing `UserRole` values mapped to 4 home screens:
+
+| UserRole (existing) | Home Screen | Notes |
+|---|---|---|
+| `receptionist`, `deputyReception`, `receptionManager` | `ReceptionHomeScreen` | Full access |
+| `maintenanceTech`, `repairman`, `maintenanceManager` | `MaintenanceHomeScreen` | Full access |
+| `housekeepingManager` | `HousekeepingHomeScreen` | Covers all housekeeping staff — no separate worker role exists in enum |
+| `securityManager`, `securityGuard` | `ReceptionHomeScreen` | Read-only: widget-level only, action buttons hidden |
+| `ceo`, `superAdmin` | `ManagerHomeScreen` | Full access |
+
+**`isManager`** = `ceo | superAdmin | receptionManager | maintenanceManager | housekeepingManager | securityManager`
+
+**Security read-only:** Enforced at widget level — action buttons hidden via `role.canClaimAndUpdate` guard (already exists). No new RLS needed since security roles cannot claim/update tickets by existing logic.
 
 ---
 
 ## Themes
 
-Two design themes, selectable per hotel via admin panel:
+Two design themes, selectable per hotel via admin panel. Stored as `hotels.theme TEXT ('luxury' | 'clean_blue')`.
+
+The new system **replaces** the existing `HotelTheme.fromJson()` hex-color approach with two named themes:
 
 | Theme | Style | Target |
 |-------|-------|--------|
-| **Luxury Dark** | Dark background + gold (#e4b800) | 4-5 star hotels |
+| **Luxury Dark** | Dark (#1a1a2e) + gold (#e4b800) | 4-5 star hotels |
 | **Clean Blue** | White + blue (#1e40af) | All hotel types |
 
-Stored in `hotels.theme` ('luxury' | 'clean_blue'). Applied at login via `AppTheme.fromHotelTheme()`.
+`AppTheme.forHotel(String theme)` returns a `ThemeData`. Called once at login, stored in `themeProvider`.
 
 ---
 
-## Implementation Phases (Priority Order)
+## Implementation Phases
 
 ### Phase 1 — Themes
-- Add `theme` field to `hotels` table
-- Implement `LuxuryTheme` + `CleanBlueTheme` in `app_theme.dart`
-- Theme switcher in Admin Panel hotel settings
-- Load theme on login, apply to `MaterialApp`
+**DB migration:**
+```sql
+ALTER TABLE hotels ADD COLUMN theme TEXT NOT NULL DEFAULT 'clean_blue'
+  CHECK (theme IN ('luxury', 'clean_blue'));
+```
+- Implement `AppTheme.forHotel()` with two complete `ThemeData` objects
+- Theme picker in Admin Panel `/dashboard/hotels` (replaces existing color pickers)
+- Load `hotels.theme` at login, apply globally
+
+---
 
 ### Phase 2 — Role-Based Home Screens
-- `HousekeepingHomeScreen` — today's rooms to clean, active checklist, proof of work
-- `MaintenanceHomeScreen` — ticket queue by priority, live SLA timer
-- `ReceptionHomeScreen` — room grid with live status, quick ticket creation
-- `ManagerHomeScreen` — KPI dashboard, SLA report, team management, automations
-- Router switches home screen based on `role` from JWT claims
+- `HomeScreen` reads `UserRole` from JWT → routes to correct home screen
+- Four new screens (see role mapping table above)
+- Each screen has its own `providers/` directory
+
+**File structure:**
+```
+features/home/presentation/
+  home_screen.dart              ← role router
+  housekeeping_home.dart
+  maintenance_home.dart
+  reception_home.dart
+  manager_home.dart
+features/home/providers/
+  housekeeping_home_provider.dart   ← today's rooms query
+  maintenance_home_provider.dart    ← ticket queue + SLA state
+  manager_home_provider.dart        ← KPIs + SLA summary
+```
+
+**Rooms — housekeeping status:**
+Add `dirty | cleaning | clean` statuses to rooms table:
+```sql
+ALTER TABLE rooms ADD COLUMN housekeeping_status TEXT
+  NOT NULL DEFAULT 'clean'
+  CHECK (housekeeping_status IN ('dirty', 'cleaning', 'clean'));
+```
+- Set to `dirty` automatically on guest check-out (Phase 8 PMS, or manually by reception)
+- Set to `cleaning` when housekeeping claims the checklist instance
+- Set to `clean` when checklist instance is completed
+
+**Reception quick ticket creation:**
+- Tapping a room in the grid opens a bottom sheet with pre-filled room number
+- One-tap priority buttons (low / normal / high / urgent)
+- Department auto-selected based on ticket type
+- Submit with single tap — no full-screen navigation required
+
+---
 
 ### Phase 3 — Quick Actions on Ticket Cards
-- Redesign `TicketCard` widget with inline action buttons
-- `[📸 Before]` → opens camera directly
-- `[▶ Start]` → claims ticket + sets `accepted_at`
-- `[✅ Close]` → validates photo_after_url exists, then resolves
-- No need to open full ticket detail for common actions
+> **Dependency:** Requires `accepted_at` column from Phase 5 DB migration.
+> Implement Phase 5 DB migration first, then build Phase 3 UI.
 
-### Phase 4 — Proof of Work (Before & After Photos)
-**DB changes:**
+Redesign `TicketCard` widget:
+- `[📸 לפני]` → opens camera, uploads to `ticket_photos` table (existing pattern), sets `tickets.photo_before_url = url`
+- `[▶ קח אחריות]` → sets `status = in_progress`, `accepted_at = NOW()`
+- `[✅ סגור]` → validates `photo_after_url != null`, then sets `status = resolved`, `resolved_at = NOW()`
+
+**photo_before_url / photo_after_url** are convenience columns on `tickets` pointing to the primary before/after photo. Full photo history remains in `ticket_photos` table (existing pattern preserved).
+
+---
+
+### Phase 4 — Proof of Work
+**DB migration:**
 ```sql
 ALTER TABLE tickets
   ADD COLUMN photo_before_url TEXT,
   ADD COLUMN photo_after_url  TEXT;
 ```
-**Logic:**
-- `photo_before_url` captured when ticket is opened (optional but encouraged)
-- `photo_after_url` REQUIRED before status can move to `resolved`
-- Riverpod guard: `canResolve = ticket.photo_after_url != null`
-- UI: disabled resolve button with message if no after-photo
+
+**Riverpod guard:**
+```dart
+final canResolveProvider = Provider.family<bool, String>((ref, ticketId) {
+  final ticket = ref.watch(ticketDetailProvider(ticketId)).valueOrNull;
+  return ticket?.photoAfterUrl != null;
+});
+```
+
+**UI enforcement:**
+- "סגור קריאה" button disabled + tooltip "נדרשת תמונה אחרי" when `canResolve = false`
+- Camera icon highlighted in red on ticket card when after-photo is missing and ticket is `in_progress`
+
+---
 
 ### Phase 5 — Time Tracking & SLA
-**DB changes:**
+**DB migration:**
 ```sql
 ALTER TABLE tickets
   ADD COLUMN accepted_at  TIMESTAMPTZ,
-  ADD COLUMN resolved_at  TIMESTAMPTZ,
-  ADD COLUMN sla_minutes  INT DEFAULT 120;
+  ADD COLUMN resolved_at  TIMESTAMPTZ;
+-- sla_deadline already exists — compute it at ticket creation:
+-- sla_deadline = created_at + INTERVAL per priority
 ```
-**Analytics query:**
+
+**SLA computation (on ticket insert trigger):**
+```sql
+CREATE OR REPLACE FUNCTION set_sla_deadline()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+  NEW.sla_deadline := NEW.created_at + CASE NEW.priority
+    WHEN 'urgent'  THEN INTERVAL '60 minutes'
+    WHEN 'high'    THEN INTERVAL '2 hours'
+    WHEN 'normal'  THEN INTERVAL '4 hours'
+    WHEN 'low'     THEN INTERVAL '8 hours'
+    ELSE INTERVAL '4 hours'
+  END;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_set_sla_deadline
+  BEFORE INSERT ON tickets
+  FOR EACH ROW EXECUTE FUNCTION set_sla_deadline();
+```
+
+**SLA analytics query (Edge Function `sla-report`):**
 ```sql
 SELECT
-  AVG(EXTRACT(EPOCH FROM (accepted_at - created_at))/60) AS avg_response_min,
-  AVG(EXTRACT(EPOCH FROM (resolved_at - accepted_at))/60) AS avg_resolve_min,
-  COUNT(*) FILTER (WHERE resolved_at - created_at > (sla_minutes * INTERVAL '1 minute')) AS sla_breaches
+  COUNT(*) AS total,
+  AVG(EXTRACT(EPOCH FROM (accepted_at - created_at))/60)::int AS avg_response_min,
+  AVG(EXTRACT(EPOCH FROM (resolved_at - accepted_at))/60)::int AS avg_resolve_min,
+  COUNT(*) FILTER (WHERE resolved_at > sla_deadline) AS sla_breaches,
+  COUNT(*) FILTER (WHERE resolved_at IS NULL AND NOW() > sla_deadline) AS active_breaches
 FROM tickets
-WHERE hotel_id = $1 AND created_at > NOW() - INTERVAL '30 days';
+WHERE hotel_id = $1
+  AND created_at > NOW() - INTERVAL '30 days';
 ```
-**SLA thresholds by priority:**
-- urgent: 60 min
-- high: 120 min
-- normal: 240 min
-- low: 480 min
+
+---
 
 ### Phase 6 — Checklists
-**New tables:**
+**Scope:** Templates are **global** (created by Super Admin, used by all hotels). No `hotel_id` on templates.
+
+**DB migrations:**
 ```sql
 CREATE TABLE checklist_templates (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  type TEXT CHECK (type IN ('housekeeping', 'maintenance')),
-  is_vip BOOLEAN DEFAULT false,
-  created_by UUID REFERENCES auth.users(id)
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        TEXT NOT NULL,
+  type        TEXT NOT NULL CHECK (type IN ('housekeeping', 'maintenance')),
+  is_vip      BOOLEAN NOT NULL DEFAULT false,
+  created_by  UUID REFERENCES auth.users(id),
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE checklist_items (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  template_id UUID REFERENCES checklist_templates(id) ON DELETE CASCADE,
-  order_index INT NOT NULL,
-  title_he TEXT NOT NULL,
-  title_en TEXT,
-  requires_photo BOOLEAN DEFAULT false
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  template_id   UUID NOT NULL REFERENCES checklist_templates(id) ON DELETE CASCADE,
+  order_index   INT NOT NULL,
+  title_he      TEXT NOT NULL,
+  title_en      TEXT,
+  requires_photo BOOLEAN NOT NULL DEFAULT false,
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE checklist_instances (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  template_id UUID REFERENCES checklist_templates(id),
-  room_id UUID REFERENCES rooms(id),
-  assigned_to UUID REFERENCES auth.users(id),
-  hotel_id UUID REFERENCES hotels(id),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  template_id  UUID NOT NULL REFERENCES checklist_templates(id),
+  room_id      UUID REFERENCES rooms(id),        -- nullable: hotel-level checklists have no room
+  assigned_to  UUID REFERENCES auth.users(id),
+  hotel_id     UUID NOT NULL REFERENCES hotels(id),
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   completed_at TIMESTAMPTZ
 );
 
 CREATE TABLE checklist_instance_items (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  instance_id UUID REFERENCES checklist_instances(id) ON DELETE CASCADE,
-  item_id UUID REFERENCES checklist_items(id),
-  is_done BOOLEAN DEFAULT false,
-  photo_url TEXT,
-  done_at TIMESTAMPTZ
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  instance_id UUID NOT NULL REFERENCES checklist_instances(id) ON DELETE CASCADE,
+  item_id     UUID REFERENCES checklist_items(id) ON DELETE SET NULL, -- SET NULL if template item deleted
+  is_done     BOOLEAN NOT NULL DEFAULT false,
+  photo_url   TEXT,
+  done_at     TIMESTAMPTZ,
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 ```
-**Templates managed by Super Admin only (in Next.js admin panel).**
-Default templates: Standard Clean, VIP Clean, Maintenance Inspection.
+
+**`updated_at` triggers (shared function, applied to all 5 new tables):**
+```sql
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN NEW.updated_at = NOW(); RETURN NEW; END;
+$$;
+
+CREATE TRIGGER trg_updated_at_checklist_templates
+  BEFORE UPDATE ON checklist_templates FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER trg_updated_at_checklist_items
+  BEFORE UPDATE ON checklist_items FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER trg_updated_at_checklist_instances
+  BEFORE UPDATE ON checklist_instances FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER trg_updated_at_checklist_instance_items
+  BEFORE UPDATE ON checklist_instance_items FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER trg_updated_at_scheduled_tasks
+  BEFORE UPDATE ON scheduled_tasks FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+```
+
+**RLS Policies:**
+```sql
+-- checklist_templates: readable by all authenticated, writable by super_admin only
+ALTER TABLE checklist_templates ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "read templates" ON checklist_templates FOR SELECT TO authenticated USING (true);
+CREATE POLICY "write templates" ON checklist_templates FOR ALL
+  USING  ((auth.jwt()->'claims'->>'role') = 'superAdmin')
+  WITH CHECK ((auth.jwt()->'claims'->>'role') = 'superAdmin');
+
+-- checklist_items: same as templates
+ALTER TABLE checklist_items ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "read items" ON checklist_items FOR SELECT TO authenticated USING (true);
+CREATE POLICY "write items" ON checklist_items FOR ALL
+  USING  ((auth.jwt()->'claims'->>'role') = 'superAdmin')
+  WITH CHECK ((auth.jwt()->'claims'->>'role') = 'superAdmin');
+
+-- checklist_instances: scoped to hotel_id
+ALTER TABLE checklist_instances ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "hotel instances" ON checklist_instances FOR ALL
+  USING ((auth.jwt()->'claims'->>'hotel_id')::uuid = hotel_id);
+
+-- checklist_instance_items: via instance's hotel
+ALTER TABLE checklist_instance_items ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "hotel instance items" ON checklist_instance_items FOR ALL
+  USING (EXISTS (
+    SELECT 1 FROM checklist_instances ci
+    WHERE ci.id = instance_id
+      AND (auth.jwt()->'claims'->>'hotel_id')::uuid = ci.hotel_id
+  ));
+```
+
+**Default templates (seeded by Super Admin):**
+1. ניקיון רגיל (8 items, housekeeping)
+2. ניקיון VIP (12 items, housekeeping, is_vip=true)
+3. ביקורת אחזקה (10 items, maintenance)
+
+---
 
 ### Phase 7 — Tasks & Automations
-**New table:**
+**DB migration:**
 ```sql
 CREATE TABLE scheduled_tasks (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  hotel_id UUID REFERENCES hotels(id),
-  room_id UUID REFERENCES rooms(id),
-  title TEXT NOT NULL,
-  description TEXT,
-  recurrence TEXT CHECK (recurrence IN ('daily','weekly','monthly','quarterly')),
-  assigned_role TEXT,
-  next_run_at TIMESTAMPTZ NOT NULL,
-  last_run_at TIMESTAMPTZ,
-  is_active BOOLEAN DEFAULT true
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  hotel_id      UUID NOT NULL REFERENCES hotels(id),
+  room_id       UUID REFERENCES rooms(id),   -- nullable: hotel-level tasks
+  title         TEXT NOT NULL,
+  description   TEXT,
+  recurrence    TEXT NOT NULL CHECK (recurrence IN ('daily','weekly','monthly','quarterly')),
+  assigned_role TEXT NOT NULL,               -- maps to tickets.assigned_dept
+  next_run_at   TIMESTAMPTZ NOT NULL,
+  last_run_at   TIMESTAMPTZ,
+  is_active     BOOLEAN NOT NULL DEFAULT true,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-```
-**Supabase pg_cron job** runs every hour, creates tickets from `scheduled_tasks` where `next_run_at <= NOW()`, then updates `next_run_at` based on `recurrence`.
 
-### Phase 8 — PMS Webhooks (Roadmap)
-- Edge Function `/functions/pms-webhook` receives check-out events
-- Auto-creates housekeeping ticket for vacated room
-- Supports Optima and Opera via configurable webhook format per hotel
+ALTER TABLE scheduled_tasks ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "hotel tasks" ON scheduled_tasks FOR ALL
+  USING ((auth.jwt()->'claims'->>'hotel_id')::uuid = hotel_id
+      OR (auth.jwt()->'claims'->>'role') = 'superAdmin');
+```
+
+**pg_cron job** (runs every hour via Supabase Edge Function `run-scheduled-tasks`):
+1. SELECT all `scheduled_tasks` WHERE `is_active = true` AND `next_run_at <= NOW()`
+2. For each: INSERT into `tickets` with `title`, `hotel_id`, `room_id`, `assigned_dept = assigned_role`, `priority = 'normal'`
+3. UPDATE `scheduled_tasks` SET `last_run_at = NOW()`, `next_run_at = NOW() + recurrence_interval`
+
+`assigned_role` → `tickets.assigned_dept` (existing TEXT field).
+
+---
+
+### Phase 8 — PMS Webhooks (Roadmap — out of scope for this iteration)
+- Edge Function `/functions/pms-webhook`
+- On check-out event: set `rooms.housekeeping_status = 'dirty'`, create housekeeping checklist instance
+- Supports Optima and Opera via per-hotel webhook config
+
+---
+
+## Offline Behavior
+- Checklist item completions queued in `sync_queue` when offline, flushed by `SyncWorker` on reconnect
+- Proof of work photos stored locally, uploaded on reconnect
+- Ticket quick actions (claim, resolve) queued if offline — same pattern as existing ticket operations
 
 ---
 
@@ -167,43 +334,47 @@ CREATE TABLE scheduled_tasks (
 lib/
   core/
     theme/
-      app_theme.dart           ← add LuxuryTheme + CleanBlueTheme
-      theme_provider.dart      ← load from hotel settings
+      app_theme.dart                  ← replace HotelTheme.fromJson() with AppTheme.forHotel()
+      theme_provider.dart             ← load from hotel JWT claim
   features/
-    home/presentation/
-      home_screen.dart         ← role-based router
-      housekeeping_home.dart   ← NEW
-      maintenance_home.dart    ← NEW
-      reception_home.dart      ← NEW
-      manager_home.dart        ← NEW
+    home/
+      presentation/
+        home_screen.dart              ← role router
+        housekeeping_home.dart        ← NEW
+        maintenance_home.dart         ← NEW
+        reception_home.dart           ← NEW
+        manager_home.dart             ← NEW
+      providers/
+        housekeeping_home_provider.dart
+        maintenance_home_provider.dart
+        manager_home_provider.dart
     tickets/presentation/
-      ticket_card.dart         ← add Quick Actions
-      ticket_detail_screen.dart ← proof of work enforcement
-    checklists/                ← NEW feature module
+      ticket_card.dart                ← Quick Actions redesign
+      ticket_detail_screen.dart       ← proof of work enforcement
+    checklists/                       ← NEW module
       data/checklist_repository.dart
       domain/checklist_model.dart
-      presentation/checklist_screen.dart
-      presentation/checklist_item_tile.dart
+      presentation/
+        checklist_screen.dart
+        checklist_item_tile.dart
       providers/checklist_provider.dart
     analytics/presentation/
-      analytics_screen.dart    ← add SLA section
+      analytics_screen.dart           ← add SLA section
 ```
-
----
 
 ## Admin Panel Changes (Next.js)
 
-- `/dashboard/hotels` — add theme picker (Luxury / Clean Blue)
-- `/dashboard/checklists` — NEW: manage checklist templates + items
+- `/dashboard/hotels` — theme picker replaces color picker
+- `/dashboard/checklists` — NEW: manage templates + items (Super Admin only)
 - `/dashboard/automations` — NEW: manage scheduled tasks per hotel
 
 ---
 
 ## Success Criteria
 
-- [ ] Each role sees only their relevant screens on login
-- [ ] Hotel theme applies immediately after login
-- [ ] Ticket cannot be resolved without after-photo
-- [ ] SLA breach visible in manager dashboard
-- [ ] Housekeeping staff can complete checklist without typing
-- [ ] Scheduled tasks auto-generate tickets via pg_cron
+- [ ] Each role logs in and sees their designated home screen (per role mapping table above)
+- [ ] Switching hotel theme in admin panel reflects immediately on next app login
+- [ ] A ticket with no `photo_after_url` cannot be moved to `resolved` status (UI button disabled + API rejects)
+- [ ] `sla_deadline` is set automatically on ticket creation; manager dashboard shows breach count
+- [ ] Housekeeping staff completes a 5-item checklist (all checkbox items) with 5 taps, zero typing
+- [ ] A `scheduled_task` with `recurrence='daily'` generates a new ticket within 65 minutes of `next_run_at`
