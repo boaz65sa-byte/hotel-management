@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hotel_app/core/auth/auth_state.dart';
 import 'package:hotel_app/core/i18n/app_localizations.dart';
 import 'package:hotel_app/core/i18n/locale_provider.dart';
+import 'package:hotel_app/core/theme/app_theme.dart';
+import 'package:hotel_app/core/theme/theme_provider.dart';
+import 'package:hotel_app/core/supabase/supabase_client.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -25,6 +28,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _emailCtrl.text.trim(),
         _passCtrl.text,
       );
+      // Load hotel theme from Supabase (read hotel_id from users table, not JWT)
+      final userId = supabase.auth.currentUser?.id;
+      if (userId != null) {
+        final userRow = await supabase
+            .from('users')
+            .select('hotel_id')
+            .eq('id', userId)
+            .maybeSingle();
+        final hotelId = userRow?['hotel_id'] as String?;
+        if (hotelId != null) {
+          final hotel = await supabase
+              .from('hotels')
+              .select('theme')
+              .eq('id', hotelId)
+              .single();
+          final themeStr = hotel['theme'] as String? ?? 'clean_blue';
+          ref.read(hotelThemeProvider.notifier).state = AppTheme.forHotel(themeStr);
+        }
+        // superAdmin has no hotel_id — default clean_blue stays, no action needed
+      }
       // Router redirects automatically via auth guard
     } catch (e) {
       setState(() { _error = e.toString(); });
