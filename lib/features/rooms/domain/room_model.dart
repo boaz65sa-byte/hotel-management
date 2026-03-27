@@ -6,6 +6,7 @@ class Room {
   final String? roomType;
   final String status; // available | on_hold | closed
   final String? notes;
+  final String housekeepingStatus; // clean | dirty | cleaning
   final DateTime createdAt;
 
   const Room({
@@ -16,6 +17,7 @@ class Room {
     this.roomType,
     required this.status,
     this.notes,
+    this.housekeepingStatus = 'clean',
     required this.createdAt,
   });
 
@@ -27,6 +29,7 @@ class Room {
     roomType: j['room_type'] as String?,
     status: j['status'] as String,
     notes: j['notes'] as String?,
+    housekeepingStatus: j['housekeeping_status'] as String? ?? 'clean',
     createdAt: DateTime.parse(j['created_at'] as String),
   );
 
@@ -34,3 +37,6 @@ class Room {
   bool get isOnHold   => status == 'on_hold';
   bool get isClosed   => status == 'closed';
 }
+
+/// Alias for backwards-compatible references to RoomModel.
+typedef RoomModel = Room;
