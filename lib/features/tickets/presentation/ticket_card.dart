@@ -4,9 +4,9 @@ import '../domain/ticket_model.dart';
 
 class TicketCard extends StatelessWidget {
   final Ticket ticket;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
-  const TicketCard({super.key, required this.ticket, required this.onTap});
+  const TicketCard({super.key, required this.ticket, this.onTap});
 
   Color get _statusColor => switch (ticket.status) {
     'open'             => Colors.orange,
