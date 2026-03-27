@@ -28,4 +28,13 @@ enum UserRole {
   bool get isManager => _managerRoles.contains(this);
   bool get isRequiredApprover =>
     this == UserRole.receptionManager || this == UserRole.maintenanceManager;
+
+  String get homeScreen {
+    if (this == UserRole.housekeepingManager) return 'housekeeping';
+    if (this == UserRole.ceo || this == UserRole.superAdmin) return 'manager';
+    if (this == UserRole.maintenanceTech ||
+        this == UserRole.repairman ||
+        this == UserRole.maintenanceManager) return 'maintenance';
+    return 'reception';
+  }
 }
