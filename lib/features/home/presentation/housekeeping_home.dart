@@ -67,7 +67,7 @@ class _DirtyRoomsList extends ConsumerWidget {
                   child: ListTile(
                     leading: const Icon(Icons.hotel),
                     title: Text('חדר ${room.roomNumber}'),
-                    subtitle: Text('קומה ${room.floor}'),
+                    subtitle: Text('קומה ${room.floor ?? '-'}'),
                     trailing: Chip(label: Text(_statusLabel(room.housekeepingStatus))),
                   ),
                 );

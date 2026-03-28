@@ -18,31 +18,26 @@ final managerKpisProvider = FutureProvider<ManagerKpis>((ref) async {
   final user = ref.watch(currentUserProvider);
   final hotelId = user?.appMetadata['hotel_id'] as String?;
 
-  var query = supabase.from('tickets').select('status, sla_deadline');
+  final List data;
   if (hotelId != null) {
-    final data = await query.eq('hotel_id', hotelId).inFilter('status', ['open', 'in_progress']);
-    final list = data as List;
-    final now = DateTime.now();
-    return ManagerKpis(
-      openTickets: list.where((t) => t['status'] == 'open').length,
-      inProgressTickets: list.where((t) => t['status'] == 'in_progress').length,
-      overdueTickets: list.where((t) {
-        final sla = t['sla_deadline'];
-        return sla != null && DateTime.parse(sla as String).isBefore(now);
-      }).length,
-    );
+    data = await supabase
+        .from('tickets')
+        .select('status, sla_deadline')
+        .eq('hotel_id', hotelId)
+        .inFilter('status', ['open', 'in_progress']) as List;
   } else {
-    // superAdmin — all hotels
-    final data = await query.inFilter('status', ['open', 'in_progress']);
-    final list = data as List;
-    final now = DateTime.now();
-    return ManagerKpis(
-      openTickets: list.where((t) => t['status'] == 'open').length,
-      inProgressTickets: list.where((t) => t['status'] == 'in_progress').length,
-      overdueTickets: list.where((t) {
-        final sla = t['sla_deadline'];
-        return sla != null && DateTime.parse(sla as String).isBefore(now);
-      }).length,
-    );
+    data = await supabase
+        .from('tickets')
+        .select('status, sla_deadline')
+        .inFilter('status', ['open', 'in_progress']) as List;
   }
+  final now = DateTime.now();
+  return ManagerKpis(
+    openTickets: data.where((t) => t['status'] == 'open').length,
+    inProgressTickets: data.where((t) => t['status'] == 'in_progress').length,
+    overdueTickets: data.where((t) {
+      final sla = t['sla_deadline'];
+      return sla != null && DateTime.parse(sla as String).isBefore(now);
+    }).length,
+  );
 });
