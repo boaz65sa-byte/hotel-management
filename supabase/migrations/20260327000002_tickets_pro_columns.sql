@@ -1,0 +1,5 @@
+ALTER TABLE tickets
+  ADD COLUMN IF NOT EXISTS accepted_at     TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS resolved_at     TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS photo_before_url TEXT,
+  ADD COLUMN IF NOT EXISTS photo_after_url  TEXT;
