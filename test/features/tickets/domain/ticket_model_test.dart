@@ -59,6 +59,36 @@ void main() {
     expect(UserRole.fromString('receptionist'), UserRole.receptionist);
   });
 
+  test('Ticket pro fields parse accepted_at and photoUrls', () {
+    final t = Ticket.fromJson({
+      'id': 't1', 'hotel_id': 'h1', 'room_id': 'r1',
+      'opened_by': 'u1', 'assigned_dept': 'maintenance',
+      'title': 'Fix AC', 'priority': 'high', 'status': 'in_progress',
+      'accepted_at': '2026-01-01T10:00:00Z',
+      'resolved_at': null,
+      'photo_before_url': 'https://example.com/before.jpg',
+      'photo_after_url': null,
+      'created_at': '2026-01-01T09:00:00Z',
+      'updated_at': '2026-01-01T10:00:00Z',
+    });
+    expect(t.acceptedAt, isNotNull);
+    expect(t.photoBeforeUrl, 'https://example.com/before.jpg');
+    expect(t.photoAfterUrl, isNull);
+    expect(t.canResolve, false);
+  });
+
+  test('canResolve is true when photoAfterUrl is set', () {
+    final t = Ticket.fromJson({
+      'id': 't1', 'hotel_id': 'h1', 'room_id': 'r1',
+      'opened_by': 'u1', 'assigned_dept': 'maintenance',
+      'title': 'Fix AC', 'priority': 'high', 'status': 'in_progress',
+      'photo_after_url': 'https://example.com/after.jpg',
+      'created_at': '2026-01-01T09:00:00Z',
+      'updated_at': '2026-01-01T10:00:00Z',
+    });
+    expect(t.canResolve, true);
+  });
+
   test('Ticket.fromJson parses nested joined fields', () {
     final t = Ticket.fromJson({
       'id': 'abc', 'hotel_id': 'h1', 'room_id': 'r1',

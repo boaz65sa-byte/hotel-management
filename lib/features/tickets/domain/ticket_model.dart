@@ -15,6 +15,9 @@ class Ticket {
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? resolvedAt;
+  final DateTime? acceptedAt;
+  final String? photoBeforeUrl;
+  final String? photoAfterUrl;
 
   // Joined fields
   final String? roomNumber;
@@ -37,6 +40,9 @@ class Ticket {
     required this.createdAt,
     required this.updatedAt,
     this.resolvedAt,
+    this.acceptedAt,
+    this.photoBeforeUrl,
+    this.photoAfterUrl,
     this.roomNumber,
     this.openerName,
     this.claimerName,
@@ -58,6 +64,9 @@ class Ticket {
     createdAt: DateTime.parse(j['created_at'] as String),
     updatedAt: DateTime.parse(j['updated_at'] as String),
     resolvedAt: j['resolved_at'] != null ? DateTime.parse(j['resolved_at'] as String) : null,
+    acceptedAt: j['accepted_at'] != null ? DateTime.parse(j['accepted_at'] as String) : null,
+    photoBeforeUrl: j['photo_before_url'] as String?,
+    photoAfterUrl: j['photo_after_url'] as String?,
     roomNumber: j['room'] != null ? (j['room'] as Map<String, dynamic>)['room_number'] as String? : null,
     openerName: j['opener'] != null ? (j['opener'] as Map<String, dynamic>)['full_name'] as String? : null,
     claimerName: j['claimer'] != null ? (j['claimer'] as Map<String, dynamic>)['full_name'] as String? : null,
@@ -65,6 +74,8 @@ class Ticket {
 
   bool get isOverSla =>
     slaDeadline != null && DateTime.now().isAfter(slaDeadline!) && resolvedAt == null;
+
+  bool get canResolve => photoAfterUrl != null;
 }
 
 class TicketUpdate {
