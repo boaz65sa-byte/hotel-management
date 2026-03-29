@@ -9,6 +9,7 @@ import 'package:hotel_app/features/tickets/presentation/new_ticket_screen.dart';
 import 'package:hotel_app/features/rooms/presentation/room_detail_screen.dart';
 import 'package:hotel_app/features/rooms/presentation/room_management_screen.dart';
 import 'package:hotel_app/features/users/presentation/new_user_screen.dart';
+import 'package:hotel_app/features/checklists/presentation/checklist_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -38,6 +39,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, state) => RoomDetailScreen(roomId: state.pathParameters['id']!),
       ),
       GoRoute(path: '/users/new', builder: (_, __) => const NewUserScreen()),
+      GoRoute(
+        path: '/checklists/:instanceId',
+        builder: (_, state) => ChecklistScreen(
+          instanceId: state.pathParameters['instanceId']!,
+        ),
+      ),
     ],
   );
 });
