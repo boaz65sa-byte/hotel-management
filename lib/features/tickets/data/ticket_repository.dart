@@ -11,6 +11,7 @@ class TicketRepository {
     id, hotel_id, room_id, opened_by, assigned_dept, claimed_by,
     title, description, priority, status, resolution_type,
     sla_deadline, created_at, updated_at, resolved_at,
+    accepted_at, photo_before_url, photo_after_url,
     room:rooms(room_number, floor),
     opener:users!tickets_opened_by_fkey(full_name),
     claimer:users!tickets_claimed_by_fkey(full_name)
@@ -151,6 +152,33 @@ class TicketRepository {
       .eq('ticket_id', ticketId)
       .order('created_at');
     return (res as List).map((j) => TicketPhoto.fromJson(j as Map<String, dynamic>)).toList();
+  }
+
+  Future<void> acceptTicket(String ticketId, String userId) async {
+    await supabase.from('tickets').update({
+      'status': 'in_progress',
+      'claimed_by': userId,
+      'accepted_at': DateTime.now().toIso8601String(),
+    }).eq('id', ticketId);
+  }
+
+  Future<void> quickResolveTicket(String ticketId) async {
+    await supabase.from('tickets').update({
+      'status': 'resolved',
+      'resolved_at': DateTime.now().toIso8601String(),
+    }).eq('id', ticketId);
+  }
+
+  Future<void> setPhotoBefore(String ticketId, String photoUrl) async {
+    await supabase.from('tickets').update({
+      'photo_before_url': photoUrl,
+    }).eq('id', ticketId);
+  }
+
+  Future<void> setPhotoAfter(String ticketId, String photoUrl) async {
+    await supabase.from('tickets').update({
+      'photo_after_url': photoUrl,
+    }).eq('id', ticketId);
   }
 
   /// Subscribe to realtime updates for a ticket
