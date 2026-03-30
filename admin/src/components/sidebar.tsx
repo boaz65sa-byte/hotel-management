@@ -13,7 +13,8 @@ export function Sidebar() {
     { href: '/dashboard/users',     label: t.users,      icon: '👥' },
     { href: '/dashboard/analytics', label: t.analytics,  icon: '📈' },
     { href: '/dashboard/logs',      label: t.auditLogs,  icon: '📋' },
-    { href: '/dashboard/checklists', label: 'צ׳קליסטים',  icon: '✅' },
+    { href: '/dashboard/checklists',   label: 'צ׳קליסטים',  icon: '✅' },
+    { href: '/dashboard/automations',  label: 'אוטומציות',   icon: '⚡' },
   ]
 
   return (
