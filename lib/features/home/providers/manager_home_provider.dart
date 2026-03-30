@@ -7,10 +7,12 @@ class ManagerKpis {
   final int openTickets;
   final int inProgressTickets;
   final int overdueTickets;
+  final int activeAutomations;
   const ManagerKpis({
     required this.openTickets,
     required this.inProgressTickets,
     required this.overdueTickets,
+    required this.activeAutomations,
   });
 }
 
@@ -32,6 +34,12 @@ final managerKpisProvider = FutureProvider<ManagerKpis>((ref) async {
         .inFilter('status', ['open', 'in_progress']) as List;
   }
   final now = DateTime.now();
+
+  final automationsList = await supabase
+      .from('scheduled_tasks')
+      .select('id')
+      .eq('is_active', true);
+
   return ManagerKpis(
     openTickets: data.where((t) => t['status'] == 'open').length,
     inProgressTickets: data.where((t) => t['status'] == 'in_progress').length,
@@ -39,5 +47,6 @@ final managerKpisProvider = FutureProvider<ManagerKpis>((ref) async {
       final sla = t['sla_deadline'];
       return sla != null && DateTime.parse(sla as String).isBefore(now);
     }).length,
+    activeAutomations: (automationsList as List).length,
   );
 });

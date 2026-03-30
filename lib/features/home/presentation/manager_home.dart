@@ -55,13 +55,16 @@ class _ManagerDashboard extends ConsumerWidget {
             const SizedBox(height: 52),
             Text('דשבורד מנהל', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 24),
-            Row(children: [
-              _KpiCard(label: 'קריאות פתוחות',  value: k.openTickets,       color: Colors.blue),
-              const SizedBox(width: 12),
-              _KpiCard(label: 'בטיפול',          value: k.inProgressTickets, color: Colors.orange),
-              const SizedBox(width: 12),
-              _KpiCard(label: 'חריגות SLA',      value: k.overdueTickets,    color: Colors.red),
-            ]),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                _KpiCard(label: 'קריאות פתוחות',    value: k.openTickets,        color: Colors.blue),
+                _KpiCard(label: 'בטיפול',            value: k.inProgressTickets,  color: Colors.orange),
+                _KpiCard(label: 'חריגות SLA',        value: k.overdueTickets,     color: Colors.red),
+                _KpiCard(label: 'אוטומציות פעילות', value: k.activeAutomations,  color: Colors.purple),
+              ],
+            ),
           ],
         ),
       ),
@@ -76,7 +79,8 @@ class _KpiCard extends StatelessWidget {
   const _KpiCard({required this.label, required this.value, required this.color});
 
   @override
-  Widget build(BuildContext context) => Expanded(
+  Widget build(BuildContext context) => SizedBox(
+    width: 150,
     child: Card(
       color: color.withOpacity(0.12),
       child: Padding(
