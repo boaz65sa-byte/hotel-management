@@ -6,7 +6,7 @@ import 'package:hotel_app/features/tickets/presentation/ticket_card.dart';
 import 'package:hotel_app/features/tickets/domain/ticket_model.dart';
 
 void main() {
-  Ticket makeTicket({String status = 'open', DateTime? slaDeadline, String? photoAfterUrl}) =>
+  Ticket makeTicket({String status = 'open', DateTime? slaDeadline, String? photoAfterUrl, bool requiresMedia = false}) =>
       Ticket(
         id: '1',
         hotelId: 'h1',
@@ -21,6 +21,7 @@ void main() {
         slaDeadline: slaDeadline,
         roomNumber: '101',
         photoAfterUrl: photoAfterUrl,
+        requiresMedia: requiresMedia,
       );
 
   testWidgets('TicketCard shows title and room number', (tester) async {
@@ -47,8 +48,8 @@ void main() {
     expect(find.text('חריגת SLA'), findsOneWidget);
   });
 
-  test('canResolve is false when photoAfterUrl is null', () {
-    expect(makeTicket().canResolve, false);
+  test('canResolve is false when photoAfterUrl is null and requiresMedia is true', () {
+    expect(makeTicket(requiresMedia: true).canResolve, false);
   });
 
   test('canResolve is true when photoAfterUrl is set', () {

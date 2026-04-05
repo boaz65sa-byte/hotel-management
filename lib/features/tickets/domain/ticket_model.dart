@@ -6,6 +6,7 @@ class Ticket {
   final String openedBy;
   final String assignedDept;
   final String? claimedBy;
+  final String? assignedTo;
   final String title;
   final String? description;
   final String priority;
@@ -18,11 +19,14 @@ class Ticket {
   final DateTime? acceptedAt;
   final String? photoBeforeUrl;
   final String? photoAfterUrl;
+  final bool requiresMedia;
+  final bool pendingClose;
 
   // Joined fields
   final String? roomNumber;
   final String? openerName;
   final String? claimerName;
+  final String? assigneeName;
 
   const Ticket({
     required this.id,
@@ -31,6 +35,7 @@ class Ticket {
     required this.openedBy,
     required this.assignedDept,
     this.claimedBy,
+    this.assignedTo,
     required this.title,
     this.description,
     required this.priority,
@@ -43,9 +48,12 @@ class Ticket {
     this.acceptedAt,
     this.photoBeforeUrl,
     this.photoAfterUrl,
+    this.requiresMedia = false,
+    this.pendingClose = false,
     this.roomNumber,
     this.openerName,
     this.claimerName,
+    this.assigneeName,
   });
 
   factory Ticket.fromJson(Map<String, dynamic> j) => Ticket(
@@ -55,27 +63,69 @@ class Ticket {
     openedBy: j['opened_by'] as String,
     assignedDept: j['assigned_dept'] as String,
     claimedBy: j['claimed_by'] as String?,
+    assignedTo: j['assigned_to'] as String?,
     title: j['title'] as String,
     description: j['description'] as String?,
     priority: j['priority'] as String,
     status: j['status'] as String,
     resolutionType: j['resolution_type'] as String?,
-    slaDeadline: j['sla_deadline'] != null ? DateTime.parse(j['sla_deadline'] as String) : null,
+    slaDeadline: j['sla_deadline'] != null
+        ? DateTime.parse(j['sla_deadline'] as String) : null,
     createdAt: DateTime.parse(j['created_at'] as String),
     updatedAt: DateTime.parse(j['updated_at'] as String),
-    resolvedAt: j['resolved_at'] != null ? DateTime.parse(j['resolved_at'] as String) : null,
-    acceptedAt: j['accepted_at'] != null ? DateTime.parse(j['accepted_at'] as String) : null,
+    resolvedAt: j['resolved_at'] != null
+        ? DateTime.parse(j['resolved_at'] as String) : null,
+    acceptedAt: j['accepted_at'] != null
+        ? DateTime.parse(j['accepted_at'] as String) : null,
     photoBeforeUrl: j['photo_before_url'] as String?,
     photoAfterUrl: j['photo_after_url'] as String?,
-    roomNumber: j['room'] != null ? (j['room'] as Map<String, dynamic>)['room_number'] as String? : null,
-    openerName: j['opener'] != null ? (j['opener'] as Map<String, dynamic>)['full_name'] as String? : null,
-    claimerName: j['claimer'] != null ? (j['claimer'] as Map<String, dynamic>)['full_name'] as String? : null,
+    requiresMedia: j['requires_media'] as bool? ?? false,
+    pendingClose: j['pending_close'] as bool? ?? false,
+    roomNumber: j['room'] != null
+        ? (j['room'] as Map<String, dynamic>)['room_number'] as String? : null,
+    openerName: j['opener'] != null
+        ? (j['opener'] as Map<String, dynamic>)['full_name'] as String? : null,
+    claimerName: j['claimer'] != null
+        ? (j['claimer'] as Map<String, dynamic>)['full_name'] as String? : null,
+    assigneeName: j['assignee'] != null
+        ? (j['assignee'] as Map<String, dynamic>)['full_name'] as String? : null,
   );
 
   bool get isOverSla =>
-    slaDeadline != null && DateTime.now().isAfter(slaDeadline!) && resolvedAt == null;
+      slaDeadline != null &&
+      DateTime.now().isAfter(slaDeadline!) &&
+      resolvedAt == null;
 
-  bool get canResolve => photoAfterUrl != null;
+  bool get canResolve => !requiresMedia || photoAfterUrl != null;
+}
+
+class TicketMessage {
+  final String id;
+  final String ticketId;
+  final String senderId;
+  final String body;
+  final DateTime createdAt;
+  final String? senderName;
+
+  const TicketMessage({
+    required this.id,
+    required this.ticketId,
+    required this.senderId,
+    required this.body,
+    required this.createdAt,
+    this.senderName,
+  });
+
+  factory TicketMessage.fromJson(Map<String, dynamic> j) => TicketMessage(
+    id: j['id'] as String,
+    ticketId: j['ticket_id'] as String,
+    senderId: j['sender_id'] as String,
+    body: j['body'] as String,
+    createdAt: DateTime.parse(j['created_at'] as String),
+    senderName: j['sender'] != null
+        ? (j['sender'] as Map<String, dynamic>)['full_name'] as String?
+        : null,
+  );
 }
 
 class TicketUpdate {
@@ -104,7 +154,8 @@ class TicketUpdate {
     message: j['message'] as String?,
     updateType: j['update_type'] as String,
     createdAt: DateTime.parse(j['created_at'] as String),
-    userName: j['user'] != null ? (j['user'] as Map<String, dynamic>)['full_name'] as String? : null,
+    userName: j['user'] != null
+        ? (j['user'] as Map<String, dynamic>)['full_name'] as String? : null,
   );
 }
 
@@ -131,6 +182,7 @@ class TicketPhoto {
     photoUrl: j['photo_url'] as String,
     fileSizeBytes: j['file_size_bytes'] as int?,
     createdAt: DateTime.parse(j['created_at'] as String),
-    uploaderName: j['uploader'] != null ? (j['uploader'] as Map<String, dynamic>)['full_name'] as String? : null,
+    uploaderName: j['uploader'] != null
+        ? (j['uploader'] as Map<String, dynamic>)['full_name'] as String? : null,
   );
 }

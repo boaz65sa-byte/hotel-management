@@ -9,12 +9,14 @@ class TicketRepository {
 
   static const _select = '''
     id, hotel_id, room_id, opened_by, assigned_dept, claimed_by,
-    title, description, priority, status, resolution_type,
+    assigned_to, title, description, priority, status, resolution_type,
     sla_deadline, created_at, updated_at, resolved_at,
     accepted_at, photo_before_url, photo_after_url,
+    requires_media, pending_close,
     room:rooms(room_number, floor),
     opener:users!tickets_opened_by_fkey(full_name),
-    claimer:users!tickets_claimed_by_fkey(full_name)
+    claimer:users!tickets_claimed_by_fkey(full_name),
+    assignee:users!tickets_assigned_to_fkey(full_name)
   ''';
 
   Future<List<Ticket>> fetchForRoom(String roomId) async {
@@ -188,5 +190,87 @@ class TicketRepository {
       .stream(primaryKey: ['id'])
       .eq('id', ticketId)
       .map((rows) => rows.isNotEmpty ? rows.first : <String, dynamic>{});
+  }
+
+  /// Assign a ticket to a staff member (manager action)
+  Future<void> assignTicket({
+    required String ticketId,
+    required String assignedTo,
+    required String assignedBy,
+    String? note,
+  }) async {
+    await supabase.from('tickets').update({
+      'assigned_to': assignedTo,
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('id', ticketId);
+    await supabase.from('ticket_assignments').insert({
+      'ticket_id': ticketId,
+      'assigned_to': assignedTo,
+      'assigned_by': assignedBy,
+      if (note != null) 'note': note,
+    });
+  }
+
+  /// Employee marks ticket as done (pending manager close)
+  Future<void> markDone(String ticketId) async {
+    await supabase.rpc('mark_ticket_done', params: {'p_ticket_id': ticketId});
+  }
+
+  /// Manager closes ticket permanently
+  Future<void> managerClose(String ticketId) async {
+    await supabase.rpc('manager_close_ticket',
+        params: {'p_ticket_id': ticketId});
+  }
+
+  /// Fetch chat messages for a ticket
+  Future<List<TicketMessage>> fetchMessages(String ticketId) async {
+    final res = await supabase
+        .from('ticket_messages')
+        .select('*, sender:users(full_name)')
+        .eq('ticket_id', ticketId)
+        .order('created_at');
+    return (res as List)
+        .map((j) => TicketMessage.fromJson(j as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Send a chat message
+  Future<void> sendMessage({
+    required String ticketId,
+    required String senderId,
+    required String body,
+  }) async {
+    await supabase.from('ticket_messages').insert({
+      'ticket_id': ticketId,
+      'sender_id': senderId,
+      'body': body,
+    });
+  }
+
+  /// Realtime stream of chat messages
+  Stream<List<Map<String, dynamic>>> watchMessages(String ticketId) {
+    return supabase
+        .from('ticket_messages')
+        .stream(primaryKey: ['id'])
+        .eq('ticket_id', ticketId)
+        .order('created_at');
+  }
+
+  /// Fetch available staff for a department
+  Future<List<Map<String, dynamic>>> fetchDeptStaff(String dept) async {
+    final deptRoles = <String, List<String>>{
+      'maintenance': ['maintenance_manager', 'maintenance_tech', 'repairman'],
+      'reception': ['reception_manager', 'deputy_reception', 'receptionist'],
+      'security': ['security_manager', 'security_guard'],
+      'housekeeping': ['housekeeping_manager'],
+    };
+    final roles = deptRoles[dept] ?? [];
+    if (roles.isEmpty) return [];
+    final res = await supabase
+        .from('users')
+        .select('id, full_name, role, is_active')
+        .inFilter('role', roles)
+        .eq('is_active', true);
+    return (res as List).cast<Map<String, dynamic>>();
   }
 }

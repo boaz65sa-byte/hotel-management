@@ -68,6 +68,7 @@ void main() {
       'resolved_at': null,
       'photo_before_url': 'https://example.com/before.jpg',
       'photo_after_url': null,
+      'requires_media': true,
       'created_at': '2026-01-01T09:00:00Z',
       'updated_at': '2026-01-01T10:00:00Z',
     });
