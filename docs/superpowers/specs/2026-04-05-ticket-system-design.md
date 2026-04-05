@@ -172,12 +172,64 @@ CREATE TRIGGER trg_requires_media
 
 ---
 
+## היררכיית הרשאות
+
+### שתי רמות ניהול עליונות
+
+| תפקיד | מי הוא | מה הוא יכול |
+|-------|--------|-------------|
+| `super_admin` | **בעלים של האפליקציה** | מפעיל/מכבה מלונות, מעניק הרשאת `hotel_admin`, גישה לכל |
+| `hotel_admin` | **מנהל האפליקציה במלון** | מוסיף/משנה/מכבה משתמשים במלון שלו בלבד |
+
+### כללי גישה לפי תפקיד
+
+```
+super_admin
+  └── יכול: כל פעולה + הענקת hotel_admin
+
+hotel_admin (per hotel)
+  └── יכול: ניהול משתמשים במלון שלו
+  └── יכול: צפייה בכל קריאות המלון
+  └── לא יכול: לגעת במלונות אחרים
+
+מנהלי מחלקות (reception_manager, maintenance_manager...)
+  └── יכולים: לשבץ עובדים במחלקה שלהם
+  └── יכולים: לפתוח קריאות לכל מחלקה
+
+עובדים (receptionist, maintenance_tech...)
+  └── יכולים: לפתוח קריאות לכל מחלקה
+  └── יכולים: לעדכן קריאות שמשובצות אליהם
+```
+
+### DB — הוספת `hotel_admin` לאנום
+```sql
+ALTER TYPE user_role ADD VALUE 'hotel_admin' AFTER 'super_admin';
+```
+
+### RLS — hotel_admin מנוהל ע"י super_admin בלבד
+```sql
+-- רק super_admin יכול ליצור/לשנות hotel_admin
+CREATE POLICY hotel_admin_managed_by_super
+  ON users FOR ALL
+  USING (
+    auth.jwt()->>'role' = 'super_admin'
+    OR (
+      auth.jwt()->>'role' = 'hotel_admin'
+      AND hotel_id = (auth.jwt()->>'hotel_id')::uuid
+      AND role != 'hotel_admin'  -- hotel_admin לא יכול ליצור hotel_admin נוסף
+    )
+  );
+```
+
+---
+
 ## Business Logic
 
 ### חוקי גישה
 - כל עובד עם גישה לאפליקציה: יכול לפתוח קריאה לכל מחלקה
 - אחראי מחלקה: יכול לשבץ עובדים בתוך המחלקה שלו
-- super_admin / hotel_admin: גישה לכל
+- `hotel_admin`: ניהול משתמשים + צפייה בכל קריאות המלון
+- `super_admin`: גישה מלאה לכל + הענקת `hotel_admin`
 
 ### ניתוב אוטומטי
 - קריאה חדשה → מחלקה שנבחרה → נראית לכל הצוות של אותה מחלקה
