@@ -1,0 +1,420 @@
+<h2>Design System — מצב יום + לילה</h2>
+<p class="subtitle">Warm Hospitality (יום) × Navy Professional (לילה) — בדוק שהכל נראה נכון לפני שנמשיך לבנות</p>
+
+<style>
+* { box-sizing: border-box; }
+
+/* Layout */
+.dual-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 24px; }
+.mode-panel { border-radius: 20px; overflow: hidden; box-shadow: 0 6px 32px rgba(0,0,0,0.18); }
+.mode-header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+.mode-title { font-size: 15px; font-weight: 800; }
+.mode-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+
+/* ═══════════════════════════════
+   DAY MODE — Warm Hospitality (D)
+   Primary: #ea580c  Secondary: #c2410c
+   BG: #fdf6f0  Surface: #fff  Border: #fed7aa
+   Text: #1f2937  Muted: #9ca3af
+   Success: #16a34a  Warning: #d97706  Error: #dc2626
+   ═══════════════════════════════ */
+.day-panel { background: #fdf6f0; }
+.day-panel .mode-header { background: linear-gradient(135deg, #c2410c, #ea580c); }
+.day-panel .mode-title { color: #fff; }
+.day-panel .mode-badge { background: #fff; color: #ea580c; }
+
+/* Palette */
+.palette-row { display: flex; gap: 8px; padding: 14px 16px; flex-wrap: wrap; }
+.swatch { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.swatch-circle { width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.swatch-label { font-size: 8px; font-weight: 600; text-align: center; max-width: 44px; }
+.day-panel .swatch-label { color: #6b7280; }
+.night-panel .swatch-label { color: #7c9dc4; }
+
+/* Typography demo */
+.typo-section { padding: 0 16px 12px; }
+.typo-row { margin-bottom: 6px; }
+
+/* Component demos */
+.comp-section { padding: 0 16px 14px; }
+.comp-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+
+/* Buttons */
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.btn { padding: 9px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; border: none; cursor: default; }
+.btn-sm { padding: 6px 12px; font-size: 11px; border-radius: 8px; border: none; cursor: default; }
+
+/* Day buttons */
+.day-btn-primary { background: #ea580c; color: #fff; }
+.day-btn-secondary { background: #fff; color: #ea580c; border: 1.5px solid #fed7aa !important; }
+.day-btn-ghost { background: #fff7ed; color: #9a3412; }
+.day-btn-danger { background: #fee2e2; color: #dc2626; }
+.day-btn-success { background: #dcfce7; color: #16a34a; }
+
+/* Night buttons */
+.night-btn-primary { background: #c9a84c; color: #0a1628; }
+.night-btn-secondary { background: #1a3160; color: #7c9dc4; }
+.night-btn-ghost { background: transparent; color: #7c9dc4; border: 1px solid #1a3160 !important; }
+.night-btn-danger { background: #7c2d1233; color: #fca5a5; border: 1px solid #7c2d1255 !important; }
+.night-btn-success { background: #1e4d2b33; color: #4ade80; border: 1px solid #1e4d2b55 !important; }
+
+/* Status chips */
+.chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.chip { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+/* Day chips */
+.day-chip-clean { background: #dcfce7; color: #16a34a; }
+.day-chip-dirty { background: #fee2e2; color: #dc2626; }
+.day-chip-progress { background: #fff7ed; color: #ea580c; }
+.day-chip-vip { background: #fef9c3; color: #a16207; }
+.day-chip-sla { background: #fef3c7; color: #d97706; }
+.day-chip-urgent { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+/* Night chips */
+.night-chip-clean { background: #1e4d2b; color: #4ade80; }
+.night-chip-dirty { background: #7c2d12; color: #fca5a5; }
+.night-chip-progress { background: #c9a84c22; color: #c9a84c; border: 1px solid #c9a84c44; }
+.night-chip-vip { background: #1e3a5f; color: #60a5fa; }
+.night-chip-sla { background: #78350f33; color: #fbbf24; }
+.night-chip-urgent { background: #7f1d1d44; color: #f87171; border: 1px solid #f8717144; }
+
+/* Room card mini */
+.room-mini-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+.room-mini { border-radius: 10px; padding: 8px 4px; text-align: center; }
+.room-mini .rnum { font-size: 12px; font-weight: 800; }
+.room-mini .rstat { font-size: 8px; margin-top: 2px; }
+/* Day rooms */
+.day-rm-clean { background: #dcfce7; border: 1.5px solid #86efac; }
+.day-rm-clean .rnum { color: #16a34a; }
+.day-rm-clean .rstat { color: #16a34a; }
+.day-rm-dirty { background: #fee2e2; border: 1.5px solid #fca5a5; }
+.day-rm-dirty .rnum { color: #dc2626; }
+.day-rm-dirty .rstat { color: #dc2626; }
+.day-rm-prog { background: #fff7ed; border: 1.5px solid #fdba74; }
+.day-rm-prog .rnum { color: #ea580c; }
+.day-rm-prog .rstat { color: #ea580c; }
+.day-rm-vip { background: #fef9c3; border: 1.5px solid #fde047; }
+.day-rm-vip .rnum { color: #a16207; }
+.day-rm-vip .rstat { color: #a16207; }
+/* Night rooms */
+.night-rm-clean { background: #1e4d2b; }
+.night-rm-clean .rnum { color: #4ade80; }
+.night-rm-clean .rstat { color: #4ade8077; }
+.night-rm-dirty { background: #7c2d12; }
+.night-rm-dirty .rnum { color: #fca5a5; }
+.night-rm-dirty .rstat { color: #fca5a577; }
+.night-rm-prog { background: #c9a84c22; border: 1px solid #c9a84c44; }
+.night-rm-prog .rnum { color: #c9a84c; }
+.night-rm-prog .rstat { color: #c9a84c77; }
+.night-rm-vip { background: #1e3a5f; }
+.night-rm-vip .rnum { color: #60a5fa; }
+.night-rm-vip .rstat { color: #60a5fa77; }
+
+/* Input */
+.input-demo { width: 100%; padding: 9px 13px; border-radius: 10px; font-size: 12px; margin-bottom: 8px; outline: none; }
+.day-input { background: #fff; border: 1.5px solid #fed7aa; color: #1f2937; }
+.night-input { background: #0f1f3d; border: 1.5px solid #1a3160; color: #e2e8f0; }
+
+/* Ticket card */
+.ticket-card { border-radius: 12px; padding: 12px; margin-bottom: 8px; }
+.ticket-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.ticket-num { font-size: 10px; font-weight: 700; }
+.ticket-title { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+.ticket-sub { font-size: 10px; }
+.ticket-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+/* Day ticket */
+.day-ticket { background: #fff; border: 1.5px solid #fed7aa; }
+.day-ticket .ticket-num { color: #9ca3af; }
+.day-ticket .ticket-title { color: #1f2937; }
+.day-ticket .ticket-sub { color: #6b7280; }
+/* Night ticket */
+.night-ticket { background: #0f1f3d; border: 1px solid #1a3160; }
+.night-ticket .ticket-num { color: #4a6fa5; }
+.night-ticket .ticket-title { color: #e2e8f0; }
+.night-ticket .ticket-sub { color: #7c9dc4; }
+
+/* Bottom nav demo */
+.bottom-nav-demo { display: flex; border-radius: 0 0 20px 20px; overflow: hidden; }
+.nav-tab { flex: 1; padding: 10px 6px; text-align: center; font-size: 8px; font-weight: 700; }
+.nav-tab .nicon { font-size: 16px; display: block; margin-bottom: 2px; }
+/* Day nav */
+.day-nav { background: #fff; border-top: 1.5px solid #fed7aa; }
+.day-nav .nav-tab { color: #9ca3af; }
+.day-nav .nav-tab.active { color: #ea580c; background: #fff7ed; }
+/* Night nav */
+.night-nav { background: #0a1628; border-top: 1px solid #1a3160; }
+.night-nav .nav-tab { color: #4a6fa5; }
+.night-nav .nav-tab.active { color: #c9a84c; background: #0f1f3d; }
+
+/* ═══════════════════════════════
+   NIGHT MODE — Navy Professional (A)
+   Primary: #c9a84c  Secondary: #2563eb
+   BG: #0a1628  Surface: #0f1f3d  Border: #1a3160
+   Text: #e2e8f0  Muted: #7c9dc4
+   ═══════════════════════════════ */
+.night-panel { background: #0a1628; }
+.night-panel .mode-header { background: #0f1f3d; border-bottom: 1px solid #1a3160; }
+.night-panel .mode-title { color: #e2e8f0; }
+.night-panel .mode-badge { background: #c9a84c; color: #0a1628; }
+.night-panel .comp-title { color: #4a6fa5; }
+.night-panel .typo-section { background: #0a1628; }
+
+/* Separator */
+.sep { height: 1px; margin: 0 16px 12px; }
+.day-sep { background: #fed7aa; }
+.night-sep { background: #1a3160; }
+
+/* Typography */
+.t-h1 { font-size: 18px; font-weight: 800; margin: 0; }
+.t-h2 { font-size: 14px; font-weight: 700; margin: 0; }
+.t-body { font-size: 12px; margin: 0; }
+.t-small { font-size: 10px; margin: 0; }
+.day-t-h1 { color: #1f2937; }
+.day-t-h2 { color: #374151; }
+.day-t-body { color: #4b5563; }
+.day-t-small { color: #9ca3af; }
+.night-t-h1 { color: #e2e8f0; }
+.night-t-h2 { color: #cbd5e1; }
+.night-t-body { color: #94a3b8; }
+.night-t-small { color: #4a6fa5; }
+
+/* Toggle switch */
+.toggle-demo { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 11px; }
+.toggle { width: 36px; height: 20px; border-radius: 20px; position: relative; cursor: default; }
+.toggle-knob { width: 16px; height: 16px; border-radius: 50%; position: absolute; top: 2px; background: #fff; }
+.toggle.on .toggle-knob { right: 2px; }
+.toggle.off .toggle-knob { left: 2px; }
+.day-toggle-on { background: #ea580c; }
+.day-toggle-off { background: #d1d5db; }
+.night-toggle-on { background: #c9a84c; }
+.night-toggle-off { background: #1a3160; }
+.day-toggle-label { color: #4b5563; }
+.night-toggle-label { color: #94a3b8; }
+</style>
+
+<div class="dual-layout">
+
+  <!-- DAY MODE -->
+  <div class="mode-panel day-panel">
+    <div class="mode-header">
+      <span class="mode-title">☀️ מצב יום — Warm Hospitality</span>
+      <span class="mode-badge">Light Mode</span>
+    </div>
+
+    <!-- Palette -->
+    <div class="palette-row">
+      <div class="swatch"><div class="swatch-circle" style="background:#ea580c"></div><span class="swatch-label">Primary</span></div>
+      <div class="swatch"><div class="swatch-circle" style="background:#c2410c"></div><span class="swatch-label">Primary Dark</span></div>
+      <div class="swatch"><div class="swatch-circle" style="background:#fed7aa"></div><span class="swatch-label">Border</span></div>
+      <div class="swatch"><div class="swatch-circle" style="background:#fdf6f0"></div><span class="swatch-label">BG</span></div>
+      <div class="swatch"><div class="swatch-circle" style="background:#fff; border:1px solid #eee"></div><span class="swatch-label">Surface</span></div>
+      <div class="swatch"><div class="swatch-circle" style="background:#16a34a"></div><span class="swatch-label">Success</span></div>
+      <div class="swatch"><div class="swatch-circle" style="background:#dc2626"></div><span class="swatch-label">Error</span></div>
+    </div>
+    <div class="sep day-sep"></div>
+
+    <!-- Typography -->
+    <div class="typo-section">
+      <div class="comp-title" style="color:#ea580caa">טיפוגרפיה</div>
+      <div class="typo-row"><p class="t-h1 day-t-h1">ניהול חדרים</p></div>
+      <div class="typo-row"><p class="t-h2 day-t-h2">קריאת שירות #1042</p></div>
+      <div class="typo-row"><p class="t-body day-t-body">תיאור הקריאה וסטטוס נוכחי</p></div>
+      <div class="typo-row"><p class="t-small day-t-small">עודכן לפני 5 דקות</p></div>
+    </div>
+    <div class="sep day-sep"></div>
+
+    <!-- Buttons -->
+    <div class="comp-section">
+      <div class="comp-title" style="color:#ea580caa">כפתורים</div>
+      <div class="btn-row">
+        <button class="btn day-btn-primary">+ קריאה חדשה</button>
+        <button class="btn day-btn-secondary">ביטול</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn-sm day-btn-success">✓ אושר</button>
+        <button class="btn-sm day-btn-danger">✕ דחוי</button>
+        <button class="btn-sm day-btn-ghost">📋 צ'קליסט</button>
+      </div>
+    </div>
+    <div class="sep day-sep"></div>
+
+    <!-- Status chips -->
+    <div class="comp-section">
+      <div class="comp-title" style="color:#ea580caa">סטטוסים</div>
+      <div class="chip-row">
+        <span class="chip day-chip-clean">✓ נקי</span>
+        <span class="chip day-chip-dirty">⚠ דרוש ניקיון</span>
+        <span class="chip day-chip-progress">↻ בתהליך</span>
+        <span class="chip day-chip-vip">★ VIP</span>
+        <span class="chip day-chip-sla">⏱ SLA</span>
+        <span class="chip day-chip-urgent">🔴 דחוף</span>
+      </div>
+    </div>
+    <div class="sep day-sep"></div>
+
+    <!-- Room grid -->
+    <div class="comp-section">
+      <div class="comp-title" style="color:#ea580caa">גריד חדרים</div>
+      <div class="room-mini-grid">
+        <div class="room-mini day-rm-clean"><div class="rnum">101</div><div class="rstat">נקי</div></div>
+        <div class="room-mini day-rm-dirty"><div class="rnum">102</div><div class="rstat">ניקיון</div></div>
+        <div class="room-mini day-rm-prog"><div class="rnum">103</div><div class="rstat">בתהליך</div></div>
+        <div class="room-mini day-rm-vip"><div class="rnum">201</div><div class="rstat">VIP</div></div>
+        <div class="room-mini day-rm-clean"><div class="rnum">202</div><div class="rstat">נקי</div></div>
+        <div class="room-mini day-rm-prog"><div class="rnum">203</div><div class="rstat">בתהליך</div></div>
+        <div class="room-mini day-rm-dirty"><div class="rnum">204</div><div class="rstat">ניקיון</div></div>
+        <div class="room-mini day-rm-clean"><div class="rnum">205</div><div class="rstat">נקי</div></div>
+      </div>
+    </div>
+    <div class="sep day-sep"></div>
+
+    <!-- Ticket card -->
+    <div class="comp-section">
+      <div class="comp-title" style="color:#ea580caa">כרטיס קריאה</div>
+      <div class="ticket-card day-ticket">
+        <div class="ticket-top">
+          <span class="ticket-num">#1042 · חדר 302</span>
+          <span class="chip day-chip-urgent">🔴 דחוף</span>
+        </div>
+        <div class="ticket-title">תקלת מזגן — לא מקרר</div>
+        <div class="ticket-sub">נפתח לפני 45 דקות · SLA: עוד 75 דק'</div>
+        <div class="ticket-footer">
+          <span class="chip day-chip-progress">↻ בטיפול</span>
+          <button class="btn-sm day-btn-primary">פתח</button>
+        </div>
+      </div>
+    </div>
+    <div class="sep day-sep"></div>
+
+    <!-- Input -->
+    <div class="comp-section">
+      <div class="comp-title" style="color:#ea580caa">שדה קלט</div>
+      <input class="input-demo day-input" placeholder="תיאור הקריאה..." />
+      <div class="toggle-demo">
+        <div class="toggle on day-toggle-on"><div class="toggle-knob"></div></div>
+        <span class="day-toggle-label">התראות פעילות</span>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="bottom-nav-demo day-nav">
+      <div class="nav-tab active"><span class="nicon">🏠</span>ראשי</div>
+      <div class="nav-tab"><span class="nicon">🎫</span>קריאות</div>
+      <div class="nav-tab"><span class="nicon">🏨</span>חדרים</div>
+      <div class="nav-tab"><span class="nicon">👤</span>פרופיל</div>
+    </div>
+  </div>
+
+  <!-- NIGHT MODE -->
+  <div class="mode-panel night-panel">
+    <div class="mode-header">
+      <span class="mode-title">🌙 מצב לילה — Navy Professional</span>
+      <span class="mode-badge">Dark Mode</span>
+    </div>
+
+    <!-- Palette -->
+    <div class="palette-row">
+      <div class="swatch"><div class="swatch-circle" style="background:#c9a84c"></div><span class="swatch-label">Gold</span></div>
+      <div class="swatch"><div class="swatch-circle" style="background:#2563eb"></div><span class="swatch-label">Accent</span></div>
+      <div class="swatch"><div class="swatch-circle" style="background:#1a3160"></div><span class="swatch-label">Surface</span></div>
+      <div class="swatch"><div class="swatch-circle" style="background:#0f1f3d"></div><span class="swatch-label">Elevated</span></div>
+      <div class="swatch"><div class="swatch-circle" style="background:#0a1628"></div><span class="swatch-label">BG</span></div>
+      <div class="swatch"><div class="swatch-circle" style="background:#4ade80"></div><span class="swatch-label">Success</span></div>
+      <div class="swatch"><div class="swatch-circle" style="background:#f87171"></div><span class="swatch-label">Error</span></div>
+    </div>
+    <div class="sep night-sep"></div>
+
+    <!-- Typography -->
+    <div class="typo-section">
+      <div class="comp-title">טיפוגרפיה</div>
+      <div class="typo-row"><p class="t-h1 night-t-h1">ניהול חדרים</p></div>
+      <div class="typo-row"><p class="t-h2 night-t-h2">קריאת שירות #1042</p></div>
+      <div class="typo-row"><p class="t-body night-t-body">תיאור הקריאה וסטטוס נוכחי</p></div>
+      <div class="typo-row"><p class="t-small night-t-small">עודכן לפני 5 דקות</p></div>
+    </div>
+    <div class="sep night-sep"></div>
+
+    <!-- Buttons -->
+    <div class="comp-section">
+      <div class="comp-title">כפתורים</div>
+      <div class="btn-row">
+        <button class="btn night-btn-primary">+ קריאה חדשה</button>
+        <button class="btn night-btn-secondary">ביטול</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn-sm night-btn-success">✓ אושר</button>
+        <button class="btn-sm night-btn-danger">✕ דחוי</button>
+        <button class="btn-sm night-btn-ghost">📋 צ'קליסט</button>
+      </div>
+    </div>
+    <div class="sep night-sep"></div>
+
+    <!-- Status chips -->
+    <div class="comp-section">
+      <div class="comp-title">סטטוסים</div>
+      <div class="chip-row">
+        <span class="chip night-chip-clean">✓ נקי</span>
+        <span class="chip night-chip-dirty">⚠ ניקיון</span>
+        <span class="chip night-chip-progress">↻ בתהליך</span>
+        <span class="chip night-chip-vip">★ VIP</span>
+        <span class="chip night-chip-sla">⏱ SLA</span>
+        <span class="chip night-chip-urgent">🔴 דחוף</span>
+      </div>
+    </div>
+    <div class="sep night-sep"></div>
+
+    <!-- Room grid -->
+    <div class="comp-section">
+      <div class="comp-title">גריד חדרים</div>
+      <div class="room-mini-grid">
+        <div class="room-mini night-rm-clean"><div class="rnum">101</div><div class="rstat">נקי</div></div>
+        <div class="room-mini night-rm-dirty"><div class="rnum">102</div><div class="rstat">ניקיון</div></div>
+        <div class="room-mini night-rm-prog"><div class="rnum">103</div><div class="rstat">בתהליך</div></div>
+        <div class="room-mini night-rm-vip"><div class="rnum">201</div><div class="rstat">VIP</div></div>
+        <div class="room-mini night-rm-clean"><div class="rnum">202</div><div class="rstat">נקי</div></div>
+        <div class="room-mini night-rm-prog"><div class="rnum">203</div><div class="rstat">בתהליך</div></div>
+        <div class="room-mini night-rm-dirty"><div class="rnum">204</div><div class="rstat">ניקיון</div></div>
+        <div class="room-mini night-rm-clean"><div class="rnum">205</div><div class="rstat">נקי</div></div>
+      </div>
+    </div>
+    <div class="sep night-sep"></div>
+
+    <!-- Ticket card -->
+    <div class="comp-section">
+      <div class="comp-title">כרטיס קריאה</div>
+      <div class="ticket-card night-ticket">
+        <div class="ticket-top">
+          <span class="ticket-num">#1042 · חדר 302</span>
+          <span class="chip night-chip-urgent">🔴 דחוף</span>
+        </div>
+        <div class="ticket-title">תקלת מזגן — לא מקרר</div>
+        <div class="ticket-sub">נפתח לפני 45 דקות · SLA: עוד 75 דק'</div>
+        <div class="ticket-footer">
+          <span class="chip night-chip-progress">↻ בטיפול</span>
+          <button class="btn-sm night-btn-primary">פתח</button>
+        </div>
+      </div>
+    </div>
+    <div class="sep night-sep"></div>
+
+    <!-- Input -->
+    <div class="comp-section">
+      <div class="comp-title">שדה קלט</div>
+      <input class="input-demo night-input" placeholder="תיאור הקריאה..." />
+      <div class="toggle-demo">
+        <div class="toggle on night-toggle-on"><div class="toggle-knob"></div></div>
+        <span class="night-toggle-label">התראות פעילות</span>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="bottom-nav-demo night-nav">
+      <div class="nav-tab active"><span class="nicon">🏠</span>ראשי</div>
+      <div class="nav-tab"><span class="nicon">🎫</span>קריאות</div>
+      <div class="nav-tab"><span class="nicon">🏨</span>חדרים</div>
+      <div class="nav-tab"><span class="nicon">👤</span>פרופיל</div>
+    </div>
+  </div>
+</div>
+
+<p style="text-align:center; margin-top:20px; color:#6b7280; font-size:13px;">
+  זהו ה-Design System המלא. האם הכל נראה נכון? אמור לי אם משהו צריך שינוי.
+</p>

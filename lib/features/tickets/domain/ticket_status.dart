@@ -2,7 +2,7 @@
 enum TicketStatus { open, inProgress, pendingApproval, resolved, closed }
 
 enum UserRole {
-  superAdmin, ceo, receptionManager, maintenanceManager,
+  superAdmin, ceo, hotelAdmin, receptionManager, maintenanceManager,
   housekeepingManager, securityManager, deputyReception,
   receptionist, securityGuard, maintenanceTech, repairman;
 
@@ -19,7 +19,7 @@ enum UserRole {
   }
 
   static const _managerRoles = [
-    superAdmin, ceo, receptionManager, maintenanceManager,
+    superAdmin, ceo, hotelAdmin, receptionManager, maintenanceManager,
     housekeepingManager, securityManager,
   ];
 

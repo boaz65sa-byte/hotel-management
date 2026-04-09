@@ -7,5 +7,5 @@ import 'app_theme.dart';
 /// Set after login using the hotel's theme string from Supabase.
 /// Defaults to clean_blue until login completes.
 final hotelThemeProvider = StateProvider<ThemeData>((ref) {
-  return AppTheme.forHotel('clean_blue');
+  return AppTheme.forHotel('warm');
 });

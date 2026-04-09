@@ -5,6 +5,7 @@ import 'package:hotel_app/core/auth/auth_state.dart';
 import 'package:hotel_app/features/auth/login_screen.dart';
 import 'package:hotel_app/features/home/presentation/home_screen.dart';
 import 'package:hotel_app/features/tickets/presentation/ticket_detail_screen.dart';
+import 'package:hotel_app/features/tickets/presentation/ticket_chat_screen.dart';
 import 'package:hotel_app/features/tickets/presentation/new_ticket_screen.dart';
 import 'package:hotel_app/features/rooms/presentation/room_detail_screen.dart';
 import 'package:hotel_app/features/rooms/presentation/room_management_screen.dart';
@@ -32,6 +33,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/tickets/:id',
         builder: (_, state) => TicketDetailScreen(ticketId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/tickets/:id/chat',
+        builder: (_, state) => TicketChatScreen(
+          ticketId: state.pathParameters['id']!,
+          ticketTitle: (state.extra as String?) ?? '',
+        ),
       ),
       GoRoute(path: '/rooms/manage', builder: (_, __) => const RoomManagementScreen()),
       GoRoute(

@@ -14,6 +14,7 @@ const Map<UserRole, List<String>> deptRoutingRules = {
   UserRole.securityGuard:       ['maintenance', 'reception'],
   UserRole.securityManager:     ['maintenance', 'housekeeping', 'security', 'reception'],
   UserRole.ceo:                 ['maintenance', 'housekeeping', 'security', 'reception'],
+  UserRole.hotelAdmin:          ['maintenance', 'housekeeping', 'security', 'reception'],
   UserRole.superAdmin:          ['maintenance', 'housekeeping', 'security', 'reception'],
 };
 

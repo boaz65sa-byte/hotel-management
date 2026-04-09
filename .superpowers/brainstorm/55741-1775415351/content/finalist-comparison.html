@@ -1,0 +1,365 @@
+<h2>השוואת פינליסטים — בחר אחד סופי</h2>
+<p class="subtitle">כל סגנון מוצג עם מסך Flutter (מובייל) ומסך Admin (Next.js). לחץ על הסגנון שבוחר.</p>
+
+<style>
+* { box-sizing: border-box; }
+.finalist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 24px; }
+.finalist-card {
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.25s;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+}
+.finalist-card:hover { transform: translateY(-5px); box-shadow: 0 10px 36px rgba(0,0,0,0.2); }
+.finalist-card.selected { border-color: #6366f1; box-shadow: 0 0 0 5px rgba(99,102,241,0.25); }
+
+.card-header { padding: 14px 16px; font-weight: 800; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
+.card-tag { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+
+.section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.5; padding: 10px 14px 4px; }
+
+/* Mobile mockup frame */
+.phone-frame {
+  margin: 0 16px 10px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.12);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}
+.phone-statusbar { height: 22px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 9px; font-weight: 700; }
+.phone-content { padding: 10px; }
+
+/* Admin frame */
+.admin-frame {
+  margin: 0 16px 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.1);
+}
+.admin-topbar { height: 28px; display: flex; align-items: center; padding: 0 12px; gap: 8px; }
+.admin-dot { width: 8px; height: 8px; border-radius: 50%; }
+.admin-body { display: flex; }
+.admin-sidebar { width: 52px; padding: 8px 6px; display: flex; flex-direction: column; gap: 6px; }
+.admin-sidebar-item { width: 100%; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.admin-main { flex: 1; padding: 8px; }
+.admin-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 6px; }
+.admin-stat-card { border-radius: 6px; padding: 6px; text-align: center; }
+.admin-stat-val { font-size: 13px; font-weight: 800; }
+.admin-stat-lbl { font-size: 7px; opacity: 0.6; }
+.admin-chart { border-radius: 6px; padding: 6px; height: 40px; display: flex; align-items: flex-end; gap: 3px; }
+.admin-bar { border-radius: 3px 3px 0 0; flex: 1; }
+
+/* Room grid micro */
+.micro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.micro-room { border-radius: 5px; padding: 5px 3px; text-align: center; font-size: 8px; font-weight: 700; }
+
+/* Bottom nav */
+.bottom-nav { display: flex; justify-content: space-around; padding: 6px 0; }
+.nav-item { text-align: center; font-size: 8px; }
+.nav-icon { font-size: 14px; }
+
+/* ── NAVY ── */
+.navy-card { background: #0a1628; }
+.navy-card .card-header { background: #0f1f3d; color: #e2e8f0; border-bottom: 1px solid #1a3160; }
+.navy-card .card-tag { background: #c9a84c; color: #0a1628; }
+.navy-card .section-title { color: #7c9dc4; }
+.navy-card .phone-frame { border-color: #1a3160; }
+.navy-card .phone-statusbar { background: #1a3160; color: #c9a84c; }
+.navy-card .phone-content { background: #0f1f3d; }
+.navy-card .micro-room.clean { background: #1e4d2b; color: #4ade80; }
+.navy-card .micro-room.dirty { background: #7c2d12; color: #fca5a5; }
+.navy-card .micro-room.prog { background: #c9a84c22; color: #c9a84c; border: 1px solid #c9a84c55; }
+.navy-card .micro-room.vip { background: #1e3a5f; color: #60a5fa; }
+.navy-card .bottom-nav { background: #0a1628; border-top: 1px solid #1a3160; }
+.navy-card .nav-item { color: #7c9dc4; }
+.navy-card .nav-item.active { color: #c9a84c; }
+.navy-quick { display: flex; gap: 5px; margin-top: 8px; }
+.navy-quick-btn { flex: 1; background: #c9a84c; color: #0a1628; border-radius: 7px; padding: 7px 3px; text-align: center; font-size: 8px; font-weight: 700; }
+.navy-quick-btn.sec { background: #1a3160; color: #7c9dc4; }
+/* admin navy */
+.navy-card .admin-frame { border-color: #1a3160; }
+.navy-card .admin-topbar { background: #0a1628; border-bottom: 1px solid #1a3160; }
+.navy-card .admin-dot:nth-child(1) { background: #ff5f56; }
+.navy-card .admin-dot:nth-child(2) { background: #ffbd2e; }
+.navy-card .admin-dot:nth-child(3) { background: #27c93f; }
+.navy-card .admin-sidebar { background: #0f1f3d; }
+.navy-card .admin-sidebar-item { color: #7c9dc4; }
+.navy-card .admin-sidebar-item.active { background: #1a3160; color: #c9a84c; }
+.navy-card .admin-main { background: #0a1628; }
+.navy-card .admin-stat-card { background: #1a3160; }
+.navy-card .admin-stat-val { color: #c9a84c; }
+.navy-card .admin-stat-lbl { color: #7c9dc4; }
+.navy-card .admin-chart { background: #0f1f3d; }
+.navy-card .admin-bar:nth-child(1) { background: #c9a84c; height: 70%; }
+.navy-card .admin-bar:nth-child(2) { background: #2563eb; height: 55%; }
+.navy-card .admin-bar:nth-child(3) { background: #c9a84c; height: 85%; }
+.navy-card .admin-bar:nth-child(4) { background: #2563eb; height: 45%; }
+.navy-card .admin-bar:nth-child(5) { background: #c9a84c; height: 65%; }
+
+/* ── TEAL ── */
+.teal-card { background: #f0fdf9; }
+.teal-card .card-header { background: #fff; color: #134e4a; border-bottom: 1px solid #ccfbf1; }
+.teal-card .card-tag { background: #0d9488; color: #fff; }
+.teal-card .section-title { color: #0d9488aa; }
+.teal-card .phone-frame { border-color: #99f6e4; }
+.teal-card .phone-statusbar { background: #0d9488; color: #fff; }
+.teal-card .phone-content { background: #f0fdf9; }
+.teal-card .micro-room.clean { background: #d1fae5; color: #059669; border: 1px solid #6ee7b7; }
+.teal-card .micro-room.dirty { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+.teal-card .micro-room.prog { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+.teal-card .micro-room.vip { background: #ede9fe; color: #7c3aed; border: 1px solid #c4b5fd; }
+.teal-card .bottom-nav { background: #fff; border-top: 1px solid #ccfbf1; }
+.teal-card .nav-item { color: #9ca3af; }
+.teal-card .nav-item.active { color: #0d9488; }
+.teal-quick { display: flex; gap: 5px; margin-top: 8px; }
+.teal-quick-btn { flex: 1; background: #0d9488; color: #fff; border-radius: 7px; padding: 7px 3px; text-align: center; font-size: 8px; font-weight: 700; }
+.teal-quick-btn.sec { background: #fff; color: #0d9488; border: 1px solid #99f6e4; }
+/* admin teal */
+.teal-card .admin-frame { border-color: #99f6e4; }
+.teal-card .admin-topbar { background: #0d9488; border-bottom: none; }
+.teal-card .admin-dot:nth-child(1) { background: #ffffff55; }
+.teal-card .admin-dot:nth-child(2) { background: #ffffff55; }
+.teal-card .admin-dot:nth-child(3) { background: #ffffff; }
+.teal-card .admin-sidebar { background: #f0fdf9; border-right: 1px solid #ccfbf1; }
+.teal-card .admin-sidebar-item { color: #6b7280; }
+.teal-card .admin-sidebar-item.active { background: #ccfbf1; color: #0d9488; }
+.teal-card .admin-main { background: #fff; }
+.teal-card .admin-stat-card { background: #f0fdf9; border: 1px solid #ccfbf1; }
+.teal-card .admin-stat-val { color: #0d9488; }
+.teal-card .admin-stat-lbl { color: #6b7280; }
+.teal-card .admin-chart { background: #f0fdf9; border: 1px solid #ccfbf1; }
+.teal-card .admin-bar:nth-child(1) { background: #0d9488; height: 70%; }
+.teal-card .admin-bar:nth-child(2) { background: #2dd4bf; height: 55%; }
+.teal-card .admin-bar:nth-child(3) { background: #0d9488; height: 85%; }
+.teal-card .admin-bar:nth-child(4) { background: #2dd4bf; height: 45%; }
+.teal-card .admin-bar:nth-child(5) { background: #0d9488; height: 65%; }
+
+/* ── WARM ── */
+.warm-card { background: #fdf6f0; }
+.warm-card .card-header { background: #fff; color: #7c2d12; border-bottom: 1px solid #fed7aa; }
+.warm-card .card-tag { background: #ea580c; color: #fff; }
+.warm-card .section-title { color: #ea580caa; }
+.warm-card .phone-frame { border-color: #fed7aa; }
+.warm-card .phone-statusbar { background: linear-gradient(90deg, #c2410c, #ea580c); color: #fff; }
+.warm-card .phone-content { background: #fdf6f0; }
+.warm-card .micro-room.clean { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
+.warm-card .micro-room.dirty { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+.warm-card .micro-room.prog { background: #fff7ed; color: #ea580c; border: 1px solid #fdba74; }
+.warm-card .micro-room.vip { background: #fef9c3; color: #a16207; border: 1px solid #fde047; }
+.warm-card .bottom-nav { background: #fff; border-top: 1px solid #fed7aa; }
+.warm-card .nav-item { color: #9ca3af; }
+.warm-card .nav-item.active { color: #ea580c; }
+.warm-quick { display: flex; gap: 5px; margin-top: 8px; }
+.warm-quick-btn { flex: 1; background: #ea580c; color: #fff; border-radius: 7px; padding: 7px 3px; text-align: center; font-size: 8px; font-weight: 700; }
+.warm-quick-btn.sec { background: #fff; color: #ea580c; border: 1px solid #fed7aa; }
+/* admin warm */
+.warm-card .admin-frame { border-color: #fed7aa; }
+.warm-card .admin-topbar { background: linear-gradient(90deg, #c2410c, #ea580c); border-bottom: none; }
+.warm-card .admin-dot:nth-child(1) { background: #ffffff55; }
+.warm-card .admin-dot:nth-child(2) { background: #ffffff55; }
+.warm-card .admin-dot:nth-child(3) { background: #ffffff; }
+.warm-card .admin-sidebar { background: #fff7ed; border-right: 1px solid #fed7aa; }
+.warm-card .admin-sidebar-item { color: #9a3412; }
+.warm-card .admin-sidebar-item.active { background: #fed7aa; color: #c2410c; }
+.warm-card .admin-main { background: #fff; }
+.warm-card .admin-stat-card { background: #fff7ed; border: 1px solid #fed7aa; }
+.warm-card .admin-stat-val { color: #ea580c; }
+.warm-card .admin-stat-lbl { color: #9ca3af; }
+.warm-card .admin-chart { background: #fff7ed; border: 1px solid #fed7aa; }
+.warm-card .admin-bar:nth-child(1) { background: #ea580c; height: 70%; }
+.warm-card .admin-bar:nth-child(2) { background: #fdba74; height: 55%; }
+.warm-card .admin-bar:nth-child(3) { background: #ea580c; height: 85%; }
+.warm-card .admin-bar:nth-child(4) { background: #fdba74; height: 45%; }
+.warm-card .admin-bar:nth-child(5) { background: #ea580c; height: 65%; }
+</style>
+
+<div class="finalist-grid">
+
+  <!-- A: NAVY -->
+  <div class="finalist-card navy-card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-header">
+      A — Navy Professional
+      <span class="card-tag">אנטרפרייז</span>
+    </div>
+
+    <div class="section-title">📱 מובייל — Flutter</div>
+    <div class="phone-frame">
+      <div class="phone-statusbar">9:41 🔋 ניהול חדרים</div>
+      <div class="phone-content">
+        <div class="micro-grid">
+          <div class="micro-room clean">101<br>✓</div>
+          <div class="micro-room dirty">102<br>⚠</div>
+          <div class="micro-room prog">103<br>↻</div>
+          <div class="micro-room vip">201<br>★</div>
+          <div class="micro-room clean">202<br>✓</div>
+          <div class="micro-room prog">203<br>↻</div>
+          <div class="micro-room dirty">204<br>⚠</div>
+          <div class="micro-room clean">205<br>✓</div>
+        </div>
+        <div class="navy-quick">
+          <div class="navy-quick-btn">+ קריאה</div>
+          <div class="navy-quick-btn sec">📋 רשימה</div>
+          <div class="navy-quick-btn sec">📊 דוח</div>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <div class="nav-item active"><div class="nav-icon">🏠</div>ראשי</div>
+        <div class="nav-item"><div class="nav-icon">🎫</div>קריאות</div>
+        <div class="nav-item"><div class="nav-icon">👤</div>פרופיל</div>
+      </div>
+    </div>
+
+    <div class="section-title">🖥️ Admin Panel — Next.js</div>
+    <div class="admin-frame">
+      <div class="admin-topbar">
+        <div class="admin-dot"></div><div class="admin-dot"></div><div class="admin-dot"></div>
+      </div>
+      <div class="admin-body">
+        <div class="admin-sidebar">
+          <div class="admin-sidebar-item active">🏠</div>
+          <div class="admin-sidebar-item">🏨</div>
+          <div class="admin-sidebar-item">👥</div>
+          <div class="admin-sidebar-item">📊</div>
+          <div class="admin-sidebar-item">⚙️</div>
+        </div>
+        <div class="admin-main">
+          <div class="admin-stats">
+            <div class="admin-stat-card"><div class="admin-stat-val">24</div><div class="admin-stat-lbl">חדרים</div></div>
+            <div class="admin-stat-card"><div class="admin-stat-val">8</div><div class="admin-stat-lbl">קריאות</div></div>
+            <div class="admin-stat-card"><div class="admin-stat-val">94%</div><div class="admin-stat-lbl">SLA</div></div>
+          </div>
+          <div class="admin-chart">
+            <div class="admin-bar"></div><div class="admin-bar"></div><div class="admin-bar"></div><div class="admin-bar"></div><div class="admin-bar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B: TEAL -->
+  <div class="finalist-card teal-card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-header">
+      B — Fresh Teal
+      <span class="card-tag">מודרני</span>
+    </div>
+
+    <div class="section-title">📱 מובייל — Flutter</div>
+    <div class="phone-frame">
+      <div class="phone-statusbar">9:41 🔋 ניהול חדרים</div>
+      <div class="phone-content">
+        <div class="micro-grid">
+          <div class="micro-room clean">101<br>✓</div>
+          <div class="micro-room dirty">102<br>⚠</div>
+          <div class="micro-room prog">103<br>↻</div>
+          <div class="micro-room vip">201<br>★</div>
+          <div class="micro-room clean">202<br>✓</div>
+          <div class="micro-room prog">203<br>↻</div>
+          <div class="micro-room dirty">204<br>⚠</div>
+          <div class="micro-room clean">205<br>✓</div>
+        </div>
+        <div class="teal-quick">
+          <div class="teal-quick-btn">+ קריאה</div>
+          <div class="teal-quick-btn sec">📋 רשימה</div>
+          <div class="teal-quick-btn sec">📊 דוח</div>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <div class="nav-item active"><div class="nav-icon">🏠</div>ראשי</div>
+        <div class="nav-item"><div class="nav-icon">🎫</div>קריאות</div>
+        <div class="nav-item"><div class="nav-icon">👤</div>פרופיל</div>
+      </div>
+    </div>
+
+    <div class="section-title">🖥️ Admin Panel — Next.js</div>
+    <div class="admin-frame">
+      <div class="admin-topbar">
+        <div class="admin-dot"></div><div class="admin-dot"></div><div class="admin-dot"></div>
+      </div>
+      <div class="admin-body">
+        <div class="admin-sidebar">
+          <div class="admin-sidebar-item active">🏠</div>
+          <div class="admin-sidebar-item">🏨</div>
+          <div class="admin-sidebar-item">👥</div>
+          <div class="admin-sidebar-item">📊</div>
+          <div class="admin-sidebar-item">⚙️</div>
+        </div>
+        <div class="admin-main">
+          <div class="admin-stats">
+            <div class="admin-stat-card"><div class="admin-stat-val">24</div><div class="admin-stat-lbl">חדרים</div></div>
+            <div class="admin-stat-card"><div class="admin-stat-val">8</div><div class="admin-stat-lbl">קריאות</div></div>
+            <div class="admin-stat-card"><div class="admin-stat-val">94%</div><div class="admin-stat-lbl">SLA</div></div>
+          </div>
+          <div class="admin-chart">
+            <div class="admin-bar"></div><div class="admin-bar"></div><div class="admin-bar"></div><div class="admin-bar"></div><div class="admin-bar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- D: WARM -->
+  <div class="finalist-card warm-card" data-choice="d" onclick="toggleSelect(this)">
+    <div class="card-header">
+      D — Warm Hospitality
+      <span class="card-tag">אירוח</span>
+    </div>
+
+    <div class="section-title">📱 מובייל — Flutter</div>
+    <div class="phone-frame">
+      <div class="phone-statusbar">9:41 🔋 ניהול חדרים</div>
+      <div class="phone-content">
+        <div class="micro-grid">
+          <div class="micro-room clean">101<br>✓</div>
+          <div class="micro-room dirty">102<br>⚠</div>
+          <div class="micro-room prog">103<br>↻</div>
+          <div class="micro-room vip">201<br>★</div>
+          <div class="micro-room clean">202<br>✓</div>
+          <div class="micro-room prog">203<br>↻</div>
+          <div class="micro-room dirty">204<br>⚠</div>
+          <div class="micro-room clean">205<br>✓</div>
+        </div>
+        <div class="warm-quick">
+          <div class="warm-quick-btn">+ קריאה</div>
+          <div class="warm-quick-btn sec">📋 רשימה</div>
+          <div class="warm-quick-btn sec">📊 דוח</div>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <div class="nav-item active"><div class="nav-icon">🏠</div>ראשי</div>
+        <div class="nav-item"><div class="nav-icon">🎫</div>קריאות</div>
+        <div class="nav-item"><div class="nav-icon">👤</div>פרופיל</div>
+      </div>
+    </div>
+
+    <div class="section-title">🖥️ Admin Panel — Next.js</div>
+    <div class="admin-frame">
+      <div class="admin-topbar">
+        <div class="admin-dot"></div><div class="admin-dot"></div><div class="admin-dot"></div>
+      </div>
+      <div class="admin-body">
+        <div class="admin-sidebar">
+          <div class="admin-sidebar-item active">🏠</div>
+          <div class="admin-sidebar-item">🏨</div>
+          <div class="admin-sidebar-item">👥</div>
+          <div class="admin-sidebar-item">📊</div>
+          <div class="admin-sidebar-item">⚙️</div>
+        </div>
+        <div class="admin-main">
+          <div class="admin-stats">
+            <div class="admin-stat-card"><div class="admin-stat-val">24</div><div class="admin-stat-lbl">חדרים</div></div>
+            <div class="admin-stat-card"><div class="admin-stat-val">8</div><div class="admin-stat-lbl">קריאות</div></div>
+            <div class="admin-stat-card"><div class="admin-stat-val">94%</div><div class="admin-stat-lbl">SLA</div></div>
+          </div>
+          <div class="admin-chart">
+            <div class="admin-bar"></div><div class="admin-bar"></div><div class="admin-bar"></div><div class="admin-bar"></div><div class="admin-bar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p style="text-align:center; margin-top:20px; color:#6b7280; font-size:13px;">לחץ על הסגנון הסופי שלך — A, B, או D</p>
