@@ -387,16 +387,21 @@ class _KpiSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
-      children: [
-        Expanded(child: SizedBox(height: 60)),
-        SizedBox(width: 8),
-        Expanded(child: SizedBox(height: 60)),
-        SizedBox(width: 8),
-        Expanded(child: SizedBox(height: 60)),
-        SizedBox(width: 8),
-        Expanded(child: SizedBox(height: 60)),
-      ],
+    final cs = Theme.of(context).colorScheme;
+    return Row(
+      children: List.generate(7, (i) => i % 2 == 0
+        ? Expanded(
+            child: Container(
+              height: 60,
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            ),
+          )
+        : const SizedBox(width: 8),
+      ),
     );
   }
 }
@@ -662,6 +667,7 @@ class _RoomSection extends ConsumerWidget {
     return _Section(
       title: 'חדרים בעייתיים',
       icon: '🚨',
+      managerOnly: true,
       child: roomsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Text('שגיאה: $e'),
