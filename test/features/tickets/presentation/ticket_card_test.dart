@@ -33,7 +33,8 @@ void main() {
       ),
     );
     expect(find.text('Broken AC'), findsOneWidget);
-    expect(find.text('Room 101 • maintenance'), findsOneWidget);
+    // New card design: shows id prefix + room number in Hebrew format
+    expect(find.textContaining('חדר 101'), findsOneWidget);
   });
 
   testWidgets('TicketCard shows SLA badge when sla_deadline is in the past', (tester) async {

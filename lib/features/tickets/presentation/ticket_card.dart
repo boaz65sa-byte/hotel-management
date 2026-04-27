@@ -100,7 +100,7 @@ class TicketCard extends StatelessWidget {
                                 size: 13, color: const Color(0xFF7C9DC4)),
                             const SizedBox(width: 4),
                             Text(
-                              '#${ticket.id.substring(0, 6).toUpperCase()} · חדר ${ticket.roomNumber ?? "?"}',
+                              '#${ticket.id.substring(0, ticket.id.length.clamp(0, 6)).toUpperCase()} · חדר ${ticket.roomNumber ?? "?"}',
                               style: const TextStyle(
                                 fontSize: 11,
                                 color: Color(0xFF7C9DC4),

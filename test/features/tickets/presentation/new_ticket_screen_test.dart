@@ -22,8 +22,9 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Title'), findsOneWidget);
-    expect(find.text('Department'), findsOneWidget);
-    expect(find.text('Priority'), findsOneWidget);
+    // Screen was redesigned in Phase 8 to use Hebrew labels and a department grid
+    expect(find.text('תיאור קצר'), findsOneWidget);
+    expect(find.text('דחיפות'), findsOneWidget);
+    expect(find.text('קריאה חדשה'), findsOneWidget); // AppBar title
   });
 }
