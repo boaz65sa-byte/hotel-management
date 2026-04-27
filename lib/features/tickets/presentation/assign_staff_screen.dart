@@ -129,7 +129,7 @@ class _AssignStaffScreenState extends ConsumerState<AssignStaffScreen> {
                               decoration: BoxDecoration(
                                 color: selected
                                     ? cs.primaryContainer
-                                    : cs.surfaceVariant,
+                                    : cs.surfaceContainerHighest,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: selected ? cs.primary : cs.outline,
@@ -190,7 +190,7 @@ class _AssignStaffScreenState extends ConsumerState<AssignStaffScreen> {
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10)),
                   filled: true,
-                  fillColor: cs.surfaceVariant,
+                  fillColor: cs.surfaceContainerHighest,
                 ),
               ),
             ),

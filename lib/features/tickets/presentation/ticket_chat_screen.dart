@@ -168,7 +168,7 @@ class _MessageBubble extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: isMe ? cs.primary : cs.surfaceVariant,
+                color: isMe ? cs.primary : cs.surfaceContainerHighest,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(16),
                   topRight: const Radius.circular(16),
@@ -249,7 +249,7 @@ class _InputBar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(24),
                       borderSide: BorderSide.none),
                   filled: true,
-                  fillColor: cs.surfaceVariant,
+                  fillColor: cs.surfaceContainerHighest,
                 ),
                 onSubmitted: (_) => onSend(),
               ),

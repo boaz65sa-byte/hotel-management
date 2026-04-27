@@ -87,6 +87,11 @@ class _TicketsListScreenState extends ConsumerState<TicketsListScreen> {
       ),
       body: Column(children: [
         const OfflineBanner(),
+        // ── Stats bar ─────────────────────────────────────────────────
+        myTickets.maybeWhen(
+          data: (tickets) => _StatsBar(tickets: tickets),
+          orElse: () => const SizedBox.shrink(),
+        ),
         // ── Filter chips ───────────────────────────────────────────────
         SizedBox(
           height: 44,
@@ -136,6 +141,75 @@ class _TicketsListScreenState extends ConsumerState<TicketsListScreen> {
         onPressed: () => context.push('/tickets/new'),
         label: Text(l.newTicket),
         icon: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+// ── Stats bar ─────────────────────────────────────────────────────────────────
+class _StatsBar extends StatelessWidget {
+  final List<Ticket> tickets;
+  const _StatsBar({required this.tickets});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final active = tickets.where((t) =>
+        t.status == 'open' || t.status == 'in_progress').length;
+    final emergency = tickets.where((t) => t.priority == 'urgent').length;
+    final pending = tickets.where((t) => t.pendingClose).length;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      color: cs.primaryContainer.withOpacity(0.4),
+      child: Row(
+        children: [
+          _StatPill(count: active, label: 'פעילות', color: cs.primary),
+          const SizedBox(width: 10),
+          if (emergency > 0)
+            _StatPill(count: emergency, label: 'חירום',
+                color: const Color(0xFFF87171)),
+          if (emergency > 0) const SizedBox(width: 10),
+          if (pending > 0)
+            _StatPill(count: pending, label: 'ממתינות סגירה',
+                color: Colors.teal),
+          const Spacer(),
+          Text(
+            '${tickets.length} קריאות סה"כ',
+            style: TextStyle(
+              fontSize: 11,
+              color: cs.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatPill extends StatelessWidget {
+  final int count;
+  final String label;
+  final Color color;
+  const _StatPill({required this.count, required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.4)),
+      ),
+      child: Text(
+        '$count $label',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
       ),
     );
   }
