@@ -4,7 +4,9 @@ import 'package:hotel_app/core/auth/auth_state.dart';
 import '../data/analytics_repository.dart';
 import '../domain/analytics_models.dart';
 
-final _repo = AnalyticsRepository();
+final analyticsRepositoryProvider = Provider<AnalyticsRepository>(
+  (ref) => AnalyticsRepository(),
+);
 
 // ── Time range ────────────────────────────────────────────────────────────────
 
@@ -15,33 +17,39 @@ final analyticsRangeProvider = StateProvider<AnalyticsRange>(
 // ── Hotel-wide stats (managers+) ──────────────────────────────────────────────
 
 final ticketStatsProvider = FutureProvider<TicketStats>((ref) {
+  final repo = ref.watch(analyticsRepositoryProvider);
   final range = ref.watch(analyticsRangeProvider);
-  return _repo.fetchStats(from: range.from, to: range.to);
+  return repo.fetchStats(from: range.from, to: range.to);
 });
 
 final dailyCountsProvider = FutureProvider<List<DailyCount>>((ref) {
+  final repo = ref.watch(analyticsRepositoryProvider);
   final range = ref.watch(analyticsRangeProvider);
-  return _repo.fetchDailyCounts(from: range.from, to: range.to);
+  return repo.fetchDailyCounts(from: range.from, to: range.to);
 });
 
 final departmentStatsProvider = FutureProvider<List<DepartmentStats>>((ref) {
+  final repo = ref.watch(analyticsRepositoryProvider);
   final range = ref.watch(analyticsRangeProvider);
-  return _repo.fetchDepartmentStats(from: range.from, to: range.to);
+  return repo.fetchDepartmentStats(from: range.from, to: range.to);
 });
 
 final techStatsProvider = FutureProvider<List<TechStats>>((ref) {
+  final repo = ref.watch(analyticsRepositoryProvider);
   final range = ref.watch(analyticsRangeProvider);
-  return _repo.fetchTechStats(from: range.from, to: range.to);
+  return repo.fetchTechStats(from: range.from, to: range.to);
 });
 
 final roomStatsProvider = FutureProvider<List<RoomStats>>((ref) {
+  final repo = ref.watch(analyticsRepositoryProvider);
   final range = ref.watch(analyticsRangeProvider);
-  return _repo.fetchRoomStats(from: range.from, to: range.to);
+  return repo.fetchRoomStats(from: range.from, to: range.to);
 });
 
 // ── Personal stats (non-manager users) ───────────────────────────────────────
 
 final myStatsProvider = FutureProvider<MyStats>((ref) {
+  final repo = ref.watch(analyticsRepositoryProvider);
   final range = ref.watch(analyticsRangeProvider);
   final user = ref.watch(currentUserProvider);
   if (user == null) {
@@ -52,5 +60,5 @@ final myStatsProvider = FutureProvider<MyStats>((ref) {
       slaCompliancePct: 100,
     ));
   }
-  return _repo.fetchMyStats(user.id, from: range.from, to: range.to);
+  return repo.fetchMyStats(user.id, from: range.from, to: range.to);
 });

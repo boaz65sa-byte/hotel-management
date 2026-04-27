@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hotel_app/core/auth/auth_state.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import '../data/analytics_repository.dart';
 import '../domain/analytics_models.dart';
 import '../providers/analytics_provider.dart';
 
@@ -28,7 +27,7 @@ class AnalyticsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final role = ref.read(authRepositoryProvider).role;
+    final role = ref.watch(authRepositoryProvider).role;
     final isManager = _isManager(role);
     final cs = Theme.of(context).colorScheme;
 
@@ -84,9 +83,9 @@ class AnalyticsScreen extends ConsumerWidget {
                     _DepartmentSection(),
                     const SizedBox(height: 8),
                     _StaffSection(),
+                    const SizedBox(height: 8),
+                    _RoomSection(),
                   ],
-                  const SizedBox(height: 8),
-                  _RoomSection(),
                 ],
               ),
             ),
@@ -102,8 +101,8 @@ class AnalyticsScreen extends ConsumerWidget {
         .showSnackBar(const SnackBar(content: Text('מכין ייצוא...')));
 
     try {
-      final rows =
-          await AnalyticsRepository().fetchTicketsForExport(from: range.from, to: range.to);
+      final repo = ref.read(analyticsRepositoryProvider);
+      final rows = await repo.fetchTicketsForExport(from: range.from, to: range.to);
 
       final workbook = Excel.createExcel();
       final sheet = workbook.sheets[workbook.getDefaultSheet()!]!;
