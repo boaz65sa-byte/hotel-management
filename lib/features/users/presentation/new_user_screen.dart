@@ -11,6 +11,7 @@ const _roles = [
   ('reception_manager', 'Reception Manager'),
   ('maintenance_manager', 'Maintenance Manager'),
   ('housekeeping_manager', 'Housekeeping Manager'),
+  ('housekeeping', 'Housekeeping Staff'),
   ('security_manager', 'Security Manager'),
   ('deputy_reception', 'Deputy Reception'),
   ('receptionist', 'Receptionist'),

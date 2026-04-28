@@ -3,7 +3,7 @@ enum TicketStatus { open, inProgress, pendingApproval, resolved, closed }
 
 enum UserRole {
   superAdmin, ceo, hotelAdmin, receptionManager, maintenanceManager,
-  housekeepingManager, securityManager, deputyReception,
+  housekeepingManager, housekeeping, securityManager, deputyReception,
   receptionist, securityGuard, maintenanceTech, repairman;
 
   static UserRole fromString(String s) {
@@ -30,7 +30,8 @@ enum UserRole {
     this == UserRole.receptionManager || this == UserRole.maintenanceManager;
 
   String get homeScreen {
-    if (this == UserRole.housekeepingManager) return 'housekeeping';
+    if (this == UserRole.housekeepingManager) return 'housekeeping_manager';
+    if (this == UserRole.housekeeping) return 'housekeeping_staff';
     if (this == UserRole.ceo || this == UserRole.superAdmin) return 'manager';
     if (this == UserRole.maintenanceTech ||
         this == UserRole.repairman ||

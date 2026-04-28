@@ -8,7 +8,8 @@ void main() {
     expect(UserRole.maintenanceManager.homeScreen, 'maintenance');
   });
   test('housekeeping routes to housekeeping', () {
-    expect(UserRole.housekeepingManager.homeScreen, 'housekeeping');
+    expect(UserRole.housekeepingManager.homeScreen, 'housekeeping_manager');
+    expect(UserRole.housekeeping.homeScreen, 'housekeeping_staff');
   });
   test('manager roles route to manager', () {
     expect(UserRole.ceo.homeScreen, 'manager');

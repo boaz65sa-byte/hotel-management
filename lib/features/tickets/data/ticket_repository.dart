@@ -262,7 +262,7 @@ class TicketRepository {
       'maintenance': ['maintenance_manager', 'maintenance_tech', 'repairman'],
       'reception': ['reception_manager', 'deputy_reception', 'receptionist'],
       'security': ['security_manager', 'security_guard'],
-      'housekeeping': ['housekeeping_manager'],
+      'housekeeping': ['housekeeping_manager', 'housekeeping'],
     };
     final roles = deptRoles[dept] ?? [];
     if (roles.isEmpty) return [];
