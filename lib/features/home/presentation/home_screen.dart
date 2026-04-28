@@ -18,10 +18,11 @@ class HomeScreen extends ConsumerWidget {
     final role = UserRole.fromString(roleStr);
 
     return switch (role.homeScreen) {
-      'housekeeping' => const HousekeepingHomeScreen(),
-      'maintenance'  => const MaintenanceHomeScreen(),
-      'manager'      => const ManagerHomeScreen(),
-      _              => const ReceptionHomeScreen(),
+      'housekeeping_manager' => const HousekeepingHomeScreen(),
+      'housekeeping_staff'   => const HousekeepingHomeScreen(),
+      'maintenance'          => const MaintenanceHomeScreen(),
+      'manager'              => const ManagerHomeScreen(),
+      _                      => const ReceptionHomeScreen(),
     };
   }
 }
