@@ -1,3 +1,8 @@
+// SQL to run in Supabase SQL editor before deploying (do NOT run automatically):
+// ALTER TABLE rooms
+//   ADD COLUMN IF NOT EXISTS assigned_to uuid REFERENCES auth.users(id),
+//   ADD COLUMN IF NOT EXISTS assigned_to_name text;
+
 class Room {
   final String id;
   final String hotelId;
@@ -7,6 +12,8 @@ class Room {
   final String status; // available | on_hold | closed
   final String? notes;
   final String housekeepingStatus; // clean | dirty | cleaning
+  final String? assignedTo;
+  final String? assignedToName;
   final DateTime createdAt;
 
   const Room({
@@ -18,6 +25,8 @@ class Room {
     required this.status,
     this.notes,
     this.housekeepingStatus = 'clean',
+    this.assignedTo,
+    this.assignedToName,
     required this.createdAt,
   });
 
@@ -30,6 +39,8 @@ class Room {
     status: j['status'] as String,
     notes: j['notes'] as String?,
     housekeepingStatus: j['housekeeping_status'] as String? ?? 'clean',
+    assignedTo: j['assigned_to'] as String?,
+    assignedToName: j['assigned_to_name'] as String?,
     createdAt: DateTime.parse(j['created_at'] as String),
   );
 
