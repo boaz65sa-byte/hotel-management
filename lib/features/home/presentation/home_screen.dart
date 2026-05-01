@@ -5,8 +5,9 @@ import 'package:hotel_app/core/auth/auth_state.dart';
 import 'package:hotel_app/features/tickets/domain/ticket_status.dart';
 import 'package:hotel_app/features/home/presentation/reception_home.dart';
 import 'package:hotel_app/features/home/presentation/maintenance_home.dart';
-import 'package:hotel_app/features/home/presentation/housekeeping_home.dart';
 import 'package:hotel_app/features/home/presentation/manager_home.dart';
+import 'package:hotel_app/features/housekeeping/presentation/housekeeping_manager_screen.dart';
+import 'package:hotel_app/features/housekeeping/presentation/housekeeping_staff_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -18,8 +19,8 @@ class HomeScreen extends ConsumerWidget {
     final role = UserRole.fromString(roleStr);
 
     return switch (role.homeScreen) {
-      'housekeeping_manager' => const HousekeepingHomeScreen(),
-      'housekeeping_staff'   => const HousekeepingHomeScreen(),
+      'housekeeping_manager' => const HousekeepingManagerScreen(),
+      'housekeeping_staff'   => const HousekeepingStaffScreen(),
       'maintenance'          => const MaintenanceHomeScreen(),
       'manager'              => const ManagerHomeScreen(),
       _                      => const ReceptionHomeScreen(),
