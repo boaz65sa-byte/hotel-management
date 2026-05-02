@@ -128,10 +128,24 @@ class _StaffRequestCard extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               FilledButton(
-                onPressed: () => ref
-                    .read(guestRequestRepositoryProvider)
-                    .updateStatus(request.id,
-                        isInProgress ? 'resolved' : 'in_progress'),
+                onPressed: () async {
+                  try {
+                    await ref
+                        .read(guestRequestRepositoryProvider)
+                        .updateStatus(
+                            request.id,
+                            isInProgress ? 'resolved' : 'in_progress');
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('עדכון נכשל: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                },
                 style: FilledButton.styleFrom(
                   backgroundColor: isInProgress
                       ? const Color(0xFF4ADE80)
