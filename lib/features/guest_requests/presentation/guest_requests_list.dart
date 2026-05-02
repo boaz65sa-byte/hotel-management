@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hotel_app/core/auth/auth_state.dart';
 import 'package:hotel_app/features/guest_requests/domain/guest_request_model.dart';
 import 'package:hotel_app/features/guest_requests/presentation/guest_request_card.dart';
+import 'package:hotel_app/features/guest_requests/presentation/hotel_qr_screen.dart';
 import 'package:hotel_app/features/guest_requests/presentation/new_guest_request_screen.dart';
 import 'package:hotel_app/features/guest_requests/providers/guest_request_providers.dart';
 
@@ -45,21 +47,40 @@ class _GuestRequestsListScreenState
             all.where((r) => _matchesFilter(r, _filter)).toList();
         return Scaffold(
           backgroundColor: const Color(0xFF0A1628),
+          appBar: AppBar(
+            backgroundColor: const Color(0xFF0A1628),
+            automaticallyImplyLeading: false,
+            title: const Text(
+              'בקשות אורחים',
+              style: TextStyle(
+                color: Color(0xFFC9A84C),
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            actions: [
+              Builder(builder: (context) {
+                final hotelId = ref.read(currentUserProvider)?.appMetadata['hotel_id'] as String?;
+                if (hotelId == null) return const SizedBox.shrink();
+                return IconButton(
+                  icon: const Icon(Icons.qr_code, color: Color(0xFFC9A84C)),
+                  tooltip: 'QR קוד מלון',
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => HotelQrScreen(
+                        hotelId: hotelId,
+                        hotelName: 'המלון',
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
           body: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: Text(
-                    'בקשות אורחים',
-                    style: TextStyle(
-                      color: Color(0xFFC9A84C),
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
