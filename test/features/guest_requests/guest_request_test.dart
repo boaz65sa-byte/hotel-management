@@ -6,6 +6,7 @@ import 'package:hotel_app/features/guest_requests/domain/guest_request_model.dar
 import 'package:hotel_app/features/guest_requests/presentation/guest_request_card.dart';
 import 'package:hotel_app/features/guest_requests/presentation/guest_requests_list.dart';
 import 'package:hotel_app/features/guest_requests/providers/guest_request_providers.dart';
+import 'package:hotel_app/features/guest_requests/presentation/staff_requests_screen.dart';
 
 void main() {
   group('GuestRequest.fromJson', () {
@@ -170,6 +171,55 @@ void main() {
       ));
       await tester.pumpAndSettle();
       expect(find.text('אין בקשות'), findsOneWidget);
+    });
+  });
+
+  group('StaffRequestsScreen', () {
+    GuestRequest _makeReq({String status = 'open'}) => GuestRequest(
+          id: 'r1',
+          hotelId: 'h1',
+          roomNumber: '303',
+          guestName: 'אורח',
+          category: 'maintenance',
+          status: status,
+          createdBy: 'guest',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+    testWidgets('shows assigned request with התחל טיפול', (tester) async {
+      await tester.pumpWidget(ProviderScope(
+        overrides: [
+          myDeptRequestsProvider.overrideWith((_) => Stream.value([_makeReq()])),
+        ],
+        child: const MaterialApp(home: StaffRequestsScreen()),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('חדר 303'), findsOneWidget);
+      expect(find.text('התחל טיפול'), findsOneWidget);
+    });
+
+    testWidgets('shows empty state', (tester) async {
+      await tester.pumpWidget(ProviderScope(
+        overrides: [
+          myDeptRequestsProvider.overrideWith((_) => Stream.value([])),
+        ],
+        child: const MaterialApp(home: StaffRequestsScreen()),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.text('אין בקשות להיום ✅'), findsOneWidget);
+    });
+
+    testWidgets('shows סמן כטופל for in_progress', (tester) async {
+      await tester.pumpWidget(ProviderScope(
+        overrides: [
+          myDeptRequestsProvider.overrideWith(
+              (_) => Stream.value([_makeReq(status: 'in_progress')])),
+        ],
+        child: const MaterialApp(home: StaffRequestsScreen()),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.text('סמן כטופל'), findsOneWidget);
     });
   });
 }
