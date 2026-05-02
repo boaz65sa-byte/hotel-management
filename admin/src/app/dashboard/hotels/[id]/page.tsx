@@ -28,6 +28,14 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Edit Hotel: {hotel.name}</h1>
+      <div className="mb-6">
+        <a
+          href={`/dashboard/hotels/${hotel.id}/qr-codes`}
+          className="inline-flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700"
+        >
+          🔲 QR Codes לחדרים
+        </a>
+      </div>
       <HotelForm hotel={{
         id: hotel.id,
         name: hotel.name,
