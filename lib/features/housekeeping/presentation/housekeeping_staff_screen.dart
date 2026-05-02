@@ -7,6 +7,7 @@ import 'package:hotel_app/core/supabase/supabase_client.dart';
 import 'package:hotel_app/features/housekeeping/providers/housekeeping_providers.dart';
 import 'package:hotel_app/features/profile/presentation/profile_screen.dart';
 import 'package:hotel_app/features/rooms/domain/room_model.dart';
+import 'package:hotel_app/features/guest_requests/presentation/staff_requests_screen.dart';
 
 class HousekeepingStaffScreen extends ConsumerStatefulWidget {
   const HousekeepingStaffScreen({super.key});
@@ -23,7 +24,8 @@ class _HousekeepingStaffScreenState
   Widget build(BuildContext context) {
     final tabs = [
       (icon: Icons.cleaning_services, label: 'החדרים שלי', screen: const _StaffRoomList()),
-      (icon: Icons.person, label: 'פרופיל', screen: const ProfileScreen()),
+      (icon: Icons.room_service,      label: 'בקשות',      screen: const StaffRequestsScreen()),
+      (icon: Icons.person,            label: 'פרופיל',     screen: const ProfileScreen()),
     ];
     return Scaffold(
       body: tabs[_tab].screen,

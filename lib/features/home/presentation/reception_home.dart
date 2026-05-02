@@ -5,6 +5,7 @@ import 'package:hotel_app/core/i18n/app_localizations.dart';
 import 'package:hotel_app/features/rooms/presentation/rooms_grid_screen.dart';
 import 'package:hotel_app/features/tickets/presentation/tickets_list_screen.dart';
 import 'package:hotel_app/features/profile/presentation/profile_screen.dart';
+import 'package:hotel_app/features/guest_requests/presentation/guest_requests_list.dart';
 
 class ReceptionHomeScreen extends ConsumerStatefulWidget {
   const ReceptionHomeScreen({super.key});
@@ -19,9 +20,10 @@ class _ReceptionHomeScreenState extends ConsumerState<ReceptionHomeScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final tabs = [
-      (icon: Icons.hotel,            label: l.rooms,     screen: const RoomsGridScreen()),
-      (icon: Icons.confirmation_num, label: l.myTickets, screen: const TicketsListScreen()),
-      (icon: Icons.person,           label: l.profile,   screen: const ProfileScreen()),
+      (icon: Icons.hotel,            label: l.rooms,         screen: const RoomsGridScreen()),
+      (icon: Icons.confirmation_num, label: l.myTickets,     screen: const TicketsListScreen()),
+      (icon: Icons.room_service,     label: 'בקשות אורחים', screen: const GuestRequestsListScreen()),
+      (icon: Icons.person,           label: l.profile,       screen: const ProfileScreen()),
     ];
     return Scaffold(
       body: tabs[_tab].screen,

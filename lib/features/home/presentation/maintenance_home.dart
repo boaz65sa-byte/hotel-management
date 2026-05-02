@@ -7,6 +7,7 @@ import 'package:hotel_app/features/home/providers/maintenance_home_provider.dart
 import 'package:hotel_app/features/tickets/domain/ticket_model.dart';
 import 'package:hotel_app/features/tickets/presentation/ticket_card.dart';
 import 'package:hotel_app/features/profile/presentation/profile_screen.dart';
+import 'package:hotel_app/features/guest_requests/presentation/staff_requests_screen.dart';
 
 // Priority filter options
 const _priorityFilters = ['הכל', 'urgent', 'high', 'normal', 'low'];
@@ -32,8 +33,9 @@ class _MaintenanceHomeScreenState extends ConsumerState<MaintenanceHomeScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final tabs = [
-      (icon: Icons.queue,  label: 'קריאות',  screen: const _MaintenanceQueue()),
-      (icon: Icons.person, label: l.profile, screen: const ProfileScreen()),
+      (icon: Icons.queue,        label: 'קריאות',  screen: const _MaintenanceQueue()),
+      (icon: Icons.room_service, label: 'בקשות',   screen: const StaffRequestsScreen()),
+      (icon: Icons.person,       label: l.profile, screen: const ProfileScreen()),
     ];
     return Scaffold(
       body: tabs[_tab].screen,

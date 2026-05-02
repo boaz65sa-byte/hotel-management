@@ -6,6 +6,8 @@ import 'package:hotel_app/features/home/providers/manager_home_provider.dart';
 import 'package:hotel_app/features/analytics/presentation/analytics_screen.dart';
 import 'package:hotel_app/features/users/presentation/users_screen.dart';
 import 'package:hotel_app/features/profile/presentation/profile_screen.dart';
+import 'package:hotel_app/features/guest_requests/presentation/guest_requests_list.dart';
+import 'package:hotel_app/features/guest_requests/presentation/guest_feedback_screen.dart';
 
 class ManagerHomeScreen extends ConsumerStatefulWidget {
   const ManagerHomeScreen({super.key});
@@ -20,10 +22,12 @@ class _ManagerHomeScreenState extends ConsumerState<ManagerHomeScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final tabs = [
-      (icon: Icons.dashboard, label: 'דשבורד',    screen: const _ManagerDashboard()),
-      (icon: Icons.bar_chart,  label: l.analytics, screen: const AnalyticsScreen()),
-      (icon: Icons.people,     label: l.users,     screen: const UsersScreen()),
-      (icon: Icons.person,     label: l.profile,   screen: const ProfileScreen()),
+      (icon: Icons.dashboard,    label: 'דשבורד',    screen: const _ManagerDashboard()),
+      (icon: Icons.room_service, label: 'בקשות',     screen: const GuestRequestsListScreen()),
+      (icon: Icons.star,         label: 'משובים',    screen: const GuestFeedbackScreen()),
+      (icon: Icons.bar_chart,    label: l.analytics, screen: const AnalyticsScreen()),
+      (icon: Icons.people,       label: l.users,     screen: const UsersScreen()),
+      (icon: Icons.person,       label: l.profile,   screen: const ProfileScreen()),
     ];
     return Scaffold(
       body: tabs[_tab].screen,

@@ -6,7 +6,7 @@ import 'package:hotel_app/core/i18n/app_localizations.dart';
 import 'package:hotel_app/features/home/presentation/reception_home.dart';
 
 void main() {
-  testWidgets('ReceptionHomeScreen has 3 nav tabs', (tester) async {
+  testWidgets('ReceptionHomeScreen has 4 nav tabs', (tester) async {
     await tester.pumpWidget(
       const ProviderScope(
         child: MaterialApp(
@@ -23,6 +23,6 @@ void main() {
     );
     await tester.pump();
     expect(find.byType(NavigationBar), findsOneWidget);
-    expect(find.byType(NavigationDestination), findsNWidgets(3));
+    expect(find.byType(NavigationDestination), findsNWidgets(4));
   });
 }
