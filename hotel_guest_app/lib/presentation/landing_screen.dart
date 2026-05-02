@@ -1,0 +1,161 @@
+// hotel_guest_app/lib/presentation/landing_screen.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hotel_guest_app/core/session.dart';
+import 'package:hotel_guest_app/providers/providers.dart';
+
+class LandingScreen extends ConsumerStatefulWidget {
+  /// hotel_id from URL query param ?hotel=<id>
+  final String? hotelId;
+  const LandingScreen({super.key, this.hotelId});
+
+  @override
+  ConsumerState<LandingScreen> createState() => _LandingScreenState();
+}
+
+class _LandingScreenState extends ConsumerState<LandingScreen> {
+  final _nameCtrl = TextEditingController();
+  final _roomCtrl = TextEditingController();
+  bool _loading = false;
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _roomCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _enter() async {
+    final name = _nameCtrl.text.trim();
+    final room = _roomCtrl.text.trim();
+    final hotel = widget.hotelId;
+
+    if (name.isEmpty || room.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('נא למלא שם ומספר חדר')),
+      );
+      return;
+    }
+    if (hotel == null || hotel.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('קוד מלון חסר — סרקו שוב את ה-QR'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    setState(() => _loading = true);
+    try {
+      await GuestSession.save(
+          guestName: name, roomNumber: room, hotelId: hotel);
+      ref.invalidate(sessionProvider);
+      if (mounted) context.go('/home');
+    } catch (e) {
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('שגיאה: $e'), backgroundColor: Colors.red),
+        );
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A1628),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.hotel,
+                      color: Color(0xFFC9A84C), size: 56),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'ברוכים הבאים',
+                    style: TextStyle(
+                      color: Color(0xFFC9A84C),
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'מלאו את הפרטים כדי להתחיל',
+                    style: TextStyle(
+                        color: Color(0xFF94A3B8), fontSize: 14),
+                  ),
+                  const SizedBox(height: 32),
+                  _buildField(_nameCtrl, 'שמך המלא', Icons.person),
+                  const SizedBox(height: 16),
+                  _buildField(
+                      _roomCtrl, 'מספר חדר', Icons.door_front_door,
+                      type: TextInputType.number),
+                  const SizedBox(height: 28),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: _loading ? null : _enter,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFFC9A84C),
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        textStyle: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w700),
+                      ),
+                      child: _loading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.black))
+                          : const Text('כניסה →'),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    '+ ניתן להוסיף לדף הבית לגישה מהירה',
+                    style:
+                        TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildField(
+      TextEditingController ctrl, String hint, IconData icon,
+      {TextInputType? type}) =>
+      TextField(
+        controller: ctrl,
+        keyboardType: type,
+        style: const TextStyle(color: Color(0xFFE2E8F0)),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(color: Color(0xFF64748B)),
+          prefixIcon: Icon(icon, color: const Color(0xFF64748B)),
+          filled: true,
+          fillColor: const Color(0xFF0F1F3D),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Color(0xFF1E3A5F)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Color(0xFF1E3A5F)),
+          ),
+        ),
+      );
+}
