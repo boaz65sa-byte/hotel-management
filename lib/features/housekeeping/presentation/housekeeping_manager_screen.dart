@@ -5,6 +5,7 @@ import 'package:hotel_app/features/housekeeping/data/housekeeping_repository.dar
 import 'package:hotel_app/features/housekeeping/providers/housekeeping_providers.dart';
 import 'package:hotel_app/features/profile/presentation/profile_screen.dart';
 import 'package:hotel_app/features/rooms/domain/room_model.dart';
+import 'package:hotel_app/features/guest_requests/presentation/staff_requests_screen.dart';
 
 class HousekeepingManagerScreen extends ConsumerStatefulWidget {
   const HousekeepingManagerScreen({super.key});
@@ -21,7 +22,8 @@ class _HousekeepingManagerScreenState
   Widget build(BuildContext context) {
     final tabs = [
       (icon: Icons.cleaning_services, label: 'ניהול חדרים', screen: const _ManagerRoomList()),
-      (icon: Icons.person, label: 'פרופיל', screen: const ProfileScreen()),
+      (icon: Icons.room_service,      label: 'בקשות',       screen: const StaffRequestsScreen()),
+      (icon: Icons.person,            label: 'פרופיל',      screen: const ProfileScreen()),
     ];
     return Scaffold(
       body: tabs[_tab].screen,
