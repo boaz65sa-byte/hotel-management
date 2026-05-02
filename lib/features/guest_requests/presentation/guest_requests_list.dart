@@ -6,6 +6,8 @@ import 'package:hotel_app/features/guest_requests/presentation/guest_request_car
 import 'package:hotel_app/features/guest_requests/presentation/hotel_qr_screen.dart';
 import 'package:hotel_app/features/guest_requests/presentation/new_guest_request_screen.dart';
 import 'package:hotel_app/features/guest_requests/providers/guest_request_providers.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:hotel_app/features/guest_requests/data/guest_export_service.dart';
 
 const _filters = ['הכול', 'פתוחות', 'בטיפול', 'טופלו'];
 
@@ -26,6 +28,33 @@ class GuestRequestsListScreen extends ConsumerStatefulWidget {
 class _GuestRequestsListScreenState
     extends ConsumerState<GuestRequestsListScreen> {
   String _filter = 'הכול';
+  bool _exporting = false;
+
+  Future<void> _export(List<GuestRequest> requests) async {
+    setState(() => _exporting = true);
+    try {
+      final feedback = await ref.read(guestFeedbackProvider.future);
+      final path = await GuestExportService.export(
+        requests: requests,
+        feedback: feedback,
+      );
+      await Share.shareXFiles(
+        [XFile(path)],
+        subject: 'דוח בקשות אורחים',
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('שגיאה בייצוא: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _exporting = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +88,23 @@ class _GuestRequestsListScreenState
               ),
             ),
             actions: [
+              if (_exporting)
+                const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: Color(0xFFC9A84C)),
+                  ),
+                )
+              else
+                IconButton(
+                  icon: const Icon(Icons.file_download,
+                      color: Color(0xFFC9A84C)),
+                  tooltip: 'ייצוא Excel',
+                  onPressed: () => _export(all),
+                ),
               Builder(builder: (context) {
                 final hotelId = ref.read(currentUserProvider)?.appMetadata['hotel_id'] as String?;
                 if (hotelId == null) return const SizedBox.shrink();
