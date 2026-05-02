@@ -153,9 +153,17 @@ class _GuestRequestsListScreenState
                     color: Color(0xFFFB923C)),
                 title: const Text('התחל טיפול',
                     style: TextStyle(color: Color(0xFFE2E8F0))),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  repo.updateStatus(request.id, 'in_progress');
+                  try {
+                    await repo.updateStatus(request.id, 'in_progress');
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('שגיאה: $e'), backgroundColor: Colors.red),
+                      );
+                    }
+                  }
                 },
               ),
             if (request.status == 'in_progress')
@@ -164,9 +172,17 @@ class _GuestRequestsListScreenState
                     color: Color(0xFF4ADE80)),
                 title: const Text('סמן כטופל',
                     style: TextStyle(color: Color(0xFFE2E8F0))),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  repo.updateStatus(request.id, 'resolved');
+                  try {
+                    await repo.updateStatus(request.id, 'resolved');
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('שגיאה: $e'), backgroundColor: Colors.red),
+                      );
+                    }
+                  }
                 },
               ),
             ListTile(
@@ -184,6 +200,7 @@ class _GuestRequestsListScreenState
 
   void _showReassignSheet(GuestRequest request) {
     Navigator.pop(context);
+    if (!mounted) return;
     final repo = ref.read(guestRequestRepositoryProvider);
     showModalBottomSheet(
       context: context,
@@ -213,9 +230,17 @@ class _GuestRequestsListScreenState
                 trailing: request.assignedDept == entry.$1
                     ? const Icon(Icons.check, color: Color(0xFFC9A84C))
                     : null,
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  repo.reassign(request.id, entry.$1);
+                  try {
+                    await repo.reassign(request.id, entry.$1);
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('שגיאה: $e'), backgroundColor: Colors.red),
+                      );
+                    }
+                  }
                 },
               ),
           ],

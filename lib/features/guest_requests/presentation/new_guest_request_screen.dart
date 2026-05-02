@@ -177,5 +177,9 @@ class _NewGuestRequestScreenState
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: Color(0xFF1E3A5F)),
         ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFC9A84C)),
+        ),
       );
 }
