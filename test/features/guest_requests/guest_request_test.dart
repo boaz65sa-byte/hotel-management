@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hotel_app/features/guest_requests/domain/guest_request_model.dart';
 import 'package:hotel_app/features/guest_requests/presentation/guest_request_card.dart';
+import 'package:hotel_app/features/guest_requests/presentation/guest_requests_list.dart';
+import 'package:hotel_app/features/guest_requests/providers/guest_request_providers.dart';
 
 void main() {
   group('GuestRequest.fromJson', () {
@@ -126,6 +128,48 @@ void main() {
         home: Scaffold(body: GuestRequestCard(request: _makeReq(status: 'resolved'))),
       ));
       expect(find.text('טופלה'), findsOneWidget);
+    });
+  });
+
+  group('GuestRequestsListScreen', () {
+    GuestRequest _makeReq({String status = 'open', String roomNumber = '101'}) =>
+        GuestRequest(
+          id: roomNumber,
+          hotelId: 'h1',
+          roomNumber: roomNumber,
+          guestName: 'אורח',
+          category: 'housekeeping',
+          status: status,
+          createdBy: 'guest',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+    testWidgets('shows all requests', (tester) async {
+      final requests = [
+        _makeReq(roomNumber: '101'),
+        _makeReq(roomNumber: '202', status: 'in_progress'),
+      ];
+      await tester.pumpWidget(ProviderScope(
+        overrides: [
+          allGuestRequestsProvider.overrideWith((_) => Stream.value(requests)),
+        ],
+        child: const MaterialApp(home: GuestRequestsListScreen()),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('חדר 101'), findsOneWidget);
+      expect(find.textContaining('חדר 202'), findsOneWidget);
+    });
+
+    testWidgets('shows empty state when no requests', (tester) async {
+      await tester.pumpWidget(ProviderScope(
+        overrides: [
+          allGuestRequestsProvider.overrideWith((_) => Stream.value([])),
+        ],
+        child: const MaterialApp(home: GuestRequestsListScreen()),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.text('אין בקשות'), findsOneWidget);
     });
   });
 }
