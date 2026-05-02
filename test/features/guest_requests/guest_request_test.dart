@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hotel_app/features/guest_requests/domain/guest_request_model.dart';
+import 'package:hotel_app/features/guest_requests/presentation/guest_request_card.dart';
 
 void main() {
   group('GuestRequest.fromJson', () {
@@ -80,6 +81,51 @@ void main() {
       };
       final fb = GuestFeedback.fromJson(json);
       expect(fb.comment, isNull);
+    });
+  });
+
+  group('GuestRequestCard', () {
+    GuestRequest _makeReq({String status = 'open', String category = 'housekeeping'}) =>
+        GuestRequest(
+          id: 'r1',
+          hotelId: 'h1',
+          roomNumber: '205',
+          guestName: 'דנה כהן',
+          category: category,
+          description: 'מגבות נוספות',
+          status: status,
+          createdBy: 'guest',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+    testWidgets('shows room number and guest name', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(body: GuestRequestCard(request: _makeReq())),
+      ));
+      expect(find.textContaining('חדר 205'), findsOneWidget);
+      expect(find.textContaining('דנה כהן'), findsOneWidget);
+    });
+
+    testWidgets('shows category label for housekeeping', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(body: GuestRequestCard(request: _makeReq())),
+      ));
+      expect(find.text('🛏️ חדרניות'), findsOneWidget);
+    });
+
+    testWidgets('shows status badge for in_progress', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(body: GuestRequestCard(request: _makeReq(status: 'in_progress'))),
+      ));
+      expect(find.text('בטיפול'), findsOneWidget);
+    });
+
+    testWidgets('shows resolved status badge', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(body: GuestRequestCard(request: _makeReq(status: 'resolved'))),
+      ));
+      expect(find.text('טופלה'), findsOneWidget);
     });
   });
 }
