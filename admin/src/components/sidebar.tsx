@@ -15,6 +15,8 @@ export function Sidebar() {
     { href: '/dashboard/logs',      label: t.auditLogs,  icon: '📋' },
     { href: '/dashboard/checklists',   label: 'צ׳קליסטים',  icon: '✅' },
     { href: '/dashboard/automations',  label: 'אוטומציות',   icon: '⚡' },
+    { href: '/dashboard/guest-requests',   label: 'בקשות אורחים', icon: '🛎️' },
+    { href: '/dashboard/guest-feedback',   label: 'משובים',        icon: '⭐' },
   ]
 
   return (

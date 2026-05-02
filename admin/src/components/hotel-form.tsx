@@ -4,7 +4,8 @@ import { useRouter } from 'next/navigation'
 
 type Hotel = { id?: string; name: string; subscription_plan: string
                default_sla_hours: number; default_language: string
-               is_active: boolean; theme?: string | null }
+               is_active: boolean; theme?: string | null
+               stay_threshold?: number }
 
 export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormData) => Promise<void> }) {
   const [data, setData] = useState(hotel)
@@ -76,6 +77,23 @@ export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormDa
           </button>
         </div>
         <input type="hidden" name="theme" value={data.theme ?? 'clean_blue'} />
+      </div>
+
+      {/* TODO: requires DB migration to add stay_threshold column to hotels table */}
+      <div>
+        <label className="block text-sm font-medium mb-1">ימי שהייה לפני משוב (stay_threshold)</label>
+        <input
+          type="number"
+          name="stay_threshold"
+          value={data.stay_threshold ?? 3}
+          onChange={e => setData({...data, stay_threshold: +e.target.value})}
+          className="w-full border rounded px-3 py-2"
+          min={1}
+          max={30}
+        />
+        <p className="text-xs text-gray-500 mt-1">
+          מספר ימים מכניסת האורח עד שמוצג banner המשוב ב-PWA (ברירת מחדל: 3)
+        </p>
       </div>
 
       <div className="flex items-center gap-3">

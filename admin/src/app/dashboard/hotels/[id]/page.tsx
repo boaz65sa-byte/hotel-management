@@ -21,6 +21,7 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
       default_language:  fd.get('default_language') as string,
       theme:             (fd.get('theme') as string) || 'clean_blue',
       is_active:         fd.get('is_active') === 'on',
+      stay_threshold:    Number(fd.get('stay_threshold')) || 3,
     }).eq('id', id)
     redirect('/dashboard/hotels')
   }
@@ -44,6 +45,7 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
         default_language: hotel.default_language,
         is_active: hotel.is_active,
         theme: hotel.theme,
+        stay_threshold: hotel.stay_threshold ?? 3,
       }} action={updateHotel} />
     </div>
   )
