@@ -78,6 +78,6 @@ class GuestRequestRepository {
         .select()
         .eq('hotel_id', hotelId)
         .order('created_at', ascending: false);
-    return (res as List).map((j) => GuestFeedback.fromJson(j)).toList();
+    return res.map((j) => GuestFeedback.fromJson(j)).toList();
   }
 }
