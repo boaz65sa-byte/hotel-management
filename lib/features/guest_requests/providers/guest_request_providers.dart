@@ -10,19 +10,19 @@ final guestRequestRepositoryProvider =
 /// All requests for the hotel — reception and manager view.
 final allGuestRequestsProvider = StreamProvider<List<GuestRequest>>((ref) {
   final user = ref.watch(currentUserProvider);
-  final hotelId = user?.appMetadata['hotel_id'] as String?;
+  final hotelId = user?.appMetadata['hotel_id']?.toString();
   if (hotelId == null) return const Stream.empty();
-  return ref.read(guestRequestRepositoryProvider).streamAll(hotelId);
+  return ref.watch(guestRequestRepositoryProvider).streamAll(hotelId);
 });
 
 /// Requests for current user's department — housekeeping and maintenance staff.
 final myDeptRequestsProvider = StreamProvider<List<GuestRequest>>((ref) {
   final user = ref.watch(currentUserProvider);
-  final hotelId = user?.appMetadata['hotel_id'] as String?;
-  final role = (user?.appMetadata['role'] as String?) ?? '';
+  final hotelId = user?.appMetadata['hotel_id']?.toString();
+  final role = (user?.appMetadata['role']?.toString()) ?? '';
   final dept = _roleToDept(role);
   if (hotelId == null || dept == null) return const Stream.empty();
-  return ref.read(guestRequestRepositoryProvider).streamMyDept(hotelId, dept);
+  return ref.watch(guestRequestRepositoryProvider).streamMyDept(hotelId, dept);
 });
 
 String? _roleToDept(String role) => switch (role) {
@@ -35,7 +35,7 @@ String? _roleToDept(String role) => switch (role) {
 /// Guest feedback list — manager/admin only.
 final guestFeedbackProvider = FutureProvider<List<GuestFeedback>>((ref) async {
   final user = ref.watch(currentUserProvider);
-  final hotelId = user?.appMetadata['hotel_id'] as String?;
+  final hotelId = user?.appMetadata['hotel_id']?.toString();
   if (hotelId == null) return [];
-  return ref.read(guestRequestRepositoryProvider).fetchFeedback(hotelId);
+  return ref.watch(guestRequestRepositoryProvider).fetchFeedback(hotelId);
 });
