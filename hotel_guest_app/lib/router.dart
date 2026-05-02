@@ -20,9 +20,10 @@ GoRouter buildRouter() => GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) {
-        // hotel_id comes from URL query param: /?hotel=<id>
-        final hotelId = state.uri.queryParameters['hotel'];
-        return LandingScreen(hotelId: hotelId);
+        // hotel_id and room come from URL query params: /?hotel=<id>&room=<number>
+        final hotelId    = state.uri.queryParameters['hotel'];
+        final roomNumber = state.uri.queryParameters['room'];
+        return LandingScreen(hotelId: hotelId, roomNumber: roomNumber);
       },
     ),
     GoRoute(

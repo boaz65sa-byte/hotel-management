@@ -8,7 +8,8 @@ import 'package:hotel_guest_app/providers/providers.dart';
 class LandingScreen extends ConsumerStatefulWidget {
   /// hotel_id from URL query param ?hotel=<id>
   final String? hotelId;
-  const LandingScreen({super.key, this.hotelId});
+  final String? roomNumber;
+  const LandingScreen({super.key, this.hotelId, this.roomNumber});
 
   @override
   ConsumerState<LandingScreen> createState() => _LandingScreenState();
@@ -18,6 +19,14 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
   final _nameCtrl = TextEditingController();
   final _roomCtrl = TextEditingController();
   bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.roomNumber != null && widget.roomNumber!.isNotEmpty) {
+      _roomCtrl.text = widget.roomNumber!;
+    }
+  }
 
   @override
   void dispose() {
