@@ -124,14 +124,14 @@ class AnalyticsRepository {
     DateTime? from,
     DateTime? to,
   }) async {
-    var query = supabase.from('tickets').select('department, created_at');
+    var query = supabase.from('tickets').select('assigned_dept, created_at');
     if (from != null) query = query.gte('created_at', from.toIso8601String()) as dynamic;
     if (to != null) query = query.lte('created_at', to.toIso8601String()) as dynamic;
 
     final rows = (await query) as List;
     final map = <String, int>{};
     for (final r in rows) {
-      final dept = (r['department'] as String?) ?? 'unknown';
+      final dept = (r['assigned_dept'] as String?) ?? 'unknown';
       map[dept] = (map[dept] ?? 0) + 1;
     }
     final total = map.values.fold(0, (a, b) => a + b);
@@ -200,7 +200,7 @@ class AnalyticsRepository {
     final rows = await supabase
         .from('tickets')
         .select(
-            'id, title, department, priority, status, created_at, resolved_at, claimed_by, room:rooms(room_number)')
+            'id, title, assigned_dept, priority, status, created_at, resolved_at, claimed_by, room:rooms(room_number)')
         .gte('created_at', from.toIso8601String())
         .lte('created_at', to.toIso8601String())
         .order('created_at');
