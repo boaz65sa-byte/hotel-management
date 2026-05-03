@@ -7,6 +7,7 @@ import 'package:hotel_app/core/i18n/locale_provider.dart';
 import 'package:hotel_app/core/theme/app_theme.dart';
 import 'package:hotel_app/core/theme/theme_provider.dart';
 import 'package:hotel_app/core/supabase/supabase_client.dart';
+import 'package:hotel_app/core/push/push_service.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -46,6 +47,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               .single();
           final themeStr = hotel['theme'] as String? ?? 'clean_blue';
           ref.read(hotelThemeProvider.notifier).state = AppTheme.forHotel(themeStr);
+        }
+        // Set up push notification tags for this user
+        final pushRole   = supabase.auth.currentUser?.appMetadata['role']?.toString() ?? '';
+        final pushUserId = supabase.auth.currentUser?.id ?? '';
+        if (mounted && hotelId != null && pushRole.isNotEmpty) {
+          await PushService.setupAfterLogin(
+            role:    pushRole,
+            hotelId: hotelId,
+            userId:  pushUserId,
+            context: context,
+          );
         }
         // superAdmin has no hotel_id — default clean_blue stays, no action needed
       }
