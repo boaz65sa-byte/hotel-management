@@ -1,26 +1,38 @@
-# Phase 11b — Flutter Push Notifications Implementation Plan
+# Phase 11b — Flutter Push Notifications (OneSignal) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add Firebase Cloud Messaging to the Flutter hotel app so staff receive push notifications for new requests and assigned tickets.
+**Goal:** Add OneSignal push notifications to the Flutter hotel app so staff receive alerts for new requests and assigned tickets.
 
-**Architecture:** `PushService` encapsulates all FCM logic: request permission, get token, subscribe to department topics, save token to `user_push_tokens`, and display foreground alerts via SnackBar. Called from `LoginScreen` after successful login, and cleaned up on logout.
+**Architecture:** `PushService` uses `onesignal_flutter` to initialize, request permission, set identifying tags (hotel_id, dept, role, user_id), and display foreground SnackBar alerts. Called from `LoginScreen` after successful login.
 
-**Tech Stack:** Flutter + `firebase_core` + `firebase_messaging` + Riverpod
+**Tech Stack:** Flutter + `onesignal_flutter: ^5.2.6`
 
 ---
 
-## ⚠️ Prerequisites (Manual — Developer Must Do Before This Plan)
+## ⚠️ Prerequisites (Manual — Before This Plan)
 
-1. Create Firebase project → Add Android + iOS apps
-2. Download `google-services.json` → place at `android/app/google-services.json`
-3. Download `GoogleService-Info.plist` → place at `ios/Runner/GoogleService-Info.plist`
-4. Run: `dart pub global activate flutterfire_cli && flutterfire configure`
-   - This generates `lib/firebase_options.dart`
-5. Confirm `android/build.gradle` has `classpath 'com.google.gms:google-services:...'`
-6. Confirm `android/app/build.gradle` has `apply plugin: 'com.google.gms.google-services'`
+### Android
+1. OneSignal dashboard → Platforms → Google Android → enter Firebase Server Key
+   *(Get from Firebase Console → Project Settings → Cloud Messaging → Server key)*
+2. Ensure `android/app/google-services.json` exists (still needed for OneSignal internally)
+3. Add to `android/build.gradle` classpath (if not already):
+   ```
+   classpath 'com.google.gms:google-services:4.4.2'
+   ```
+4. Add to `android/app/build.gradle` (if not already):
+   ```
+   apply plugin: 'com.google.gms.google-services'
+   ```
 
-**These steps cannot be automated — the plan assumes they are complete.**
+### iOS
+1. OneSignal dashboard → Platforms → Apple iOS → upload APNs .p8 key
+   *(Get from [developer.apple.com](https://developer.apple.com) → Certificates → Keys)*
+2. Enable Push Notifications capability in Xcode (ios/Runner.xcworkspace)
+
+### OneSignal App ID
+- Get from OneSignal Dashboard → Settings → Keys & IDs → **App ID**
+- Add to `.env` file: `ONESIGNAL_APP_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
 
 ---
 
@@ -28,24 +40,24 @@
 
 | Action | File |
 |--------|------|
-| Modify | `pubspec.yaml` — add `firebase_core`, `firebase_messaging` |
-| Modify | `lib/main.dart` — call `Firebase.initializeApp()` |
+| Modify | `pubspec.yaml` — add `onesignal_flutter` |
+| Modify | `.env` — add `ONESIGNAL_APP_ID` |
 | Create | `lib/core/push/push_service.dart` |
-| Modify | `lib/features/auth/login_screen.dart` — call `PushService` after login |
+| Modify | `lib/features/auth/login_screen.dart` — call PushService after login |
+| Modify | `lib/main.dart` — init OneSignal |
 
 ---
 
-### Task 1: Add Firebase dependencies
+### Task 1: Add `onesignal_flutter` dependency
 
 **Files:**
 - Modify: `pubspec.yaml`
 
-- [ ] **Step 1: Add dependencies**
+- [ ] **Step 1: Add dependency**
 
-In `pubspec.yaml`, under `# Backend` or `# Utilities`:
+Under `# Backend` in `pubspec.yaml`:
 ```yaml
-  firebase_core: ^3.6.0
-  firebase_messaging: ^15.1.3
+  onesignal_flutter: ^5.2.6
 ```
 
 - [ ] **Step 2: Install**
@@ -59,67 +71,34 @@ Expected: `Got dependencies!`
 - [ ] **Step 3: Commit**
 
 ```bash
-git add pubspec.yaml pubspec.lock
-git commit -m "chore: add firebase_core and firebase_messaging dependencies"
+git add pubspec.yaml && git commit -m "chore: add onesignal_flutter dependency"
 ```
 
 ---
 
-### Task 2: Initialize Firebase in main.dart
+### Task 2: Add OneSignal App ID to .env
 
 **Files:**
-- Modify: `lib/main.dart`
+- Modify: `.env`
 
-Current content:
-```dart
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  if (kIsWeb) {
-    databaseFactory = databaseFactoryFfiWeb;
-  }
-  await dotenv.load();
-  await initSupabase();
-  await LocalDb.instance; // pre-warm SQLite
-  runApp(const ProviderScope(child: HotelApp()));
-}
+- [ ] **Step 1: Add to .env**
+
+Add this line to `.env` (developer fills in the real value):
+```
+ONESIGNAL_APP_ID=YOUR_ONESIGNAL_APP_ID_HERE
 ```
 
-- [ ] **Step 1: Add Firebase import and init**
+- [ ] **Step 2: Add to .env.example (if it exists)**
 
-Add import:
-```dart
-import 'package:firebase_core/firebase_core.dart';
-import 'package:hotel_app/firebase_options.dart';
-```
-
-Modify `main()` to initialize Firebase before Supabase:
-```dart
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  if (kIsWeb) {
-    databaseFactory = databaseFactoryFfiWeb;
-  }
-  await dotenv.load();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await initSupabase();
-  await LocalDb.instance;
-  runApp(const ProviderScope(child: HotelApp()));
-}
-```
-
-- [ ] **Step 2: Analyze**
-
-```bash
-cd "/Users/boazsaada/manegmant resapceon" && flutter analyze lib/main.dart 2>&1 | tail -5
-```
-
-Expected: no errors (will fail if `firebase_options.dart` doesn't exist yet — that's the prerequisite).
+If `.env.example` exists, add the same key with a placeholder value.
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add lib/main.dart && git commit -m "feat: initialize Firebase in main.dart"
+git add .env.example && git commit -m "chore: add ONESIGNAL_APP_ID to env config"
 ```
+
+Note: `.env` itself is gitignored — do NOT commit it.
 
 ---
 
@@ -132,82 +111,66 @@ git add lib/main.dart && git commit -m "feat: initialize Firebase in main.dart"
 
 ```dart
 // lib/core/push/push_service.dart
-import 'dart:io';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
-/// Top-level handler for background/terminated-state messages.
-/// Must be a top-level function (not a method).
-@pragma('vm:entry-point')
-Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
-  // FCM displays the notification automatically in the system tray.
-  // Nothing to do here unless you need data processing.
-}
+// Maps role → OneSignal dept tag value
+const _roleToDept = {
+  'housekeeping':          'housekeeping',
+  'housekeeping_manager':  'housekeeping',
+  'maintenance':           'maintenance',
+  'maintenance_manager':   'maintenance',
+  'maintenance_tech':      'maintenance',
+  'receptionist':          'reception',
+  'reception_manager':     'reception',
+  'hotel_admin':           'reception',
+};
+
+const _managerRoles = {
+  'reception_manager', 'hotel_admin', 'super_admin',
+  'housekeeping_manager', 'maintenance_manager',
+};
 
 class PushService {
   PushService._();
 
-  static final _messaging = FirebaseMessaging.instance;
-
-  /// Call once at app startup (after Firebase.initializeApp).
-  static Future<void> init() async {
-    // Register background handler
-    FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
-
-    // Request permission (Android 13+ and iOS)
-    await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    // Set foreground notification presentation (iOS)
-    await _messaging.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+  /// Call once in main() after dotenv.load(), before runApp().
+  static void initOneSignal(String appId) {
+    OneSignal.initialize(appId);
+    OneSignal.notifications.requestPermission(true);
   }
 
-  /// Call after successful login to subscribe to the right topic and save token.
-  static Future<void> subscribeAfterLogin({
+  /// Call after successful login to set identifying tags.
+  /// Tags are used by the Edge Function to target the right users.
+  static Future<void> setupAfterLogin({
     required String role,
     required String hotelId,
+    required String userId,
     required BuildContext context,
   }) async {
     try {
-      // Subscribe to department topic
-      final topic = _topicForRole(role, hotelId);
-      if (topic != null) {
-        await _messaging.subscribeToTopic(topic);
-      }
+      final dept = _roleToDept[role] ?? 'other';
+      final isManager = _managerRoles.contains(role);
 
-      // Always subscribe managers to the managers topic
-      if (_isManager(role)) {
-        await _messaging.subscribeToTopic('hotel-$hotelId-managers');
-      }
+      await OneSignal.User.addTagWithKey('hotel_id', hotelId);
+      await OneSignal.User.addTagWithKey('dept', isManager ? 'managers' : dept);
+      await OneSignal.User.addTagWithKey('role', role);
+      await OneSignal.User.addTagWithKey('user_id', userId);
+      await OneSignal.User.addTagWithKey('type', 'staff');
 
-      // Save individual token for direct assignment notifications
-      final token = await _messaging.getToken();
-      if (token != null) {
-        final platform = Platform.isAndroid ? 'android' : 'ios';
-        await Supabase.instance.client.from('user_push_tokens').upsert({
-          'user_id':    Supabase.instance.client.auth.currentUser!.id,
-          'token':      token,
-          'platform':   platform,
-          'updated_at': DateTime.now().toIso8601String(),
-        });
-      }
+      // Associate device with user for direct (assigned) notifications
+      OneSignal.login(userId);
 
-      // Listen for foreground messages and show SnackBar
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        final notification = message.notification;
-        if (notification == null) return;
+      // Show foreground messages as SnackBar
+      OneSignal.notifications.addForegroundWillDisplayListener((event) {
+        final notif = event.notification;
+        event.preventDefault(); // prevent system notification when app is open
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${notification.title ?? ''} — ${notification.body ?? ''}'),
+              content: Text(
+                '${notif.title ?? ''} — ${notif.body ?? ''}',
+              ),
               backgroundColor: const Color(0xFF0F1F3D),
               duration: const Duration(seconds: 4),
             ),
@@ -216,39 +179,23 @@ class PushService {
       });
     } catch (e) {
       // Push is non-critical — log and continue
-      debugPrint('PushService.subscribeAfterLogin error: $e');
+      debugPrint('PushService.setupAfterLogin error: $e');
     }
   }
 
-  /// Call on logout to unsubscribe from all topics.
-  static Future<void> unsubscribeOnLogout({
-    required String role,
-    required String hotelId,
-  }) async {
+  /// Call on logout to clear tags so this device stops receiving notifications.
+  static Future<void> clearOnLogout() async {
     try {
-      final topic = _topicForRole(role, hotelId);
-      if (topic != null) await _messaging.unsubscribeFromTopic(topic);
-      if (_isManager(role)) {
-        await _messaging.unsubscribeFromTopic('hotel-$hotelId-managers');
-      }
+      await OneSignal.User.removeTag('hotel_id');
+      await OneSignal.User.removeTag('dept');
+      await OneSignal.User.removeTag('role');
+      await OneSignal.User.removeTag('user_id');
+      await OneSignal.User.removeTag('type');
+      OneSignal.logout();
     } catch (e) {
-      debugPrint('PushService.unsubscribeOnLogout error: $e');
+      debugPrint('PushService.clearOnLogout error: $e');
     }
   }
-
-  static String? _topicForRole(String role, String hotelId) => switch (role) {
-    'housekeeping' || 'housekeeping_manager' => 'hotel-$hotelId-housekeeping',
-    'maintenance' || 'maintenance_manager' || 'maintenance_tech'
-                                             => 'hotel-$hotelId-maintenance',
-    'receptionist'                           => 'hotel-$hotelId-reception',
-    'reception_manager' || 'hotel_admin'     => 'hotel-$hotelId-reception',
-    _                                        => null,
-  };
-
-  static bool _isManager(String role) => const {
-    'reception_manager', 'hotel_admin', 'super_admin',
-    'housekeeping_manager', 'maintenance_manager',
-  }.contains(role);
 }
 ```
 
@@ -263,58 +210,95 @@ Expected: no errors.
 - [ ] **Step 3: Commit**
 
 ```bash
-git add lib/core/push/push_service.dart && git commit -m "feat: add PushService for FCM topic subscriptions and token management"
+git add lib/core/push/push_service.dart && git commit -m "feat: add PushService using OneSignal for staff push notifications"
 ```
 
 ---
 
-### Task 4: Wire PushService into LoginScreen
+### Task 4: Initialize OneSignal in main.dart
+
+**Files:**
+- Modify: `lib/main.dart`
+
+Current `main()`:
+```dart
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (kIsWeb) { databaseFactory = databaseFactoryFfiWeb; }
+  await dotenv.load();
+  await initSupabase();
+  await LocalDb.instance;
+  runApp(const ProviderScope(child: HotelApp()));
+}
+```
+
+- [ ] **Step 1: Add import and init call**
+
+Add import:
+```dart
+import 'package:hotel_app/core/push/push_service.dart';
+```
+
+Add after `await dotenv.load()`:
+```dart
+  final oneSignalAppId = dotenv.env['ONESIGNAL_APP_ID'] ?? '';
+  if (oneSignalAppId.isNotEmpty) {
+    PushService.initOneSignal(oneSignalAppId);
+  }
+```
+
+- [ ] **Step 2: Analyze**
+
+```bash
+cd "/Users/boazsaada/manegmant resapceon" && flutter analyze lib/main.dart 2>&1 | tail -5
+```
+
+Expected: no errors.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add lib/main.dart && git commit -m "feat: initialize OneSignal in main.dart"
+```
+
+---
+
+### Task 5: Wire PushService into LoginScreen
 
 **Files:**
 - Modify: `lib/features/auth/login_screen.dart`
 
-The `_login()` method currently:
-1. Calls `signIn`
-2. Reads hotel theme
-3. Router redirects
+The `_login()` method currently ends with the hotel theme loading and then the router redirects.
 
-Add PushService call **after** successful login (after `ref.read(hotelThemeProvider.notifier).state = ...`).
+- [ ] **Step 1: Read the current file**
 
-- [ ] **Step 1: Add import**
+Read `lib/features/auth/login_screen.dart` lines 25–58 to see the current `_login()` method.
+
+- [ ] **Step 2: Add import**
 
 ```dart
 import 'package:hotel_app/core/push/push_service.dart';
 ```
 
-- [ ] **Step 2: Add PushService call in `_login()`**
+- [ ] **Step 3: Add PushService call after theme loading**
 
-Find the end of the hotel theme loading block (after `ref.read(hotelThemeProvider.notifier).state = ...`) and add:
+In `_login()`, after `ref.read(hotelThemeProvider.notifier).state = AppTheme.forHotel(themeStr);`, add:
 
 ```dart
-        // Register for push notifications
-        final role = supabase.auth.currentUser?.appMetadata['role'] as String? ?? '';
-        if (mounted && hotelId != null) {
-          await PushService.subscribeAfterLogin(
-            role: role,
+        // Set up push notification tags for this user
+        final role   = supabase.auth.currentUser?.appMetadata['role'] as String? ?? '';
+        final userId = supabase.auth.currentUser?.id ?? '';
+        if (mounted && hotelId != null && role.isNotEmpty) {
+          await PushService.setupAfterLogin(
+            role:    role,
             hotelId: hotelId,
+            userId:  userId,
             context: context,
           );
         }
 ```
 
-Also add `PushService.init()` call at the very start of `_login()`, before the try block:
-
-Actually, `PushService.init()` should be called once, not per login. Add it to the `initState` of `_LoginScreenState`:
-
-```dart
-  @override
-  void initState() {
-    super.initState();
-    PushService.init();
-  }
-```
-
-- [ ] **Step 3: Analyze**
+- [ ] **Step 4: Analyze**
 
 ```bash
 cd "/Users/boazsaada/manegmant resapceon" && flutter analyze lib/features/auth/login_screen.dart 2>&1 | tail -5
@@ -322,7 +306,7 @@ cd "/Users/boazsaada/manegmant resapceon" && flutter analyze lib/features/auth/l
 
 Expected: no errors.
 
-- [ ] **Step 4: Run existing tests**
+- [ ] **Step 5: Run tests**
 
 ```bash
 cd "/Users/boazsaada/manegmant resapceon" && flutter test test/features/guest_requests/guest_request_test.dart 2>&1 | tail -5
@@ -330,8 +314,8 @@ cd "/Users/boazsaada/manegmant resapceon" && flutter test test/features/guest_re
 
 Expected: 13/13 pass.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add lib/features/auth/login_screen.dart && git commit -m "feat: subscribe to FCM push notifications after login"
+git add lib/features/auth/login_screen.dart && git commit -m "feat: setup OneSignal tags and foreground listener after login"
 ```

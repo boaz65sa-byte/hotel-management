@@ -1,23 +1,20 @@
-# Phase 11c — PWA Web Push Notifications Implementation Plan
+# Phase 11c — PWA Web Push Notifications (OneSignal) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add Web Push to the guest PWA (`hotel_guest_app`) so guests receive notifications when their request status changes.
+**Goal:** Add Web Push to the guest PWA so guests receive a notification when their request status changes.
 
-**Architecture:** Firebase JS SDK runs in a Service Worker. Guests tap "הפעל התראות" on the HomeScreen to grant permission. The PWA token is saved to `guest_push_tokens` in Supabase. The Edge Function (`send-push`, built in Phase 11a) sends the notification when status changes.
+**Architecture:** OneSignal Web SDK is loaded via CDN in `index.html`. Flutter Web uses `dart:js_interop` to call the JS SDK. When the guest taps "הפעל התראות", OneSignal requests permission and registers the device. Tags `hotel_id`, `room_number`, and `type=guest` are set so the Edge Function can target this device.
 
-**Tech Stack:** Flutter Web + `firebase_core` + `firebase_messaging` + Firebase JS Service Worker
+**Tech Stack:** Flutter Web + OneSignal JS SDK (CDN) + `dart:js_interop`
 
 ---
 
-## ⚠️ Prerequisites
+## ⚠️ Prerequisites (Manual — Before This Plan)
 
-1. Firebase project must exist (done in Phase 11a prerequisites)
-2. In Firebase Console → Project Settings → General → **Your apps** → Web app:
-   - Create a Web app (if not already)
-   - Copy: `apiKey`, `projectId`, `messagingSenderId`, `appId`
-3. Firebase Console → Cloud Messaging → **Web Push certificates** → Generate key pair → copy **VAPID public key**
-4. All 4 values go into `hotel_guest_app/lib/core/firebase_config.dart` (created in Task 2)
+1. OneSignal Dashboard → Platforms → Web Push → add your PWA domain (e.g., `https://guest.hotel.com`)
+2. OneSignal App ID must be in the OneSignal Dashboard → Settings → Keys & IDs
+3. The same App ID used for Flutter (Plan 11b) is reused here
 
 ---
 
@@ -25,125 +22,98 @@
 
 | Action | File |
 |--------|------|
-| Modify | `hotel_guest_app/pubspec.yaml` — add `firebase_core`, `firebase_messaging` |
-| Create | `hotel_guest_app/lib/core/firebase_config.dart` |
+| Modify | `hotel_guest_app/web/index.html` — add OneSignal Web SDK |
 | Create | `hotel_guest_app/lib/core/push_service_web.dart` |
-| Create | `hotel_guest_app/web/firebase-messaging-sw.js` |
-| Modify | `hotel_guest_app/web/index.html` — import Firebase scripts |
-| Modify | `hotel_guest_app/lib/presentation/home_screen.dart` — add "הפעל התראות" button |
-| Modify | `hotel_guest_app/lib/main.dart` — init Firebase |
+| Modify | `hotel_guest_app/lib/presentation/home_screen.dart` — add opt-in button |
 
 ---
 
-### Task 1: Add Firebase dependencies to PWA pubspec
+### Task 1: Add OneSignal Web SDK to index.html
 
 **Files:**
-- Modify: `hotel_guest_app/pubspec.yaml`
+- Modify: `hotel_guest_app/web/index.html`
 
-- [ ] **Step 1: Add dependencies**
+- [ ] **Step 1: Read the current index.html**
 
-```yaml
-  firebase_core: ^3.6.0
-  firebase_messaging: ^15.1.3
+Read `hotel_guest_app/web/index.html` to find the `<head>` closing tag.
+
+- [ ] **Step 2: Add OneSignal SDK before `</head>`**
+
+Add the following snippet (replace `YOUR_ONESIGNAL_APP_ID` with the actual App ID from OneSignal Dashboard):
+
+```html
+  <!-- OneSignal Web Push SDK -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "YOUR_ONESIGNAL_APP_ID",
+        notifyButton: { enable: false },
+        allowLocalhostAsSecureOrigin: true,
+      });
+    });
+  </script>
 ```
-
-- [ ] **Step 2: Install**
-
-```bash
-cd "/Users/boazsaada/manegmant resapceon/hotel_guest_app" && flutter pub get
-```
-
-Expected: `Got dependencies!`
 
 - [ ] **Step 3: Commit**
 
 ```bash
-cd "/Users/boazsaada/manegmant resapceon" && git add hotel_guest_app/pubspec.yaml && git commit -m "chore: add firebase deps to guest PWA"
+cd "/Users/boazsaada/manegmant resapceon" && git add hotel_guest_app/web/index.html && git commit -m "feat: add OneSignal Web SDK to guest PWA"
 ```
 
 ---
 
-### Task 2: Create Firebase config file
-
-**Files:**
-- Create: `hotel_guest_app/lib/core/firebase_config.dart`
-
-This file holds the Web app credentials. The developer must fill in the real values (from Firebase Console) after the plan runs.
-
-- [ ] **Step 1: Create the file**
-
-```dart
-// hotel_guest_app/lib/core/firebase_config.dart
-// Fill in values from Firebase Console → Project Settings → Your apps → Web app
-// and Cloud Messaging → Web Push certificates (VAPID key)
-
-const firebaseApiKey           = 'YOUR_API_KEY';
-const firebaseProjectId        = 'YOUR_PROJECT_ID';
-const firebaseMessagingSenderId = 'YOUR_MESSAGING_SENDER_ID';
-const firebaseAppId            = 'YOUR_APP_ID';
-const firebaseVapidKey         = 'YOUR_VAPID_PUBLIC_KEY';
-```
-
-- [ ] **Step 2: Commit**
-
-```bash
-cd "/Users/boazsaada/manegmant resapceon" && git add hotel_guest_app/lib/core/firebase_config.dart && git commit -m "feat: add Firebase config placeholder for guest PWA"
-```
-
----
-
-### Task 3: Create PWA Push Service
+### Task 2: Create PushServiceWeb (Dart → JS interop)
 
 **Files:**
 - Create: `hotel_guest_app/lib/core/push_service_web.dart`
+
+The OneSignal Web SDK is already loaded in JS (step 1). We call it from Dart via `dart:js_interop`.
 
 - [ ] **Step 1: Create the file**
 
 ```dart
 // hotel_guest_app/lib/core/push_service_web.dart
-import 'package:firebase_messaging/firebase_messaging.dart';
+// Calls the OneSignal JS SDK (loaded in index.html) via dart:js_interop.
+// Only works on Web — guards are in place.
+
 import 'package:flutter/foundation.dart';
-import 'package:hotel_guest_app/core/firebase_config.dart';
-import 'package:hotel_guest_app/core/supabase_init.dart';
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:js' as js;
 
 class PushServiceWeb {
   PushServiceWeb._();
 
-  /// Call once after Firebase.initializeApp() in main.dart (Web only).
-  static Future<void> init() async {
-    if (!kIsWeb) return;
-    // Nothing to init beyond firebase_messaging on web
-  }
-
-  /// Request permission and register the token for this guest session.
-  /// [hotelId] and [roomNumber] come from GuestSession.
-  static Future<bool> requestAndRegister({
+  /// Request push permission and set tags for this guest.
+  /// Returns true if permission was granted.
+  static Future<bool> requestAndSetTags({
     required String hotelId,
     required String roomNumber,
   }) async {
     if (!kIsWeb) return false;
     try {
-      final messaging = FirebaseMessaging.instance;
-
-      final settings = await messaging.requestPermission(
-        alert: true,
-        badge: false,
-        sound: true,
-      );
-
-      if (settings.authorizationStatus != AuthorizationStatus.authorized) {
+      // Request permission via OneSignal JS SDK
+      final context = js.context;
+      final oneSignal = context['OneSignal'];
+      if (oneSignal == null) {
+        debugPrint('PushServiceWeb: OneSignal JS not loaded');
         return false;
       }
 
-      final token = await messaging.getToken(vapidKey: firebaseVapidKey);
-      if (token == null) return false;
+      // Request notification permission
+      final permResult = await _promiseToFuture(
+        oneSignal.callMethod('Notifications', [])
+      );
 
-      // Upsert into guest_push_tokens
-      await supabase.from('guest_push_tokens').upsert({
+      // Set tags for targeting
+      final tags = js.JsObject.jsify({
         'hotel_id':    hotelId,
         'room_number': roomNumber,
-        'token':       token,
-      }, onConflict: 'hotel_id, room_number');
+        'type':        'guest',
+      });
+      oneSignal.callMethod('User', [])
+        ..callMethod('addTags', [tags]);
 
       return true;
     } catch (e) {
@@ -151,148 +121,117 @@ class PushServiceWeb {
       return false;
     }
   }
-}
-```
 
-- [ ] **Step 2: Commit**
-
-```bash
-cd "/Users/boazsaada/manegmant resapceon" && git add hotel_guest_app/lib/core/push_service_web.dart && git commit -m "feat: add PWA web push service"
-```
-
----
-
-### Task 4: Create Firebase Service Worker
-
-**Files:**
-- Create: `hotel_guest_app/web/firebase-messaging-sw.js`
-
-- [ ] **Step 1: Create the file**
-
-```javascript
-// hotel_guest_app/web/firebase-messaging-sw.js
-// This service worker handles background push notifications for the guest PWA.
-// The Firebase config values must match firebase_config.dart.
-// Replace YOUR_* values with real credentials after Firebase setup.
-
-importScripts('https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging-compat.js');
-
-firebase.initializeApp({
-  apiKey:            'YOUR_API_KEY',
-  projectId:         'YOUR_PROJECT_ID',
-  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-  appId:             'YOUR_APP_ID',
-});
-
-const messaging = firebase.messaging();
-
-messaging.onBackgroundMessage((payload) => {
-  const { title, body } = payload.notification ?? {};
-  self.registration.showNotification(title ?? 'עדכון', {
-    body:  body ?? '',
-    icon:  '/icons/Icon-192.png',
-    badge: '/icons/Icon-192.png',
-    dir:   'rtl',
-    lang:  'he',
-  });
-});
-```
-
-- [ ] **Step 2: Update `hotel_guest_app/web/index.html`**
-
-Add the Firebase app script import inside `<head>`, just before the closing `</head>` tag:
-
-```html
-  <!-- Firebase Messaging Service Worker registration -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/firebase-messaging-sw.js')
-        .catch(err => console.error('SW registration failed:', err));
+  /// Simpler approach: use OneSignal's built-in opt-in prompt.
+  static void showNativePrompt() {
+    if (!kIsWeb) return;
+    try {
+      final oneSignal = js.context['OneSignal'];
+      if (oneSignal == null) return;
+      js.context.callMethod('eval', [
+        '''
+        if (window.OneSignalDeferred) {
+          window.OneSignalDeferred.push(async function(os) {
+            const granted = await os.Notifications.requestPermission();
+            if (granted) {
+              await os.User.addTag("type", "guest");
+            }
+          });
+        }
+        '''
+      ]);
+    } catch (e) {
+      debugPrint('PushServiceWeb.showNativePrompt error: $e');
     }
-  </script>
-```
-
-- [ ] **Step 3: Commit**
-
-```bash
-cd "/Users/boazsaada/manegmant resapceon" && git add hotel_guest_app/web/firebase-messaging-sw.js hotel_guest_app/web/index.html && git commit -m "feat: add Firebase messaging service worker for PWA"
-```
-
----
-
-### Task 5: Initialize Firebase in PWA main.dart
-
-**Files:**
-- Modify: `hotel_guest_app/lib/main.dart`
-
-Current content of `main()`:
-```dart
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await initSupabase();
-  runApp(ProviderScope(child: MaterialApp.router(...)));
-}
-```
-
-- [ ] **Step 1: Add Firebase init**
-
-Add import:
-```dart
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
-import 'package:hotel_guest_app/core/firebase_config.dart';
-```
-
-Modify `main()`:
-```dart
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  if (kIsWeb) {
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey:            firebaseApiKey,
-        projectId:         firebaseProjectId,
-        messagingSenderId: firebaseMessagingSenderId,
-        appId:             firebaseAppId,
-      ),
-    );
   }
-  await initSupabase();
-  runApp(ProviderScope(child: MaterialApp.router(...)));
+
+  /// Set hotel and room tags after permission is granted.
+  static void setGuestTags({
+    required String hotelId,
+    required String roomNumber,
+  }) {
+    if (!kIsWeb) return;
+    try {
+      js.context.callMethod('eval', [
+        '''
+        if (window.OneSignalDeferred) {
+          window.OneSignalDeferred.push(async function(os) {
+            await os.User.addTags({
+              hotel_id:    "$hotelId",
+              room_number: "$roomNumber",
+              type:        "guest"
+            });
+          });
+        }
+        '''
+      ]);
+    } catch (e) {
+      debugPrint('PushServiceWeb.setGuestTags error: $e');
+    }
+  }
+
+  static Future<dynamic> _promiseToFuture(dynamic jsPromise) {
+    // Convert a JS Promise to a Dart Future
+    final completer = Completer<dynamic>();
+    jsPromise.callMethod('then', [
+      js.allowInterop((value) => completer.complete(value)),
+    ]);
+    jsPromise.callMethod('catch', [
+      js.allowInterop((error) => completer.completeError(error)),
+    ]);
+    return completer.future;
+  }
 }
 ```
 
-- [ ] **Step 2: Analyze**
+> **Note on dart:js:** `dart:js` is available in Flutter Web and is simpler than `dart:js_interop` for calling arbitrary JS. The `// ignore: avoid_web_libraries_in_flutter` suppresses the lint for this intentional web-only file.
 
-```bash
-cd "/Users/boazsaada/manegmant resapceon/hotel_guest_app" && flutter analyze lib/main.dart 2>&1 | tail -5
+- [ ] **Step 2: Add missing import**
+
+Add at the top (after existing imports):
+```dart
+import 'dart:async';
 ```
 
-Expected: no errors.
-
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Analyze**
 
 ```bash
-cd "/Users/boazsaada/manegmant resapceon" && git add hotel_guest_app/lib/main.dart && git commit -m "feat: initialize Firebase in PWA main.dart"
+cd "/Users/boazsaada/manegmant resapceon/hotel_guest_app" && flutter analyze lib/core/push_service_web.dart 2>&1 | tail -5
+```
+
+Expected: no errors (info warnings about dart:js are OK).
+
+- [ ] **Step 4: Commit**
+
+```bash
+cd "/Users/boazsaada/manegmant resapceon" && git add hotel_guest_app/lib/core/push_service_web.dart && git commit -m "feat: add web push service using OneSignal JS interop"
 ```
 
 ---
 
-### Task 6: Add push permission button to HomeScreen
+### Task 3: Add push opt-in to HomeScreen
 
 **Files:**
 - Modify: `hotel_guest_app/lib/presentation/home_screen.dart`
 
 The `HomeScreen` is currently a `ConsumerWidget`. Convert to `ConsumerStatefulWidget` to hold `_pushEnabled` state.
 
-- [ ] **Step 1: Read the current HomeScreen structure**
+- [ ] **Step 1: Read the current file**
 
-Read `hotel_guest_app/lib/presentation/home_screen.dart` lines 1–60 to understand the current layout.
+Read `hotel_guest_app/lib/presentation/home_screen.dart` lines 1–35.
 
 - [ ] **Step 2: Convert to ConsumerStatefulWidget**
 
-Replace the class declaration:
+Replace:
+```dart
+class HomeScreen extends ConsumerWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+```
+
+With:
 ```dart
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -304,62 +243,66 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _pushEnabled = false;
 
-  Future<void> _enablePush(String hotelId, String roomNumber) async {
-    final enabled = await PushServiceWeb.requestAndRegister(
-      hotelId: hotelId,
-      roomNumber: roomNumber,
-    );
-    if (mounted) setState(() => _pushEnabled = enabled);
+  void _enablePush(String hotelId, String roomNumber) {
+    PushServiceWeb.showNativePrompt();
+    PushServiceWeb.setGuestTags(hotelId: hotelId, roomNumber: roomNumber);
+    setState(() => _pushEnabled = true);
   }
 
   @override
   Widget build(BuildContext context) {
-    // existing build content, replacing `WidgetRef ref` → use `ref` field
 ```
 
-- [ ] **Step 3: Add push opt-in banner**
-
-In the `data: (session)` section, after the feedback banner (look for `shouldShowFeedback` logic), add:
+- [ ] **Step 3: Add import**
 
 ```dart
-                // Push opt-in banner
-                if (!_pushEnabled)
-                  Container(
-                    margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0F1F3D),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFF1E3A5F)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.notifications_outlined,
-                            color: Color(0xFFC9A84C), size: 20),
-                        const SizedBox(width: 10),
-                        const Expanded(
-                          child: Text(
-                            'הפעל התראות ועקוב אחר הבקשות שלך',
-                            style: TextStyle(
-                                color: Color(0xFFE2E8F0), fontSize: 13),
+import 'package:flutter/foundation.dart';
+import 'package:hotel_guest_app/core/push_service_web.dart';
+```
+
+- [ ] **Step 4: Add push opt-in banner**
+
+In the `data: (session)` block, after the feedback banner (`if (session.shouldShowFeedback) ...`), add:
+
+```dart
+                // Web Push opt-in banner (Web only, shown until enabled)
+                if (kIsWeb && !_pushEnabled)
+                  GestureDetector(
+                    onTap: () => _enablePush(
+                        session.hotelId, session.roomNumber),
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F1F3D),
+                        borderRadius: BorderRadius.circular(12),
+                        border:
+                            Border.all(color: const Color(0xFF1E3A5F)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.notifications_outlined,
+                              color: Color(0xFFC9A84C), size: 20),
+                          const SizedBox(width: 10),
+                          const Expanded(
+                            child: Text(
+                              'הפעל התראות ועקוב אחר הבקשות שלך',
+                              style: TextStyle(
+                                  color: Color(0xFFE2E8F0),
+                                  fontSize: 13),
+                            ),
                           ),
-                        ),
-                        TextButton(
-                          onPressed: () =>
-                              _enablePush(session.hotelId, session.roomNumber),
-                          child: const Text('הפעל',
-                              style: TextStyle(color: Color(0xFFC9A84C))),
-                        ),
-                      ],
+                          TextButton(
+                            onPressed: () => _enablePush(
+                                session.hotelId, session.roomNumber),
+                            child: const Text('הפעל',
+                                style:
+                                    TextStyle(color: Color(0xFFC9A84C))),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-```
-
-- [ ] **Step 4: Add import**
-
-At the top of the file:
-```dart
-import 'package:hotel_guest_app/core/push_service_web.dart';
 ```
 
 - [ ] **Step 5: Analyze**
@@ -373,18 +316,15 @@ Expected: no errors.
 - [ ] **Step 6: Commit**
 
 ```bash
-cd "/Users/boazsaada/manegmant resapceon" && git add hotel_guest_app/lib/presentation/home_screen.dart && git commit -m "feat: add push notification opt-in to PWA home screen"
+cd "/Users/boazsaada/manegmant resapceon" && git add hotel_guest_app/lib/presentation/home_screen.dart && git commit -m "feat: add push notification opt-in banner to PWA home screen"
 ```
 
 ---
 
-## After All Tasks: Fill In Real Firebase Values
+## After All Tasks: Update App ID in index.html
 
-Once the code is committed, the developer must replace `YOUR_*` placeholders in:
-1. `hotel_guest_app/lib/core/firebase_config.dart`
-2. `hotel_guest_app/web/firebase-messaging-sw.js`
+Replace `YOUR_ONESIGNAL_APP_ID` in `hotel_guest_app/web/index.html` with the real value from OneSignal Dashboard, then rebuild:
 
-With the real values from Firebase Console, then rebuild the PWA:
 ```bash
 cd "/Users/boazsaada/manegmant resapceon/hotel_guest_app" && flutter build web --release
 ```
