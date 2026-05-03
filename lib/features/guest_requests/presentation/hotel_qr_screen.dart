@@ -27,7 +27,7 @@ class _HotelQrScreenState extends State<HotelQrScreen> {
   bool _saving = false;
 
   String get _pwaUrl =>
-      'https://zesty-queijadas-16c29.netlify.app/?hotel=${widget.hotelId}';
+      'https://zesty-queijadas-16c29.netlify.app/#/?hotel=${widget.hotelId}';
 
   Future<Uint8List?> _captureQr() async {
     final boundary = _qrKey.currentContext?.findRenderObject()
