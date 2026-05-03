@@ -27,3 +27,4 @@ ios/Flutter/Generated.xcconfig
 android/.gradle/
 android/local.properties
 android/app/google-services.json
+.superpowers/
