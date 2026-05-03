@@ -1,15 +1,30 @@
 // hotel_guest_app/lib/presentation/home_screen.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hotel_guest_app/core/push_service_web.dart';
 import 'package:hotel_guest_app/domain/guest_request.dart';
 import 'package:hotel_guest_app/providers/providers.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool _pushEnabled = false;
+
+  void _enablePush(String hotelId, String roomNumber) {
+    PushServiceWeb.showNativePrompt();
+    PushServiceWeb.setGuestTags(hotelId: hotelId, roomNumber: roomNumber);
+    setState(() => _pushEnabled = true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final sessionAsync = ref.watch(sessionProvider);
     final requestsAsync = ref.watch(myRequestsProvider);
 
@@ -93,6 +108,45 @@ class HomeScreen extends ConsumerWidget {
                           ),
                           Icon(Icons.chevron_right,
                               color: Color(0xFF64748B)),
+                        ],
+                      ),
+                    ),
+                  ),
+                // Web Push opt-in banner (Web only, shown until enabled)
+                if (kIsWeb && !_pushEnabled)
+                  GestureDetector(
+                    onTap: () =>
+                        _enablePush(session.hotelId, session.roomNumber),
+                    child: Container(
+                      margin:
+                          const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F1F3D),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                            color: const Color(0xFF1E3A5F)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.notifications_outlined,
+                              color: Color(0xFFC9A84C), size: 20),
+                          const SizedBox(width: 10),
+                          const Expanded(
+                            child: Text(
+                              'הפעל התראות ועקוב אחר הבקשות שלך',
+                              style: TextStyle(
+                                  color: Color(0xFFE2E8F0),
+                                  fontSize: 13),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => _enablePush(
+                                session.hotelId, session.roomNumber),
+                            child: const Text('הפעל',
+                                style: TextStyle(
+                                    color: Color(0xFFC9A84C))),
+                          ),
                         ],
                       ),
                     ),
