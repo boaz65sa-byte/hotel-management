@@ -13,11 +13,15 @@ This repo is a multi-target project. Each layer ships to a different host.
 
 ## 1. Admin Panel → Vercel
 
+> **CRITICAL** — this is a monorepo. The Next.js app lives in `admin/`, not at the repo root. You MUST tell Vercel where it is, otherwise you get a 404 on the deployed URL.
+
 ### One-time setup (5 minutes)
 
+#### If creating a new project:
 1. Go to <https://vercel.com/new> → **Import Git Repository** → pick `boaz65sa-byte/hotel-management`.
-2. Vercel auto-detects the monorepo via `vercel.json` at the repo root. **Leave Root Directory empty** (= repo root). The `vercel.json` already redirects build to `admin/`.
-3. **Environment Variables** — add all four (Production + Preview):
+2. **Root Directory** → click **Edit** → select **`admin`** from the tree → confirm.
+3. Vercel auto-detects Next.js (via `admin/vercel.json` + `admin/package.json`). Leave Build/Output overrides empty.
+4. **Environment Variables** — add all four (apply to Production + Preview + Development):
 
    | Key | Where to find |
    |-----|---------------|
@@ -26,11 +30,20 @@ This repo is a multi-target project. Each layer ships to a different host.
    | `NEXT_PUBLIC_SUPABASE_URL` | same as `SUPABASE_URL` |
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Settings → API → `anon public` |
 
-4. Click **Deploy**. First build ≈ 90 seconds.
-5. After deploy, open the assigned `*.vercel.app` URL → log in with `superadmin@hotel.com / Admin1234!`.
+5. Click **Deploy**. First build ≈ 90 seconds.
+6. Open the assigned `*.vercel.app` URL — should redirect to `/login`. Log in with `superadmin@hotel.com / Admin1234!`.
+
+#### If you already created the project (and got a 404):
+1. Vercel → Project → **Settings** → **General** → **Root Directory** → click **Edit**.
+2. Pick **`admin`** from the tree → **Save**.
+3. **Deployments** → latest → ⋯ menu → **Redeploy**.
 
 ### Updates
-Every push to `main` auto-deploys. The `ignoreCommand` in `vercel.json` skips deploys when only non-`admin/` files changed (saves build minutes).
+Every push to `main` auto-deploys. To skip deploys when only non-`admin/` paths change, in Vercel Settings → Git → **Ignored Build Step** set:
+```
+git diff --quiet HEAD^ HEAD ./
+```
+(Vercel applies this relative to the project Root Directory, which is `admin/`, so this skips the build whenever nothing inside `admin/` changed.)
 
 ### Custom domain
 Vercel → Project → Settings → Domains → add your domain. Free TLS via Let's Encrypt.
