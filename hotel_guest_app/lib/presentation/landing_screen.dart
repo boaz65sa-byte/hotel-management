@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hotel_guest_app/core/session.dart';
+import 'package:hotel_guest_app/l10n/app_localizations.dart';
 import 'package:hotel_guest_app/providers/providers.dart';
 
 class LandingScreen extends ConsumerStatefulWidget {
@@ -36,20 +37,21 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
   }
 
   Future<void> _enter() async {
+    final loc = AppLocalizations.of(context)!;
     final name = _nameCtrl.text.trim();
     final room = _roomCtrl.text.trim();
     final hotel = widget.hotelId;
 
     if (name.isEmpty || room.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('נא למלא שם ומספר חדר')),
+        SnackBar(content: Text(loc.landingErrorMissingFields)),
       );
       return;
     }
     if (hotel == null || hotel.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('קוד מלון חסר — סרקו שוב את ה-QR'),
+        SnackBar(
+          content: Text(loc.landingErrorMissingHotel),
           backgroundColor: Colors.red,
         ),
       );
@@ -64,7 +66,9 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
     } catch (e) {
       if (mounted)
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('שגיאה: $e'), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text(loc.errorGeneric(e.toString())),
+              backgroundColor: Colors.red),
         );
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -73,6 +77,7 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFF0A1628),
       body: SafeArea(
@@ -87,25 +92,25 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
                   const Icon(Icons.hotel,
                       color: Color(0xFFC9A84C), size: 56),
                   const SizedBox(height: 12),
-                  const Text(
-                    'ברוכים הבאים',
-                    style: TextStyle(
+                  Text(
+                    loc.landingWelcome,
+                    style: const TextStyle(
                       color: Color(0xFFC9A84C),
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'מלאו את הפרטים כדי להתחיל',
-                    style: TextStyle(
+                  Text(
+                    loc.landingSubtitle,
+                    style: const TextStyle(
                         color: Color(0xFF94A3B8), fontSize: 14),
                   ),
                   const SizedBox(height: 32),
-                  _buildField(_nameCtrl, 'שמך המלא', Icons.person),
+                  _buildField(_nameCtrl, loc.landingNameHint, Icons.person),
                   const SizedBox(height: 16),
                   _buildField(
-                      _roomCtrl, 'מספר חדר', Icons.door_front_door,
+                      _roomCtrl, loc.landingRoomHint, Icons.door_front_door,
                       type: TextInputType.number),
                   const SizedBox(height: 28),
                   SizedBox(
@@ -125,14 +130,14 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
                               height: 20,
                               child: CircularProgressIndicator(
                                   strokeWidth: 2, color: Colors.black))
-                          : const Text('כניסה →'),
+                          : Text(loc.landingEnter),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    '+ ניתן להוסיף לדף הבית לגישה מהירה',
-                    style:
-                        TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                  Text(
+                    loc.landingAddToHome,
+                    style: const TextStyle(
+                        color: Color(0xFF64748B), fontSize: 12),
                     textAlign: TextAlign.center,
                   ),
                 ],

@@ -1,0 +1,52 @@
+{
+  "@@locale": "ru",
+  "appTitle": "Гость отеля",
+  "landingWelcome": "Добро пожаловать",
+  "landingSubtitle": "Введите данные, чтобы начать",
+  "landingNameHint": "Ваше полное имя",
+  "landingRoomHint": "Номер комнаты",
+  "landingEnter": "Войти →",
+  "landingAddToHome": "+ Добавьте на главный экран для быстрого доступа",
+  "landingErrorMissingFields": "Пожалуйста, введите имя и номер комнаты",
+  "landingErrorMissingHotel": "Код отеля отсутствует — отсканируйте QR снова",
+  "homeGreeting": "Привет, {name} 👋",
+  "@homeGreeting": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "homeRoom": "Комната {room}",
+  "@homeRoom": {
+    "placeholders": { "room": { "type": "String" } }
+  },
+  "homeFeedbackTitle": "Как прошло ваше пребывание?",
+  "homeFeedbackSubtitle": "Оставьте нам краткий отзыв",
+  "homePushBanner": "Включите уведомления и отслеживайте запросы",
+  "homePushEnable": "Включить",
+  "homeNewRequest": "Новый запрос",
+  "homeMyRequests": "Мои запросы",
+  "homeNoRequests": "Запросов пока нет",
+  "categoryHousekeeping": "Горничная",
+  "categoryMaintenance": "Техобслуживание",
+  "categoryReception": "Ресепшн",
+  "statusOpen": "Открыт",
+  "statusInProgress": "В работе",
+  "statusResolved": "Выполнено ✓",
+  "statusCancelled": "Отменено",
+  "newRequestTitle": "Новый запрос",
+  "newRequestCategoryLabel": "Категория",
+  "newRequestDetailsLabel": "Детали (необязательно)",
+  "newRequestDetailsHint": "Расскажите, чем мы можем помочь...",
+  "newRequestSubmit": "Отправить запрос",
+  "feedbackTitle": "Отзыв о пребывании",
+  "feedbackQuestion": "Как прошло ваше пребывание?",
+  "feedbackCommentHint": "Расскажите о своём опыте (необязательно)...",
+  "feedbackSubmit": "Отправить отзыв",
+  "feedbackThanksTitle": "Спасибо за ваш отзыв!",
+  "feedbackThanksSubtitle": "Спасибо, что выбрали нас 🙏",
+  "feedbackBackHome": "На главную",
+  "feedbackErrorNoRating": "Пожалуйста, выберите оценку",
+  "errorGeneric": "Ошибка: {error}",
+  "@errorGeneric": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "errorNoSession": "Нет сеанса"
+}

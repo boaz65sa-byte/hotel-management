@@ -39,6 +39,7 @@ class ProfileScreen extends ConsumerWidget {
               DropdownMenuItem(value: 'he', child: Text('עברית')),
               DropdownMenuItem(value: 'en', child: Text('English')),
               DropdownMenuItem(value: 'ar', child: Text('العربية')),
+              DropdownMenuItem(value: 'ru', child: Text('🇷🇺 Русский')),
             ],
             onChanged: (lang) {
               if (lang != null) {

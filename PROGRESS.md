@@ -1,10 +1,15 @@
 # Hotel Management App - Progress Tracker
 
 ## Current Status
-**Phase**: ✅ **Production-Ready** — All code-side critical bugs, important issues, features and polish completed.
+**Phase**: ✅ **Production-Ready + 4 Languages** — Admin live on Vercel, code-side polish complete, RU added.
 **Date**: 2026-05-08
 
-**Last session (2026-05-08)** — Final polish round (3 parallel agents):
+**Latest (2026-05-08, evening)** — Admin live + Russian everywhere:
+- ✅ **Admin deployed to Vercel** at `hotel-management-rho-two.vercel.app` (Root Directory = `admin`, all 4 Supabase env vars set, build green).
+- 🇷🇺 **Russian (ru) added to Staff Flutter app** — 35 keys in `lib/core/i18n/arb/app_ru.arb` + dropdown in profile screen.
+- 🇷🇺🇮🇱🇬🇧🇸🇦 **Guest PWA i18n built from scratch** — 40 strings extracted, 4 ARB files (he/en/ar/ru), Riverpod `localeProvider` + `shared_preferences`, flag dropdown on home header, `flutter gen-l10n` succeeded → 0 analyzer issues.
+
+**Earlier today (2026-05-08, morning)** — Final polish round (3 parallel agents):
 - 🟢 Real hotel name in staff QR screen (no more `'המלון'` placeholder).
 - 🟢 `SessionTimeoutManager` wired in `app.dart` with pointer-event activity reset + auto sign-out.
 - 🟢 Dead code removed: `acceptTicket`, `quickResolveTicket`.

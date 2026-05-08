@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hotel_guest_app/core/session.dart';
+import 'package:hotel_guest_app/l10n/app_localizations.dart';
 import 'package:hotel_guest_app/providers/providers.dart';
 
 class FeedbackScreen extends ConsumerStatefulWidget {
@@ -24,16 +25,17 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
   }
 
   Future<void> _submit() async {
+    final loc = AppLocalizations.of(context)!;
     if (_rating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('נא לבחור דירוג')),
+        SnackBar(content: Text(loc.feedbackErrorNoRating)),
       );
       return;
     }
     setState(() => _loading = true);
     try {
       final session = await ref.read(sessionProvider.future);
-      if (session == null) throw Exception('אין סשן');
+      if (session == null) throw Exception(loc.errorNoSession);
       await ref.read(guestRepositoryProvider).submitFeedback(
             hotelId:    session.hotelId,
             roomNumber: session.roomNumber,
@@ -50,7 +52,7 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
       if (mounted)
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('שגיאה: $e'),
+              content: Text(loc.errorGeneric(e.toString())),
               backgroundColor: Colors.red),
         );
     } finally {
@@ -60,6 +62,8 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     if (_submitted) {
       return Scaffold(
         backgroundColor: const Color(0xFF0A1628),
@@ -70,14 +74,14 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
               const Icon(Icons.check_circle,
                   color: Color(0xFF4ADE80), size: 64),
               const SizedBox(height: 16),
-              const Text('תודה על המשוב!',
-                  style: TextStyle(
+              Text(loc.feedbackThanksTitle,
+                  style: const TextStyle(
                       color: Color(0xFFC9A84C),
                       fontSize: 22,
                       fontWeight: FontWeight.w800)),
               const SizedBox(height: 8),
-              const Text('תודה שבחרתם בנו 🙏',
-                  style: TextStyle(
+              Text(loc.feedbackThanksSubtitle,
+                  style: const TextStyle(
                       color: Color(0xFF94A3B8), fontSize: 14)),
               const SizedBox(height: 24),
               FilledButton(
@@ -86,8 +90,8 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
                   backgroundColor: const Color(0xFFC9A84C),
                   foregroundColor: Colors.black,
                 ),
-                child: const Text('חזרה לדף הבית',
-                    style: TextStyle(fontWeight: FontWeight.w700)),
+                child: Text(loc.feedbackBackHome,
+                    style: const TextStyle(fontWeight: FontWeight.w700)),
               ),
             ],
           ),
@@ -100,8 +104,8 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0A1628),
         foregroundColor: const Color(0xFFE2E8F0),
-        title: const Text('משוב שהייה',
-            style: TextStyle(fontWeight: FontWeight.w700)),
+        title: Text(loc.feedbackTitle,
+            style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -109,8 +113,8 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
           constraints: const BoxConstraints(maxWidth: 500),
           child: Column(
             children: [
-              const Text('איך הייתה השהייה?',
-                  style: TextStyle(
+              Text(loc.feedbackQuestion,
+                  style: const TextStyle(
                       color: Color(0xFFC9A84C),
                       fontSize: 22,
                       fontWeight: FontWeight.w800),
@@ -139,7 +143,7 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
                 maxLines: 4,
                 style: const TextStyle(color: Color(0xFFE2E8F0)),
                 decoration: InputDecoration(
-                  hintText: 'ספרו לנו על החוויה שלכם (אופציונלי)...',
+                  hintText: loc.feedbackCommentHint,
                   hintStyle:
                       const TextStyle(color: Color(0xFF64748B)),
                   filled: true,
@@ -174,7 +178,7 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
                           height: 20,
                           child: CircularProgressIndicator(
                               strokeWidth: 2, color: Colors.black))
-                      : const Text('שלח משוב'),
+                      : Text(loc.feedbackSubmit),
                 ),
               ),
             ],

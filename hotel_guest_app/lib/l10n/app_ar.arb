@@ -1,0 +1,52 @@
+{
+  "@@locale": "ar",
+  "appTitle": "نزيل الفندق",
+  "landingWelcome": "مرحباً بكم",
+  "landingSubtitle": "أدخل بياناتك للبدء",
+  "landingNameHint": "اسمك الكامل",
+  "landingRoomHint": "رقم الغرفة",
+  "landingEnter": "تسجيل الدخول →",
+  "landingAddToHome": "+ أضفه إلى الشاشة الرئيسية للوصول السريع",
+  "landingErrorMissingFields": "يرجى إدخال الاسم ورقم الغرفة",
+  "landingErrorMissingHotel": "رمز الفندق مفقود — امسح رمز QR مجدداً",
+  "homeGreeting": "مرحباً {name} 👋",
+  "@homeGreeting": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "homeRoom": "غرفة {room}",
+  "@homeRoom": {
+    "placeholders": { "room": { "type": "String" } }
+  },
+  "homeFeedbackTitle": "كيف كانت إقامتك؟",
+  "homeFeedbackSubtitle": "اترك لنا تقييماً سريعاً",
+  "homePushBanner": "فعّل الإشعارات وتابع طلباتك",
+  "homePushEnable": "تفعيل",
+  "homeNewRequest": "طلب جديد",
+  "homeMyRequests": "طلباتي",
+  "homeNoRequests": "لا توجد طلبات بعد",
+  "categoryHousekeeping": "خدمة الغرف",
+  "categoryMaintenance": "الصيانة",
+  "categoryReception": "الاستقبال",
+  "statusOpen": "مفتوح",
+  "statusInProgress": "قيد التنفيذ",
+  "statusResolved": "تم الحل ✓",
+  "statusCancelled": "ملغى",
+  "newRequestTitle": "طلب جديد",
+  "newRequestCategoryLabel": "الفئة",
+  "newRequestDetailsLabel": "التفاصيل (اختياري)",
+  "newRequestDetailsHint": "أخبرنا كيف يمكننا مساعدتك...",
+  "newRequestSubmit": "إرسال الطلب",
+  "feedbackTitle": "تقييم الإقامة",
+  "feedbackQuestion": "كيف كانت إقامتك؟",
+  "feedbackCommentHint": "أخبرنا عن تجربتك (اختياري)...",
+  "feedbackSubmit": "إرسال التقييم",
+  "feedbackThanksTitle": "شكراً على تقييمك!",
+  "feedbackThanksSubtitle": "شكراً لاختياركم لنا 🙏",
+  "feedbackBackHome": "العودة إلى الرئيسية",
+  "feedbackErrorNoRating": "يرجى اختيار تقييم",
+  "errorGeneric": "خطأ: {error}",
+  "@errorGeneric": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "errorNoSession": "لا توجد جلسة"
+}

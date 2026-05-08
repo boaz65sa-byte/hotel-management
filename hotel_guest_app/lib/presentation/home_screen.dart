@@ -3,8 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hotel_guest_app/core/i18n/locale_provider.dart';
 import 'package:hotel_guest_app/core/push_service_web.dart';
 import 'package:hotel_guest_app/domain/guest_request.dart';
+import 'package:hotel_guest_app/l10n/app_localizations.dart';
 import 'package:hotel_guest_app/providers/providers.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -25,6 +27,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final sessionAsync = ref.watch(sessionProvider);
     final requestsAsync = ref.watch(myRequestsProvider);
 
@@ -36,7 +39,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       error: (e, _) => Scaffold(
         backgroundColor: const Color(0xFF0A1628),
         body: Center(
-            child: Text('שגיאה: $e',
+            child: Text(loc.errorGeneric(e.toString()),
                 style: const TextStyle(color: Colors.white))),
       ),
       data: (session) {
@@ -53,22 +56,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-                  child: Column(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'שלום ${session.guestName} 👋',
-                        style: const TextStyle(
-                          color: Color(0xFFC9A84C),
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              loc.homeGreeting(session.guestName),
+                              style: const TextStyle(
+                                color: Color(0xFFC9A84C),
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            Text(
+                              loc.homeRoom(session.roomNumber),
+                              style: const TextStyle(
+                                  color: Color(0xFF94A3B8), fontSize: 14),
+                            ),
+                          ],
                         ),
                       ),
-                      Text(
-                        'חדר ${session.roomNumber}',
-                        style: const TextStyle(
-                            color: Color(0xFF94A3B8), fontSize: 14),
-                      ),
+                      const _LanguageSwitcher(),
                     ],
                   ),
                 ),
@@ -86,27 +97,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         border: Border.all(
                             color: const Color(0xFF4ADE80)),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.star, color: Color(0xFFC9A84C)),
-                          SizedBox(width: 10),
+                          const Icon(Icons.star, color: Color(0xFFC9A84C)),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment:
                                   CrossAxisAlignment.start,
                               children: [
-                                Text('איך הייתה השהייה?',
-                                    style: TextStyle(
+                                Text(loc.homeFeedbackTitle,
+                                    style: const TextStyle(
                                         color: Color(0xFFE2E8F0),
                                         fontWeight: FontWeight.w700)),
-                                Text('השאירו לנו משוב קצר',
-                                    style: TextStyle(
+                                Text(loc.homeFeedbackSubtitle,
+                                    style: const TextStyle(
                                         color: Color(0xFF94A3B8),
                                         fontSize: 12)),
                               ],
                             ),
                           ),
-                          Icon(Icons.chevron_right,
+                          const Icon(Icons.chevron_right,
                               color: Color(0xFF64748B)),
                         ],
                       ),
@@ -132,10 +143,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           const Icon(Icons.notifications_outlined,
                               color: Color(0xFFC9A84C), size: 20),
                           const SizedBox(width: 10),
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'הפעל התראות ועקוב אחר הבקשות שלך',
-                              style: TextStyle(
+                              loc.homePushBanner,
+                              style: const TextStyle(
                                   color: Color(0xFFE2E8F0),
                                   fontSize: 13),
                             ),
@@ -143,8 +154,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           TextButton(
                             onPressed: () => _enablePush(
                                 session.hotelId, session.roomNumber),
-                            child: const Text('הפעל',
-                                style: TextStyle(
+                            child: Text(loc.homePushEnable,
+                                style: const TextStyle(
                                     color: Color(0xFFC9A84C))),
                           ),
                         ],
@@ -159,8 +170,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: FilledButton.icon(
                       onPressed: () => context.push('/new'),
                       icon: const Icon(Icons.add),
-                      label: const Text('בקשה חדשה',
-                          style: TextStyle(fontWeight: FontWeight.w700)),
+                      label: Text(loc.homeNewRequest,
+                          style: const TextStyle(fontWeight: FontWeight.w700)),
                       style: FilledButton.styleFrom(
                         backgroundColor: const Color(0xFFC9A84C),
                         foregroundColor: Colors.black,
@@ -170,10 +181,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
-                  child: Text('הבקשות שלי',
-                      style: TextStyle(
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                  child: Text(loc.homeMyRequests,
+                      style: const TextStyle(
                           color: Color(0xFFE2E8F0),
                           fontSize: 15,
                           fontWeight: FontWeight.w700)),
@@ -187,9 +198,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             style: const TextStyle(
                                 color: Color(0xFF94A3B8)))),
                     data: (requests) => requests.isEmpty
-                        ? const Center(
-                            child: Text('אין בקשות עדיין',
-                                style: TextStyle(
+                        ? Center(
+                            child: Text(loc.homeNoRequests,
+                                style: const TextStyle(
                                     color: Color(0xFF94A3B8),
                                     fontSize: 14)),
                           )
@@ -211,15 +222,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
+class _LanguageSwitcher extends ConsumerWidget {
+  const _LanguageSwitcher();
+
+  static const _langs = [
+    (Locale('he'), '🇮🇱', 'עברית'),
+    (Locale('en'), '🇬🇧', 'English'),
+    (Locale('ar'), '🇸🇦', 'العربية'),
+    (Locale('ru'), '🇷🇺', 'Русский'),
+  ];
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final current = ref.watch(localeProvider);
+    final flag = _langs
+        .firstWhere((l) => l.$1.languageCode == current.languageCode,
+            orElse: () => _langs[0])
+        .$2;
+    return PopupMenuButton<Locale>(
+      onSelected: (l) => ref.read(localeProvider.notifier).setLocale(l),
+      tooltip: '',
+      color: const Color(0xFF0F1F3D),
+      icon: Text(flag, style: const TextStyle(fontSize: 22)),
+      itemBuilder: (_) => _langs
+          .map((item) => PopupMenuItem<Locale>(
+                value: item.$1,
+                child: Row(
+                  children: [
+                    Text(item.$2, style: const TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Text(item.$3,
+                        style:
+                            const TextStyle(color: Color(0xFFE2E8F0))),
+                  ],
+                ),
+              ))
+          .toList(),
+    );
+  }
+}
+
 class _RequestTile extends StatelessWidget {
   final GuestRequest request;
   const _RequestTile({required this.request});
-
-  static const _categoryLabel = {
-    'housekeeping': '🛏️ חדרניות',
-    'maintenance':  '🔧 תחזוקה',
-    'reception':    '🛎️ קבלה',
-  };
 
   static const _statusColor = {
     'open':        Color(0xFFF87171),
@@ -229,16 +274,29 @@ class _RequestTile extends StatelessWidget {
     'cancelled':   Color(0xFF64748B),
   };
 
-  static const _statusLabel = {
-    'open':        'פתוחה',
-    'assigned':    'בטיפול',
-    'in_progress': 'בטיפול',
-    'resolved':    'טופלה ✓',
-    'cancelled':   'בוטלה',
-  };
+  String _categoryLabel(String category, AppLocalizations loc) {
+    switch (category) {
+      case 'housekeeping': return '🛏️ ${loc.categoryHousekeeping}';
+      case 'maintenance':  return '🔧 ${loc.categoryMaintenance}';
+      case 'reception':    return '🛎️ ${loc.categoryReception}';
+      default:             return category;
+    }
+  }
+
+  String _statusLabel(String status, AppLocalizations loc) {
+    switch (status) {
+      case 'open':        return loc.statusOpen;
+      case 'assigned':    return loc.statusInProgress;
+      case 'in_progress': return loc.statusInProgress;
+      case 'resolved':    return loc.statusResolved;
+      case 'cancelled':   return loc.statusCancelled;
+      default:            return status;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final statusColor =
         _statusColor[request.status] ?? const Color(0xFF64748B);
     return Container(
@@ -258,7 +316,7 @@ class _RequestTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _categoryLabel[request.category] ?? request.category,
+                  _categoryLabel(request.category, loc),
                   style: const TextStyle(
                       color: Color(0xFFE2E8F0),
                       fontWeight: FontWeight.w600,
@@ -284,7 +342,7 @@ class _RequestTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              _statusLabel[request.status] ?? request.status,
+              _statusLabel(request.status, loc),
               style: TextStyle(
                   color: statusColor,
                   fontSize: 10,

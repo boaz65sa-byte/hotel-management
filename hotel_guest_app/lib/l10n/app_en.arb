@@ -1,0 +1,52 @@
+{
+  "@@locale": "en",
+  "appTitle": "Hotel Guest",
+  "landingWelcome": "Welcome",
+  "landingSubtitle": "Fill in your details to get started",
+  "landingNameHint": "Your full name",
+  "landingRoomHint": "Room number",
+  "landingEnter": "Check In →",
+  "landingAddToHome": "+ Add to home screen for quick access",
+  "landingErrorMissingFields": "Please fill in your name and room number",
+  "landingErrorMissingHotel": "Hotel code missing — scan the QR again",
+  "homeGreeting": "Hello, {name} 👋",
+  "@homeGreeting": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "homeRoom": "Room {room}",
+  "@homeRoom": {
+    "placeholders": { "room": { "type": "String" } }
+  },
+  "homeFeedbackTitle": "How was your stay?",
+  "homeFeedbackSubtitle": "Leave us a quick review",
+  "homePushBanner": "Enable notifications and track your requests",
+  "homePushEnable": "Enable",
+  "homeNewRequest": "New Request",
+  "homeMyRequests": "My Requests",
+  "homeNoRequests": "No requests yet",
+  "categoryHousekeeping": "Housekeeping",
+  "categoryMaintenance": "Maintenance",
+  "categoryReception": "Reception",
+  "statusOpen": "Open",
+  "statusInProgress": "In Progress",
+  "statusResolved": "Resolved ✓",
+  "statusCancelled": "Cancelled",
+  "newRequestTitle": "New Request",
+  "newRequestCategoryLabel": "Category",
+  "newRequestDetailsLabel": "Details (optional)",
+  "newRequestDetailsHint": "Tell us how we can help you...",
+  "newRequestSubmit": "Submit Request",
+  "feedbackTitle": "Stay Feedback",
+  "feedbackQuestion": "How was your stay?",
+  "feedbackCommentHint": "Tell us about your experience (optional)...",
+  "feedbackSubmit": "Submit Feedback",
+  "feedbackThanksTitle": "Thank you for your feedback!",
+  "feedbackThanksSubtitle": "Thank you for choosing us 🙏",
+  "feedbackBackHome": "Back to Home",
+  "feedbackErrorNoRating": "Please select a rating",
+  "errorGeneric": "Error: {error}",
+  "@errorGeneric": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "errorNoSession": "No session"
+}

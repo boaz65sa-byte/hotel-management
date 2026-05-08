@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hotel_guest_app/l10n/app_localizations.dart';
 import 'package:hotel_guest_app/providers/providers.dart';
 
 class NewRequestScreen extends ConsumerStatefulWidget {
@@ -16,23 +17,24 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
   String _category = 'housekeeping';
   bool _loading = false;
 
-  static const _categories = [
-    ('housekeeping', '🛏️ חדרניות'),
-    ('maintenance',  '🔧 תחזוקה'),
-    ('reception',    '🛎️ קבלה'),
-  ];
-
   @override
   void dispose() {
     _descCtrl.dispose();
     super.dispose();
   }
 
+  List<(String, String)> _categories(AppLocalizations loc) => [
+    ('housekeeping', '🛏️ ${loc.categoryHousekeeping}'),
+    ('maintenance',  '🔧 ${loc.categoryMaintenance}'),
+    ('reception',    '🛎️ ${loc.categoryReception}'),
+  ];
+
   Future<void> _submit() async {
+    final loc = AppLocalizations.of(context)!;
     setState(() => _loading = true);
     try {
       final session = await ref.read(sessionProvider.future);
-      if (session == null) throw Exception('אין סשן');
+      if (session == null) throw Exception(loc.errorNoSession);
       await ref.read(guestRepositoryProvider).submitRequest(
             hotelId:     session.hotelId,
             roomNumber:  session.roomNumber,
@@ -47,7 +49,7 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
       if (mounted)
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('שגיאה: $e'),
+              content: Text(loc.errorGeneric(e.toString())),
               backgroundColor: Colors.red),
         );
     } finally {
@@ -57,13 +59,15 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final categories = _categories(loc);
     return Scaffold(
       backgroundColor: const Color(0xFF0A1628),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0A1628),
         foregroundColor: const Color(0xFFE2E8F0),
-        title: const Text('בקשה חדשה',
-            style: TextStyle(fontWeight: FontWeight.w700)),
+        title: Text(loc.newRequestTitle,
+            style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -72,8 +76,8 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('קטגוריה',
-                  style: TextStyle(
+              Text(loc.newRequestCategoryLabel,
+                  style: const TextStyle(
                       color: Color(0xFF94A3B8),
                       fontSize: 12,
                       fontWeight: FontWeight.w600)),
@@ -81,7 +85,7 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
-                children: _categories
+                children: categories
                     .map((c) => GestureDetector(
                           onTap: () =>
                               setState(() => _category = c.$1),
@@ -114,8 +118,8 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
                     .toList(),
               ),
               const SizedBox(height: 20),
-              const Text('פרטים (אופציונלי)',
-                  style: TextStyle(
+              Text(loc.newRequestDetailsLabel,
+                  style: const TextStyle(
                       color: Color(0xFF94A3B8),
                       fontSize: 12,
                       fontWeight: FontWeight.w600)),
@@ -125,7 +129,7 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
                 maxLines: 4,
                 style: const TextStyle(color: Color(0xFFE2E8F0)),
                 decoration: InputDecoration(
-                  hintText: 'ספרו לנו במה תרצו עזרה...',
+                  hintText: loc.newRequestDetailsHint,
                   hintStyle: const TextStyle(color: Color(0xFF64748B)),
                   filled: true,
                   fillColor: const Color(0xFF0F1F3D),
@@ -159,7 +163,7 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
                           height: 20,
                           child: CircularProgressIndicator(
                               strokeWidth: 2, color: Colors.black))
-                      : const Text('שלח בקשה'),
+                      : Text(loc.newRequestSubmit),
                 ),
               ),
             ],
