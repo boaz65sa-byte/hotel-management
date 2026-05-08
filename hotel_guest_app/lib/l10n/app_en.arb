@@ -2,6 +2,10 @@
   "@@locale": "en",
   "appTitle": "Hotel Guest",
   "landingWelcome": "Welcome",
+  "landingWelcomeWithName": "Welcome to {hotel}",
+  "@landingWelcomeWithName": {
+    "placeholders": { "hotel": { "type": "String" } }
+  },
   "landingSubtitle": "Fill in your details to get started",
   "landingNameHint": "Your full name",
   "landingRoomHint": "Room number",

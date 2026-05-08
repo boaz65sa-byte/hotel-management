@@ -2,6 +2,10 @@
   "@@locale": "ru",
   "appTitle": "Гость отеля",
   "landingWelcome": "Добро пожаловать",
+  "landingWelcomeWithName": "Добро пожаловать в {hotel}",
+  "@landingWelcomeWithName": {
+    "placeholders": { "hotel": { "type": "String" } }
+  },
   "landingSubtitle": "Введите данные, чтобы начать",
   "landingNameHint": "Ваше полное имя",
   "landingRoomHint": "Номер комнаты",

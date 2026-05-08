@@ -6,7 +6,8 @@ type Hotel = { id?: string; name: string; subscription_plan: string
                default_sla_hours: number; default_language: string
                is_active: boolean; theme?: string | null
                stay_threshold?: number
-               guest_pwa_url?: string | null }
+               guest_pwa_url?: string | null
+               logo_url?: string | null }
 
 export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormData) => Promise<void> }) {
   const [data, setData] = useState(hotel)
@@ -47,8 +48,32 @@ export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormDa
             <option value="he">Hebrew</option>
             <option value="en">English</option>
             <option value="ar">Arabic</option>
+            <option value="ru">Russian</option>
           </select>
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Logo URL</label>
+        <input
+          type="url"
+          name="logo_url"
+          value={data.logo_url ?? ''}
+          onChange={e => setData({...data, logo_url: e.target.value})}
+          className="w-full border rounded px-3 py-2"
+          placeholder="https://example.com/hotel-logo.png"
+        />
+        <p className="text-xs text-gray-500 mt-1">
+          לוגו המלון — מוצג באפליקציית האורחים. ריק = אייקון ברירת מחדל.
+        </p>
+        {data.logo_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={data.logo_url}
+            alt="Hotel logo preview"
+            className="mt-2 h-20 w-20 object-cover rounded-lg border"
+          />
+        )}
       </div>
 
       <div>

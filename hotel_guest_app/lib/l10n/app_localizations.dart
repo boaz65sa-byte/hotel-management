@@ -111,6 +111,12 @@ abstract class AppLocalizations {
   /// **'ברוכים הבאים'**
   String get landingWelcome;
 
+  /// Landing screen welcome with hotel name
+  ///
+  /// In he, this message translates to:
+  /// **'ברוכים הבאים ל{hotel}'**
+  String landingWelcomeWithName(String hotel);
+
   /// Landing screen subtitle
   ///
   /// In he, this message translates to:

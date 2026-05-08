@@ -13,6 +13,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get landingWelcome => 'ברוכים הבאים';
 
   @override
+  String landingWelcomeWithName(String hotel) {
+    return 'ברוכים הבאים ל$hotel';
+  }
+
+  @override
   String get landingSubtitle => 'מלאו את הפרטים כדי להתחיל';
 
   @override

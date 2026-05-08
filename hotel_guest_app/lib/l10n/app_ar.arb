@@ -2,6 +2,10 @@
   "@@locale": "ar",
   "appTitle": "نزيل الفندق",
   "landingWelcome": "مرحباً بكم",
+  "landingWelcomeWithName": "مرحباً بكم في {hotel}",
+  "@landingWelcomeWithName": {
+    "placeholders": { "hotel": { "type": "String" } }
+  },
   "landingSubtitle": "أدخل بياناتك للبدء",
   "landingNameHint": "اسمك الكامل",
   "landingRoomHint": "رقم الغرفة",

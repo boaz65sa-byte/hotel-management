@@ -6,6 +6,12 @@
   "landingWelcome": "ברוכים הבאים",
   "@landingWelcome": { "description": "Landing screen welcome heading" },
 
+  "landingWelcomeWithName": "ברוכים הבאים ל{hotel}",
+  "@landingWelcomeWithName": {
+    "description": "Landing screen welcome with hotel name",
+    "placeholders": { "hotel": { "type": "String" } }
+  },
+
   "landingSubtitle": "מלאו את הפרטים כדי להתחיל",
   "@landingSubtitle": { "description": "Landing screen subtitle" },
 

@@ -16,6 +16,7 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
   async function updateHotel(fd: FormData) {
     'use server'
     const guestPwaUrl = ((fd.get('guest_pwa_url') as string) ?? '').trim()
+    const logoUrl = ((fd.get('logo_url') as string) ?? '').trim()
     await supabaseAdmin.from('hotels').update({
       name:              fd.get('name') as string,
       subscription_plan: fd.get('subscription_plan') as string,
@@ -25,6 +26,7 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
       is_active:         fd.get('is_active') === 'on',
       stay_threshold:    Number(fd.get('stay_threshold')) || 3,
       ...(guestPwaUrl ? { guest_pwa_url: guestPwaUrl } : {}),
+      logo_url:          logoUrl || null,
     }).eq('id', id)
     redirect('/dashboard/hotels')
   }
@@ -57,6 +59,7 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
         theme: hotel.theme,
         stay_threshold: hotel.stay_threshold ?? 3,
         guest_pwa_url: hotel.guest_pwa_url ?? null,
+        logo_url: hotel.logo_url ?? null,
       }} action={updateHotel} />
     </div>
   )

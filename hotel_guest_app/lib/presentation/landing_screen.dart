@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hotel_guest_app/core/session.dart';
+import 'package:hotel_guest_app/data/guest_repository.dart';
 import 'package:hotel_guest_app/l10n/app_localizations.dart';
 import 'package:hotel_guest_app/providers/providers.dart';
 
@@ -20,6 +21,7 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
   final _nameCtrl = TextEditingController();
   final _roomCtrl = TextEditingController();
   bool _loading = false;
+  HotelBranding? _hotel;
 
   @override
   void initState() {
@@ -27,6 +29,14 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
     if (widget.roomNumber != null && widget.roomNumber!.isNotEmpty) {
       _roomCtrl.text = widget.roomNumber!;
     }
+    _loadHotel();
+  }
+
+  Future<void> _loadHotel() async {
+    final id = widget.hotelId;
+    if (id == null || id.isEmpty) return;
+    final hotel = await GuestRepository().getHotelBranding(id);
+    if (mounted) setState(() => _hotel = hotel);
   }
 
   @override
@@ -89,11 +99,13 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.hotel,
-                      color: Color(0xFFC9A84C), size: 56),
+                  _HotelHeader(hotel: _hotel),
                   const SizedBox(height: 12),
                   Text(
-                    loc.landingWelcome,
+                    _hotel?.name == null
+                        ? loc.landingWelcome
+                        : loc.landingWelcomeWithName(_hotel!.name),
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Color(0xFFC9A84C),
                       fontSize: 26,
@@ -152,7 +164,7 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
   Widget _buildField(
       TextEditingController ctrl, String hint, IconData icon,
       {TextInputType? type}) =>
-      TextField(
+    TextField(
         controller: ctrl,
         keyboardType: type,
         style: const TextStyle(color: Color(0xFFE2E8F0)),
@@ -172,4 +184,62 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
           ),
         ),
       );
+}
+
+class _HotelHeader extends StatelessWidget {
+  final HotelBranding? hotel;
+  const _HotelHeader({this.hotel});
+
+  @override
+  Widget build(BuildContext context) {
+    final logo = hotel?.logoUrl;
+    if (logo != null && logo.trim().isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.network(
+          logo,
+          width: 96,
+          height: 96,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => const _FallbackHotelIcon(),
+          loadingBuilder: (_, child, progress) {
+            if (progress == null) return child;
+            return const SizedBox(
+              width: 96,
+              height: 96,
+              child: Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Color(0xFFC9A84C),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    }
+    return const _FallbackHotelIcon();
+  }
+}
+
+class _FallbackHotelIcon extends StatelessWidget {
+  const _FallbackHotelIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 96,
+      height: 96,
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F1F3D),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFC9A84C), width: 2),
+      ),
+      child: const Icon(
+        Icons.hotel,
+        color: Color(0xFFC9A84C),
+        size: 48,
+      ),
+    );
+  }
 }

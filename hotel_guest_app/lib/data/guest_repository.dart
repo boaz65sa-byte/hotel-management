@@ -1,7 +1,32 @@
 import 'package:hotel_guest_app/core/supabase_init.dart';
 import 'package:hotel_guest_app/domain/guest_request.dart';
 
+class HotelBranding {
+  final String name;
+  final String? logoUrl;
+  const HotelBranding({required this.name, this.logoUrl});
+}
+
 class GuestRepository {
+  /// Fetches the hotel's public branding (name + logo).
+  /// Returns null if hotelId is invalid or the row is missing.
+  Future<HotelBranding?> getHotelBranding(String hotelId) async {
+    try {
+      final row = await supabase
+          .from('hotels')
+          .select('name, logo_url')
+          .eq('id', hotelId)
+          .maybeSingle();
+      if (row == null) return null;
+      return HotelBranding(
+        name: row['name'] as String,
+        logoUrl: row['logo_url'] as String?,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Streams this guest's requests, newest first.
   /// Filtered client-side — stream() only supports one .eq() filter.
   Stream<List<GuestRequest>> streamMyRequests(

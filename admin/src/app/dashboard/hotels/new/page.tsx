@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 async function createHotel(fd: FormData) {
   'use server'
   const guestPwaUrl = ((fd.get('guest_pwa_url') as string) ?? '').trim()
+  const logoUrl = ((fd.get('logo_url') as string) ?? '').trim()
   await supabaseAdmin.from('hotels').insert({
     name:              fd.get('name') as string,
     subscription_plan: fd.get('subscription_plan') as string,
@@ -16,6 +17,7 @@ async function createHotel(fd: FormData) {
     storage_quota_gb:  fd.get('subscription_plan') === 'enterprise' ? 200
                      : fd.get('subscription_plan') === 'pro' ? 50 : 10,
     ...(guestPwaUrl ? { guest_pwa_url: guestPwaUrl } : {}),
+    ...(logoUrl ? { logo_url: logoUrl } : {}),
   })
   redirect('/dashboard/hotels')
 }

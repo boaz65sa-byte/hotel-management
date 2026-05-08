@@ -13,6 +13,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get landingWelcome => 'Добро пожаловать';
 
   @override
+  String landingWelcomeWithName(String hotel) {
+    return 'Добро пожаловать в $hotel';
+  }
+
+  @override
   String get landingSubtitle => 'Введите данные, чтобы начать';
 
   @override
