@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import QRCode from 'qrcode'
 import JSZip from 'jszip'
 
-const FALLBACK_PWA_BASE_URL = 'https://zesty-queijadas-16c29.netlify.app'
+const FALLBACK_PWA_BASE_URL = 'https://exquisite-cocada-7966bd.netlify.app'
 
 /**
  * Builds a ZIP file containing one PNG per room QR code for a hotel.

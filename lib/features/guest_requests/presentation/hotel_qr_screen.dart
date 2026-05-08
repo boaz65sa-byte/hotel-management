@@ -11,7 +11,7 @@ import 'dart:io';
 
 // Fallback used when the hotels.guest_pwa_url column is unset/unreachable.
 const String kDefaultGuestPwaBaseUrl =
-    'https://zesty-queijadas-16c29.netlify.app';
+    'https://exquisite-cocada-7966bd.netlify.app';
 
 class HotelQrScreen extends StatefulWidget {
   final String hotelId;

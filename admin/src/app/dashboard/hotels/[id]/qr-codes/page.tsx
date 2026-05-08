@@ -4,7 +4,7 @@ import QRCode from 'qrcode'
 import { DownloadZipButton } from './download-zip-button'
 import { HotelQrActions } from './hotel-qr-actions'
 
-const FALLBACK_PWA_BASE_URL = 'https://zesty-queijadas-16c29.netlify.app'
+const FALLBACK_PWA_BASE_URL = 'https://exquisite-cocada-7966bd.netlify.app'
 
 async function generateQrDataUrl(url: string, size = 200): Promise<string> {
   return QRCode.toDataURL(url, {

@@ -70,7 +70,7 @@
 - [x] stay_threshold שדה
 
 ### Guest PWA
-- [x] פרוס ב-Netlify: **https://zesty-queijadas-16c29.netlify.app**
+- [x] פרוס ב-Netlify: **https://exquisite-cocada-7966bd.netlify.app**
 - [x] Landing screen — שם + חדר (עם pre-fill מURL)
 - [x] Home screen — רשימת בקשות + feedback banner
 - [x] New request + Feedback
@@ -238,7 +238,7 @@ cd hotel_guest_app && flutter build web --release
 | שכבה | מיקום |
 |------|-------|
 | Flutter Staff App | `/Users/boazsaada/manegmant resapceon/` (localhost בפיתוח) |
-| Guest PWA | https://zesty-queijadas-16c29.netlify.app |
+| Guest PWA | https://exquisite-cocada-7966bd.netlify.app |
 | Admin Panel | `/Users/boazsaada/manegmant resapceon/admin/` (localhost) |
 | Backend | Supabase: vetwlonyzyzvhrtdwbzj.supabase.co |
 | Edge Functions | `supabase/functions/` (send-push, invite-user, manage-user, run-scheduled-tasks, export-excel) |

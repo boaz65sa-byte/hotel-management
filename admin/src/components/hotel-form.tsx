@@ -115,7 +115,7 @@ export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormDa
           value={data.guest_pwa_url ?? ''}
           onChange={e => setData({...data, guest_pwa_url: e.target.value})}
           className="w-full border rounded px-3 py-2"
-          placeholder="https://zesty-queijadas-16c29.netlify.app"
+          placeholder="https://exquisite-cocada-7966bd.netlify.app"
         />
         <p className="text-xs text-gray-500 mt-1">
           ה-URL הבסיסי של אפליקציית האורחים לקודי ה-QR. ריק = ברירת מחדל.

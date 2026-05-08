@@ -5,7 +5,7 @@ This repo is a multi-target project. Each layer ships to a different host.
 | Layer | Path | Host | Notes |
 |-------|------|------|-------|
 | Admin Panel | `admin/` | **Vercel** | Next.js 16 — monorepo config in `vercel.json` |
-| Guest PWA | `hotel_guest_app/` | **Netlify** | already live at `zesty-queijadas-16c29.netlify.app` |
+| Guest PWA | `hotel_guest_app/` | **Netlify** | already live at `exquisite-cocada-7966bd.netlify.app` |
 | Staff App | `lib/` (root Flutter) | Android Play Store / iOS App Store | mobile build, not a hosted website |
 | Backend | `supabase/` | **Supabase** | migrations + edge functions + auth + storage |
 

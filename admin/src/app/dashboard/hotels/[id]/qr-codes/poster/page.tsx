@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import QRCode from 'qrcode'
 import { PrintButton } from './print-button'
 
-const FALLBACK_PWA_BASE_URL = 'https://zesty-queijadas-16c29.netlify.app'
+const FALLBACK_PWA_BASE_URL = 'https://exquisite-cocada-7966bd.netlify.app'
 
 export default async function HotelPosterPage({
   params,
