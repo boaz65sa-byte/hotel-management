@@ -58,12 +58,13 @@ class _NewGuestRequestScreenState
           );
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text('שגיאה: $e'),
               backgroundColor: Colors.red),
         );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }

@@ -68,6 +68,18 @@ OneSignal ──→ Flutter app (Android native via FCM / iOS via APNs)
 | Guest request status updated | `guest_requests` UPDATE | `hotel_id = X AND room_number = Y` (guest) | "הבקשה שלך {status}" |
 | Ticket created | `tickets` INSERT | `hotel_id = X AND dept = Y` | "קריאה חדשה · {priority} · {title}" |
 | Ticket assigned | `ticket_assignments` INSERT | `user_id = Z` (specific user) | "קריאה הוקצתה לך · {title}" |
+| Room assigned to staff | `rooms` UPDATE (`assigned_to` changed) | `user_id = new assignee` | "הוקצה לך חדר חדש · חדר {room_number}" |
+
+**Webhook (Supabase Dashboard → Database → Webhooks)** — הקיים + אופציונלי:
+
+| Name | Table | Events | Header `x-event-type` |
+|------|-------|--------|-------------------------|
+| (כבר רשום) | guest_requests | INSERT / UPDATE | `guest_request_insert` / `guest_request_status` |
+| (כבר רשום) | tickets | INSERT | `ticket_insert` |
+| (כבר רשום) | ticket_assignments | INSERT | `ticket_assigned` |
+| **push_room_assigned** | rooms | UPDATE | `room_assigned` |
+
+ה-Edge Function `send-push` מטפל ב-`room_assigned` רק כש-`record.assigned_to` שונה מ-`old_record.assigned_to`.
 
 ---
 

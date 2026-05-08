@@ -12,8 +12,11 @@ import '../providers/analytics_provider.dart';
 
 // Roles that see hotel-wide data and manager-only sections
 const _managerRoles = {
+  'ceo',
   'reception_manager',
   'maintenance_manager',
+  'housekeeping_manager',
+  'security_manager',
   'hotel_admin',
   'super_admin',
 };

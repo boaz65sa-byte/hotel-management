@@ -4,8 +4,14 @@ import '../domain/room_model.dart';
 class RoomTile extends StatelessWidget {
   final Room room;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
-  const RoomTile({super.key, required this.room, required this.onTap});
+  const RoomTile({
+    super.key,
+    required this.room,
+    required this.onTap,
+    this.onLongPress,
+  });
 
   Color get _color => switch (room.status) {
     'available' => Colors.green,
@@ -18,6 +24,7 @@ class RoomTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Container(
         decoration: BoxDecoration(
           color: _color.withOpacity(0.15),

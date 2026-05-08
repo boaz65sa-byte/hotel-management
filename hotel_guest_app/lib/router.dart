@@ -9,11 +9,24 @@ import 'package:hotel_guest_app/presentation/feedback_screen.dart';
 GoRouter buildRouter() => GoRouter(
   initialLocation: '/',
   redirect: (context, state) async {
-    // If navigating to home but no session exists, redirect to landing
-    if (state.matchedLocation == '/home') {
-      final session = await GuestSession.load();
-      if (session == null) return '/';
+    final loc = state.matchedLocation;
+    final session = await GuestSession.load();
+
+    // Routes that require an active guest session
+    const requiresSession = {'/home', '/new', '/feedback'};
+    if (requiresSession.contains(loc) && session == null) {
+      return '/';
     }
+
+    // Already-logged-in guest landing on '/' → send straight to /home,
+    // unless they explicitly arrived with new ?hotel= / ?room= URL params
+    // (which means they re-scanned a QR — in that case we let them re-enter).
+    if (loc == '/' && session != null) {
+      final hasOverride = state.uri.queryParameters.containsKey('hotel') ||
+                          state.uri.queryParameters.containsKey('room');
+      if (!hasOverride) return '/home';
+    }
+
     return null;
   },
   routes: [

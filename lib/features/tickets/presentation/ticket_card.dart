@@ -96,8 +96,8 @@ class TicketCard extends StatelessWidget {
                         // Row 1: ticket# + room + time
                         Row(
                           children: [
-                            Icon(Icons.meeting_room_outlined,
-                                size: 13, color: const Color(0xFF7C9DC4)),
+                            const Icon(Icons.meeting_room_outlined,
+                                size: 13, color: Color(0xFF7C9DC4)),
                             const SizedBox(width: 4),
                             Text(
                               '#${ticket.id.substring(0, ticket.id.length.clamp(0, 6)).toUpperCase()} · חדר ${ticket.roomNumber ?? "?"}',

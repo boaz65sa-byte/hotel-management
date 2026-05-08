@@ -1,19 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-
-const ROLES = [
-  { value: 'ceo',                  label: 'CEO' },
-  { value: 'reception_manager',    label: 'Reception Manager' },
-  { value: 'maintenance_manager',  label: 'Maintenance Manager' },
-  { value: 'housekeeping_manager', label: 'Housekeeping Manager' },
-  { value: 'security_manager',     label: 'Security Manager' },
-  { value: 'deputy_reception',     label: 'Deputy Reception' },
-  { value: 'receptionist',         label: 'Receptionist' },
-  { value: 'security_guard',       label: 'Security Guard' },
-  { value: 'maintenance_tech',     label: 'Maintenance Tech' },
-  { value: 'repairman',            label: 'Repairman' },
-]
+import { ROLES } from '@/lib/roles'
 
 export default function EditUserPage() {
   const router = useRouter()

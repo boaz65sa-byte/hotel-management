@@ -187,6 +187,20 @@ Deno.serve(async (req) => {
         break
       }
 
+      // ── Room assigned to housekeeping staff ──────────────────────────────
+      case 'room_assigned': {
+        const newAssignee = record.assigned_to as string | null
+        const oldAssignee = oldRecord.assigned_to as string | null
+        if (!newAssignee || newAssignee === oldAssignee) break
+
+        await sendNotification(appId, restKey,
+          [tagFilter('user_id', newAssignee)],
+          'הוקצה לך חדר חדש',
+          `חדר ${record.room_number ?? ''}`,
+        )
+        break
+      }
+
       default:
         console.warn(`Unknown event type: ${eventType}`)
     }

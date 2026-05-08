@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hotel_app/core/auth/auth_state.dart';
+import 'package:hotel_app/core/auth/role_helpers.dart';
 import 'package:hotel_app/features/guest_requests/domain/guest_request_model.dart';
 import 'package:hotel_app/features/guest_requests/presentation/guest_request_card.dart';
 import 'package:hotel_app/features/guest_requests/presentation/hotel_qr_screen.dart';
@@ -88,23 +89,25 @@ class _GuestRequestsListScreenState
               ),
             ),
             actions: [
-              if (_exporting)
-                const Padding(
-                  padding: EdgeInsets.all(12),
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Color(0xFFC9A84C)),
+              if (canExportData(ref.watch(authRepositoryProvider).role)) ...[
+                if (_exporting)
+                  const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Color(0xFFC9A84C)),
+                    ),
+                  )
+                else
+                  IconButton(
+                    icon: const Icon(Icons.file_download,
+                        color: Color(0xFFC9A84C)),
+                    tooltip: 'ייצוא Excel',
+                    onPressed: () => _export(all),
                   ),
-                )
-              else
-                IconButton(
-                  icon: const Icon(Icons.file_download,
-                      color: Color(0xFFC9A84C)),
-                  tooltip: 'ייצוא Excel',
-                  onPressed: () => _export(all),
-                ),
+              ],
               Builder(builder: (context) {
                 final hotelId = ref.read(currentUserProvider)?.appMetadata['hotel_id'] as String?;
                 if (hotelId == null) return const SizedBox.shrink();
@@ -221,15 +224,14 @@ class _GuestRequestsListScreenState
                 title: const Text('התחל טיפול',
                     style: TextStyle(color: Color(0xFFE2E8F0))),
                 onTap: () async {
+                  final messenger = ScaffoldMessenger.of(context);
                   Navigator.pop(context);
                   try {
                     await repo.updateStatus(request.id, 'in_progress');
                   } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('שגיאה: $e'), backgroundColor: Colors.red),
-                      );
-                    }
+                    messenger.showSnackBar(
+                      SnackBar(content: Text('שגיאה: $e'), backgroundColor: Colors.red),
+                    );
                   }
                 },
               ),
@@ -240,15 +242,14 @@ class _GuestRequestsListScreenState
                 title: const Text('סמן כטופל',
                     style: TextStyle(color: Color(0xFFE2E8F0))),
                 onTap: () async {
+                  final messenger = ScaffoldMessenger.of(context);
                   Navigator.pop(context);
                   try {
                     await repo.updateStatus(request.id, 'resolved');
                   } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('שגיאה: $e'), backgroundColor: Colors.red),
-                      );
-                    }
+                    messenger.showSnackBar(
+                      SnackBar(content: Text('שגיאה: $e'), backgroundColor: Colors.red),
+                    );
                   }
                 },
               ),
@@ -298,15 +299,14 @@ class _GuestRequestsListScreenState
                     ? const Icon(Icons.check, color: Color(0xFFC9A84C))
                     : null,
                 onTap: () async {
+                  final messenger = ScaffoldMessenger.of(context);
                   Navigator.pop(context);
                   try {
                     await repo.reassign(request.id, entry.$1);
                   } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('שגיאה: $e'), backgroundColor: Colors.red),
-                      );
-                    }
+                    messenger.showSnackBar(
+                      SnackBar(content: Text('שגיאה: $e'), backgroundColor: Colors.red),
+                    );
                   }
                 },
               ),

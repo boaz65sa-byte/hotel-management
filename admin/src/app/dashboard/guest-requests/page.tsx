@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { revalidatePath } from 'next/cache'
 
 const STATUS_LABELS: Record<string, string> = {
   open:        'פתוחה',
@@ -56,6 +57,18 @@ export default async function GuestRequestsAdminPage({
   const hotelMap = Object.fromEntries((hotels ?? []).map(h => [h.id, h.name]))
 
   const statuses = ['open', 'assigned', 'in_progress', 'resolved', 'cancelled']
+
+  async function updateRequestStatus(fd: FormData) {
+    'use server'
+    const id = fd.get('id') as string
+    const status = fd.get('status') as string
+    if (!id || !status) return
+    await supabaseAdmin
+      .from('guest_requests')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', id)
+    revalidatePath('/dashboard/guest-requests')
+  }
 
   return (
     <div className="p-6" dir="rtl">
@@ -121,13 +134,14 @@ export default async function GuestRequestsAdminPage({
                 <th className="text-right px-4 py-3 font-semibold text-gray-600">אורח</th>
                 <th className="text-right px-4 py-3 font-semibold text-gray-600">קטגוריה</th>
                 <th className="text-right px-4 py-3 font-semibold text-gray-600">סטטוס</th>
+                <th className="text-right px-4 py-3 font-semibold text-gray-600">עדכן ל-</th>
                 <th className="text-right px-4 py-3 font-semibold text-gray-600">תיאור</th>
                 <th className="text-right px-4 py-3 font-semibold text-gray-600">תאריך</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {requests.map(r => (
-                <tr key={r.id} className="hover:bg-gray-50">
+                <tr key={r.id} className="hover:bg-gray-50 align-top">
                   <td className="px-4 py-3 text-gray-700">{hotelMap[r.hotel_id] ?? r.hotel_id.slice(0, 8)}</td>
                   <td className="px-4 py-3 font-medium">{r.room_number}</td>
                   <td className="px-4 py-3 text-gray-700">{r.guest_name}</td>
@@ -137,7 +151,35 @@ export default async function GuestRequestsAdminPage({
                       {STATUS_LABELS[r.status] ?? r.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-500 max-w-xs truncate">{r.description ?? '—'}</td>
+                  <td className="px-4 py-3">
+                    <form action={updateRequestStatus} className="flex items-center gap-2">
+                      <input type="hidden" name="id" value={r.id} />
+                      <select
+                        name="status"
+                        defaultValue={r.status}
+                        className="border rounded px-2 py-1 text-xs"
+                      >
+                        {statuses.map(s => (
+                          <option key={s} value={s}>{STATUS_LABELS[s]}</option>
+                        ))}
+                      </select>
+                      <button type="submit" className="text-xs bg-gray-900 text-white px-2 py-1 rounded hover:bg-gray-700">
+                        ✓
+                      </button>
+                    </form>
+                  </td>
+                  <td className="px-4 py-3 text-gray-500 max-w-xs">
+                    <details>
+                      <summary className="cursor-pointer truncate max-w-[20ch]">
+                        {r.description ?? '—'}
+                      </summary>
+                      {r.description && (
+                        <p className="mt-2 whitespace-pre-wrap text-gray-700">
+                          {r.description}
+                        </p>
+                      )}
+                    </details>
+                  </td>
                   <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{fmtDate(r.created_at)}</td>
                 </tr>
               ))}

@@ -81,13 +81,13 @@ class _ManagerRoomListState extends ConsumerState<_ManagerRoomList> {
             child: Column(
               children: [
                 // Header
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
                   child: Row(
                     children: [
-                      const Icon(Icons.cleaning_services, color: Color(0xFFC9A84C)),
-                      const SizedBox(width: 8),
-                      const Text(
+                      Icon(Icons.cleaning_services, color: Color(0xFFC9A84C)),
+                      SizedBox(width: 8),
+                      Text(
                         'ניהול ניקיון',
                         style: TextStyle(
                           color: Color(0xFFE2E8F0),

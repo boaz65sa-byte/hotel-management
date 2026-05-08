@@ -6,7 +6,12 @@ import 'dart:ui' as ui;
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:hotel_app/core/supabase/supabase_client.dart';
 import 'dart:io';
+
+// Fallback used when the hotels.guest_pwa_url column is unset/unreachable.
+const String kDefaultGuestPwaBaseUrl =
+    'https://zesty-queijadas-16c29.netlify.app';
 
 class HotelQrScreen extends StatefulWidget {
   final String hotelId;
@@ -26,8 +31,38 @@ class _HotelQrScreenState extends State<HotelQrScreen> {
   final _qrKey = GlobalKey();
   bool _saving = false;
 
-  String get _pwaUrl =>
-      'https://zesty-queijadas-16c29.netlify.app/#/?hotel=${widget.hotelId}';
+  String _baseUrl = kDefaultGuestPwaBaseUrl;
+  bool _baseUrlLoading = true;
+  String? _hotelName;
+
+  String get _pwaUrl => '$_baseUrl/#/?hotel=${widget.hotelId}';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBaseUrl();
+  }
+
+  Future<void> _loadBaseUrl() async {
+    try {
+      final row = await supabase
+          .from('hotels')
+          .select('guest_pwa_url, name')
+          .eq('id', widget.hotelId)
+          .maybeSingle();
+      final url = (row?['guest_pwa_url'] as String?)?.trim();
+      final name = (row?['name'] as String?)?.trim();
+      if (mounted) {
+        setState(() {
+          if (url != null && url.isNotEmpty) _baseUrl = url;
+          if (name != null && name.isNotEmpty) _hotelName = name;
+          _baseUrlLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _baseUrlLoading = false);
+    }
+  }
 
   Future<Uint8List?> _captureQr() async {
     final boundary = _qrKey.currentContext?.findRenderObject()
@@ -48,7 +83,7 @@ class _HotelQrScreenState extends State<HotelQrScreen> {
       await file.writeAsBytes(bytes);
       await Share.shareXFiles(
         [XFile(file.path)],
-        subject: 'QR קוד — ${widget.hotelName}',
+        subject: 'QR קוד — ${_hotelName ?? widget.hotelName}',
       );
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -93,7 +128,7 @@ class _HotelQrScreenState extends State<HotelQrScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                widget.hotelName,
+                _hotelName ?? widget.hotelName,
                 style: const TextStyle(
                   color: Color(0xFFC9A84C),
                   fontSize: 20,
@@ -107,19 +142,25 @@ class _HotelQrScreenState extends State<HotelQrScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 28),
-              RepaintBoundary(
-                key: _qrKey,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  color: Colors.white,
-                  child: QrImageView(
-                    data: _pwaUrl,
-                    version: QrVersions.auto,
-                    size: 240,
-                    backgroundColor: Colors.white,
+              if (_baseUrlLoading)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 80),
+                  child: CircularProgressIndicator(color: Color(0xFFC9A84C)),
+                )
+              else
+                RepaintBoundary(
+                  key: _qrKey,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    color: Colors.white,
+                    child: QrImageView(
+                      data: _pwaUrl,
+                      version: QrVersions.auto,
+                      size: 240,
+                      backgroundColor: Colors.white,
+                    ),
                   ),
                 ),
-              ),
               const SizedBox(height: 16),
               Text(
                 _pwaUrl,

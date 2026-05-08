@@ -72,12 +72,15 @@ class HousekeepingRepository {
   }
 
   /// Assigns a room to a staff member.
+  ///
+  /// Push notification is dispatched by the `send-push` Edge Function via a
+  /// Supabase Database Webhook on UPDATE of `rooms` when `assigned_to`
+  /// changes (event: `room_assigned`). See `supabase/functions/send-push`.
   Future<void> assignRoom(String roomId, String staffId, String staffName) async {
     await supabase.from('rooms').update({
       'assigned_to': staffId,
       'assigned_to_name': staffName,
     }).eq('id', roomId);
-    // TODO(Module 4): send push notification to assigned_to
   }
 
   /// Clears assignment from a room.

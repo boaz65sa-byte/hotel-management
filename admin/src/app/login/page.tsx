@@ -24,13 +24,23 @@ export default function LoginPage() {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
+      if (!data.session) return
 
-      if (data.session) {
-        // Store tokens in cookies for server-side auth
-        document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=3600; SameSite=Lax`
-        document.cookie = `sb-refresh-token=${data.session.refresh_token}; path=/; max-age=86400; SameSite=Lax`
-        router.push('/dashboard')
+      // If the user has any verified TOTP factors, force the MFA step
+      // before granting cookie-based session access.
+      const { data: assurance } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+      const requiresMfa =
+        assurance?.nextLevel === 'aal2' && assurance?.currentLevel !== 'aal2'
+
+      if (requiresMfa) {
+        setStep('mfa')
+        return
       }
+
+      // Store tokens in cookies for server-side auth
+      document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=3600; SameSite=Lax`
+      document.cookie = `sb-refresh-token=${data.session.refresh_token}; path=/; max-age=86400; SameSite=Lax`
+      router.push('/dashboard')
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'An error occurred')
     } finally {
@@ -44,9 +54,22 @@ export default function LoginPage() {
     try {
       const { data: factorsData } = await supabase.auth.mfa.listFactors()
       const totp = factorsData?.totp
-      const factorId = totp![0].id
-      const { data: challenge } = await supabase.auth.mfa.challenge({ factorId })
-      await supabase.auth.mfa.verify({ factorId, challengeId: challenge!.id, code: mfaCode })
+      if (!totp || totp.length === 0) throw new Error('No TOTP factor enrolled')
+      const factorId = totp[0].id
+      const { data: challenge, error: challengeError } =
+        await supabase.auth.mfa.challenge({ factorId })
+      if (challengeError || !challenge) throw challengeError ?? new Error('MFA challenge failed')
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId, challengeId: challenge.id, code: mfaCode,
+      })
+      if (verifyError) throw verifyError
+
+      // Re-fetch the elevated session and persist it for server-side use
+      const { data: sessionData } = await supabase.auth.getSession()
+      if (sessionData.session) {
+        document.cookie = `sb-access-token=${sessionData.session.access_token}; path=/; max-age=3600; SameSite=Lax`
+        document.cookie = `sb-refresh-token=${sessionData.session.refresh_token}; path=/; max-age=86400; SameSite=Lax`
+      }
       router.push('/dashboard')
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'An error occurred')

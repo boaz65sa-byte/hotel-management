@@ -1,11 +1,11 @@
 {
-  "name": "Hotel Guest",
-  "short_name": "Guest",
+  "name": "Hotel Guest Service",
+  "short_name": "Hotel Guest",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a1628",
   "theme_color": "#c9a84c",
-  "description": "Submit hotel service requests",
+  "description": "Submit guest requests, leave feedback, and stay in touch with hotel staff.",
   "icons": [
     {
       "src": "icons/Icon-192.png",

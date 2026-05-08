@@ -1,19 +1,7 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-
-const ROLES = [
-  { value: 'ceo',                  label: 'CEO' },
-  { value: 'reception_manager',    label: 'Reception Manager' },
-  { value: 'maintenance_manager',  label: 'Maintenance Manager' },
-  { value: 'housekeeping_manager', label: 'Housekeeping Manager' },
-  { value: 'security_manager',     label: 'Security Manager' },
-  { value: 'deputy_reception',     label: 'Deputy Reception' },
-  { value: 'receptionist',         label: 'Receptionist' },
-  { value: 'security_guard',       label: 'Security Guard' },
-  { value: 'maintenance_tech',     label: 'Maintenance Tech' },
-  { value: 'repairman',            label: 'Repairman' },
-]
+import { ROLES } from '@/lib/roles'
 
 export default function NewUserPage() {
   const router = useRouter()
@@ -22,10 +10,12 @@ export default function NewUserPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Load hotels on mount
-  useState(() => {
-    fetch('/api/hotels').then(r => r.json()).then(setHotels)
-  })
+  useEffect(() => {
+    fetch('/api/hotels')
+      .then(r => r.json())
+      .then((data) => setHotels(Array.isArray(data) ? data : []))
+      .catch(() => setHotels([]))
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

@@ -1,8 +1,9 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notFound } from 'next/navigation'
 import QRCode from 'qrcode'
+import { DownloadZipButton } from './download-zip-button'
 
-const PWA_BASE_URL = 'https://guest.hotel.com'
+const FALLBACK_PWA_BASE_URL = 'https://zesty-queijadas-16c29.netlify.app'
 
 async function generateQrDataUrl(url: string): Promise<string> {
   return QRCode.toDataURL(url, {
@@ -21,11 +22,13 @@ export default async function HotelQrCodesPage({
 
   const { data: hotel } = await supabaseAdmin
     .from('hotels')
-    .select('id, name')
+    .select('id, name, guest_pwa_url')
     .eq('id', id)
     .single()
 
   if (!hotel) notFound()
+
+  const baseUrl = (hotel.guest_pwa_url as string | null)?.trim() || FALLBACK_PWA_BASE_URL
 
   const { data: rooms } = await supabaseAdmin
     .from('rooms')
@@ -35,7 +38,7 @@ export default async function HotelQrCodesPage({
 
   const roomsWithQr = await Promise.all(
     (rooms ?? []).map(async (room) => {
-      const url = `${PWA_BASE_URL}/?hotel=${hotel.id}&room=${room.room_number}`
+      const url = `${baseUrl}/#/?hotel=${hotel.id}&room=${room.room_number}`
       const qrDataUrl = await generateQrDataUrl(url)
       return { ...room, url, qrDataUrl }
     })
@@ -50,12 +53,15 @@ export default async function HotelQrCodesPage({
             QR נפרד לכל חדר — יש להדביק בחדר
           </p>
         </div>
-        <a
-          href={`/dashboard/hotels/${id}`}
-          className="text-sm text-blue-600 hover:underline"
-        >
-          ← חזרה למלון
-        </a>
+        <div className="flex items-center gap-3">
+          <DownloadZipButton hotelId={id} />
+          <a
+            href={`/dashboard/hotels/${id}`}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            ← חזרה למלון
+          </a>
+        </div>
       </div>
 
       {roomsWithQr.length === 0 ? (
@@ -68,6 +74,7 @@ export default async function HotelQrCodesPage({
               className="border rounded-xl p-4 flex flex-col items-center gap-3 bg-white shadow-sm"
             >
               <p className="font-bold text-lg">חדר {room.room_number}</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={room.qrDataUrl}
                 alt={`QR חדר ${room.room_number}`}

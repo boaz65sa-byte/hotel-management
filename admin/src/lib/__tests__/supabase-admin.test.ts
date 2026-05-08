@@ -1,9 +1,9 @@
 describe('supabaseAdmin', () => {
-  it('throws if env vars are missing', () => {
+  it('throws if env vars are missing', async () => {
     const originalUrl = process.env.SUPABASE_URL
     delete process.env.SUPABASE_URL
     jest.resetModules()
-    expect(() => require('../supabase-admin')).toThrow('Missing Supabase env vars')
+    await expect(import('../supabase-admin')).rejects.toThrow('Missing Supabase env vars')
     process.env.SUPABASE_URL = originalUrl
   })
 })

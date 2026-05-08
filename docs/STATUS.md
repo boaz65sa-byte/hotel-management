@@ -1,6 +1,50 @@
 # סטטוס פרויקט — מה עובד ומה נשאר
 
-**עודכן:** 2026-05-03
+**עודכן:** 2026-05-08
+
+---
+
+## 🆕 סשן 2026-05-08 — סבב ליטוש סופי
+
+הופעלו 3 סוכנים במקביל וסגרו את שאר משימות הליטוש בקוד:
+
+### Flutter Staff App
+- ✅ **שם מלון אמיתי במסך QR** — `hotel_qr_screen.dart` שולף `name` מטבלת `hotels` ומציג אותו במקום הטקסט הקבוע "המלון" (עם fallback).
+- ✅ **`SessionTimeoutService` חוט** — `SessionTimeoutManager` + `sessionTimeoutManagerProvider` נוספו ב-`session_timeout.dart`; `app.dart` עוטף את האפליקציה ב-`Listener` שמאתחל timer בכל pointer event; auto sign-out כשהזמן עובר.
+- ✅ **Dead code** — הוסרו `acceptTicket` ו-`quickResolveTicket` מ-`ticket_repository.dart` (אומת אפס שימושים בכל הקוד).
+- ✅ **0 lints** — כל 16 ה-info של `flutter analyze lib` נסגרו (const constructors, curly braces, captured ScaffoldMessenger לפני await).
+
+### Flutter Guest PWA
+- ✅ **Branding ב-`web/index.html`**: title `Hotel Guest Service`, description, `apple-mobile-web-app-title=Hotel Guest`.
+- ✅ **`web/manifest.json`**: name / short_name / description בהתאמה.
+- ✅ **`test/widget_test.dart` נמחק** (היה ברירת המחדל של Flutter Counter; smoke test היה נופל בגלל אתחול Supabase).
+
+### RBAC ל-Excel Export
+- ✅ קובץ עזר חדש `lib/core/auth/role_helpers.dart` עם `kExportRoles` + `canExportData(role)`.
+- ✅ הכפתור ב-`guest_requests_list.dart` ו-`guest_feedback_screen.dart` מסתתר אם המשתמש לא בקבוצה: `manager / *_manager / ceo / hotel_admin / super_admin`.
+
+### בדיקות שעברו (סוף הסבב)
+| בדיקה | תוצאה |
+|------|------|
+| `npx eslint .` (admin) | 0 errors / 0 warnings |
+| `npx tsc --noEmit` (admin) | 0 errors |
+| `flutter analyze lib` (staff) | **No issues found!** |
+| `flutter analyze lib` (PWA) | **No issues found!** |
+| TODO/FIXME/HACK בקוד | 0 |
+
+---
+
+## 🗓️ סשן 2026-05-04 — Admin: משוב אורחים
+
+- **דף** `admin/src/app/dashboard/guest-feedback/page.tsx`:
+  - טקסט אורח ארוך מתקפל ב-`<details>`
+  - עמודת **הערות צוות** (`staff_notes`) + כפתור שמירה
+  - **מחיקה** של שורת משוב (אחרי אישור)
+- **מיגרציה:** `supabase/migrations/20260504000001_guest_feedback_staff_notes.sql` — מוסיפה `guest_feedback.staff_notes` (TEXT).
+
+> **חשוב:** לפני שהעמוד לא יפול ב-REST, הרץ את המיגרציה ב-Supabase (`db push` או SQL Editor).
+
+- **תיעוד Push:** עודכן `docs/superpowers/specs/2026-05-03-push-notifications-design.md` — אירוע `room_assigned` על `rooms` UPDATE + שורת webhook `push_room_assigned`.
 
 ---
 
@@ -155,6 +199,7 @@ supabase functions deploy send-push
 | push_guest_request_update | guest_requests | UPDATE | guest_request_status |
 | push_ticket_insert | tickets | INSERT | ticket_insert |
 | push_ticket_assigned | ticket_assignments | INSERT | ticket_assigned |
+| **push_room_assigned** (מומלץ) | **rooms** | **UPDATE** | **room_assigned** |
 
 כל ה-webhooks שולחים ל-`{supabase-url}/functions/v1/send-push` עם header `x-webhook-secret`.
 

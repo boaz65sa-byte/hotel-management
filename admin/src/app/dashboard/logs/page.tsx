@@ -1,5 +1,13 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
+type Rel<T> = T | T[] | null
+
+function pickName<T extends { name?: string; full_name?: string }>(rel: Rel<T>): string | undefined {
+  if (!rel) return undefined
+  const r = Array.isArray(rel) ? rel[0] : rel
+  return r?.name ?? r?.full_name
+}
+
 export default async function LogsPage() {
   const { data: logs } = await supabaseAdmin
     .from('ticket_updates')
@@ -25,8 +33,8 @@ export default async function LogsPage() {
                 <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
                   {new Date(log.created_at).toLocaleString()}
                 </td>
-                <td className="px-4 py-3">{(log.hotel as any)?.name ?? '—'}</td>
-                <td className="px-4 py-3">{(log.user as any)?.full_name ?? '—'}</td>
+                <td className="px-4 py-3">{pickName(log.hotel as Rel<{ name?: string }>) ?? '—'}</td>
+                <td className="px-4 py-3">{pickName(log.user as Rel<{ full_name?: string }>) ?? '—'}</td>
                 <td className="px-4 py-3">
                   <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
                     {log.update_type}

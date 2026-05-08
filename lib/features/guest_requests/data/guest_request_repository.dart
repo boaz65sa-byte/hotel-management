@@ -54,12 +54,15 @@ class GuestRequestRepository {
   }
 
   /// Updates the status of a request (e.g., open → in_progress → resolved).
+  ///
+  /// Push notifications are dispatched automatically by the `send-push` Edge
+  /// Function via a Supabase Database Webhook on UPDATE of `guest_requests`
+  /// (event: `guest_request_status`). No client-side action needed.
   Future<void> updateStatus(String id, String status) async {
     await supabase.from('guest_requests').update({
       'status':     status,
       'updated_at': DateTime.now().toIso8601String(),
     }).eq('id', id);
-    // TODO(Module 4): send push notification to assigned dept
   }
 
   /// Manager reassigns a request to a different department.

@@ -30,7 +30,9 @@ class _AssignStaffScreenState extends ConsumerState<AssignStaffScreen> {
   Future<void> _loadStaff() async {
     final repo = ref.read(ticketRepoProvider);
     final staff = await repo.fetchDeptStaff(widget.ticket.assignedDept);
-    if (mounted) setState(() { _staff = staff; _staffLoading = false; });
+    if (mounted) {
+      setState(() { _staff = staff; _staffLoading = false; });
+    }
   }
 
   Future<void> _assign() async {
@@ -47,9 +49,11 @@ class _AssignStaffScreenState extends ConsumerState<AssignStaffScreen> {
       );
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }

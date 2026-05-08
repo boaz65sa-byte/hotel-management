@@ -68,7 +68,7 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // ── Dept selector ─────────────────────────────────────────────
-            _SectionLabel(label: 'מחלקה'),
+            const _SectionLabel(label: 'מחלקה'),
             const SizedBox(height: 8),
             _DeptGrid(
               available: availableDepts,
@@ -79,7 +79,7 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
             const SizedBox(height: 16),
 
             // ── Room selector ─────────────────────────────────────────────
-            _SectionLabel(label: 'מיקום (חדר / אזור)'),
+            const _SectionLabel(label: 'מיקום (חדר / אזור)'),
             const SizedBox(height: 8),
             roomsAsync.when(
               loading: () => const LinearProgressIndicator(),
@@ -111,7 +111,7 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
             const SizedBox(height: 16),
 
             // ── Title ─────────────────────────────────────────────────────
-            _SectionLabel(label: 'תיאור קצר'),
+            const _SectionLabel(label: 'תיאור קצר'),
             const SizedBox(height: 8),
             TextField(
               controller: _titleCtrl,
@@ -124,7 +124,7 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
             const SizedBox(height: 16),
 
             // ── Description ───────────────────────────────────────────────
-            _SectionLabel(label: 'פירוט (אופציונלי)'),
+            const _SectionLabel(label: 'פירוט (אופציונלי)'),
             const SizedBox(height: 8),
             TextField(
               controller: _descCtrl,
@@ -139,7 +139,7 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
             const SizedBox(height: 16),
 
             // ── Priority ──────────────────────────────────────────────────
-            _SectionLabel(label: 'דחיפות'),
+            const _SectionLabel(label: 'דחיפות'),
             const SizedBox(height: 8),
             _PriorityGrid(
               selected: _priority,
@@ -187,9 +187,9 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: Text(
+                    child: const Text(
                       'שלח קריאה ←',
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 15, fontWeight: FontWeight.w800),
                     ),
                   ),

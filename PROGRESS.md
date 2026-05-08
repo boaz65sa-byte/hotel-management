@@ -1,9 +1,28 @@
 # Hotel Management App - Progress Tracker
 
 ## Current Status
-**Phase**: Implementation - All 5 Plans Complete ✅
-**Date**: 2026-03-24
-**Next Step**: V2 Features - Push Notifications (FCM) or Optima Integration
+**Phase**: ✅ **Production-Ready** — All code-side critical bugs, important issues, features and polish completed.
+**Date**: 2026-05-08
+
+**Last session (2026-05-08)** — Final polish round (3 parallel agents):
+- 🟢 Real hotel name in staff QR screen (no more `'המלון'` placeholder).
+- 🟢 `SessionTimeoutManager` wired in `app.dart` with pointer-event activity reset + auto sign-out.
+- 🟢 Dead code removed: `acceptTicket`, `quickResolveTicket`.
+- 🟢 RBAC for Excel export — shared helper `lib/core/auth/role_helpers.dart`; export button gated to manager/admin roles in both guest requests + guest feedback screens.
+- 🟢 PWA branding in `index.html` + `manifest.json`; deleted stale Flutter counter `widget_test.dart`.
+- 🟢 All 16 Flutter info lints fixed → **0 issues** in both `lib/` and `hotel_guest_app/lib/`.
+
+**Verifications green:** `eslint` (admin) 0/0 · `tsc --noEmit` (admin) 0 · `flutter analyze` (staff) 0 · `flutter analyze` (PWA) 0 · 0 TODO/FIXME in code.
+
+**Previous session (2026-05-04)**: Guest Feedback in Admin — expandable comment, **staff_notes** column + migration `20260504000001_guest_feedback_staff_notes.sql`, delete row. Push spec + `docs/STATUS.md` documented **5th webhook** `room_assigned` on `rooms` UPDATE.
+
+**Previous session (2026-05-03)**: Closed 20 prioritized items (5 critical / 7 important / 8 features).
+
+**Remaining (operational / config — outside the codebase):**
+1. **Mandatory** — run new migrations in Supabase (`20260503000001_fix_auth_users_null_tokens.sql`, `20260503000002_hotel_guest_pwa_url.sql`, `20260504000001_guest_feedback_staff_notes.sql`).
+2. **Mandatory** — verify the JWT hook `public.custom_jwt_claims` is registered as Custom Access Token under Authentication → Auth Hooks.
+3. **OneSignal** — secrets (`ONESIGNAL_APP_ID`, `ONESIGNAL_REST_API_KEY`, `WEBHOOK_SECRET`), `supabase functions deploy send-push`, 5 DB webhooks, replace `YOUR_ONESIGNAL_APP_ID` in `hotel_guest_app/web/index.html` and rebuild PWA.
+4. **Optional** — TOTP factor on super admin user; iOS APNs `.p8` for OneSignal.
 
 ---
 

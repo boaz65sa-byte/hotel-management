@@ -8,7 +8,8 @@ export default async function AnalyticsPage() {
   const hotelMap: Record<string, { name: string; total: number; open: number; resolved: number }> = {}
   for (const t of ticketsByHotel ?? []) {
     const id = t.hotel_id
-    const name = (t.hotels as any)?.name ?? id
+    const hotelRel = t.hotels as { name?: string } | { name?: string }[] | null
+    const name = (Array.isArray(hotelRel) ? hotelRel[0]?.name : hotelRel?.name) ?? id
     if (!hotelMap[id]) hotelMap[id] = { name, total: 0, open: 0, resolved: 0 }
     hotelMap[id].total++
     if (['resolved','closed'].includes(t.status)) hotelMap[id].resolved++

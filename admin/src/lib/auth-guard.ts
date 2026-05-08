@@ -29,7 +29,8 @@ export async function authGuard(req: NextRequest): Promise<{ access_token: strin
 export async function requireSuperAdmin() {
   const cookieStore = await cookies()
   const accessToken = cookieStore.get('sb-access-token')?.value
-  const refreshToken = cookieStore.get('sb-refresh-token')?.value
+  // refreshToken is intentionally not used here — the client refreshes on its own
+  // and we only need a fresh access token to verify role on each request.
 
   if (!accessToken) redirect('/login')
 

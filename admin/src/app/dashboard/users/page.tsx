@@ -2,6 +2,12 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { revalidatePath } from 'next/cache'
 import Link from 'next/link'
 
+type HotelRel = { name?: string } | { name?: string }[] | null
+function hotelName(rel: HotelRel): string | undefined {
+  if (!rel) return undefined
+  return Array.isArray(rel) ? rel[0]?.name : rel.name
+}
+
 export default async function UsersPage({
   searchParams,
 }: {
@@ -13,8 +19,8 @@ export default async function UsersPage({
     .select('*, hotel:hotels(name)')
     .order('created_at', { ascending: false })
 
-  if (hotel) query = query.eq('hotel_id', hotel) as any
-  if (role)  query = query.eq('role', role) as any
+  if (hotel) query = query.eq('hotel_id', hotel)
+  if (role)  query = query.eq('role', role)
 
   const { data: users } = await query
 
@@ -41,7 +47,7 @@ export default async function UsersPage({
               <tr key={user.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 font-medium">{user.full_name}</td>
                 <td className="px-4 py-3 text-sm text-gray-600">{user.email}</td>
-                <td className="px-4 py-3 text-sm">{(user.hotel as any)?.name ?? '—'}</td>
+                <td className="px-4 py-3 text-sm">{hotelName(user.hotel as HotelRel) ?? '—'}</td>
                 <td className="px-4 py-3">
                   <span className="bg-gray-100 text-xs px-2 py-1 rounded-full">{user.role}</span>
                 </td>

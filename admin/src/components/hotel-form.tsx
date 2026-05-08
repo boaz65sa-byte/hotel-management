@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 type Hotel = { id?: string; name: string; subscription_plan: string
                default_sla_hours: number; default_language: string
                is_active: boolean; theme?: string | null
-               stay_threshold?: number }
+               stay_threshold?: number
+               guest_pwa_url?: string | null }
 
 export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormData) => Promise<void> }) {
   const [data, setData] = useState(hotel)
@@ -79,7 +80,6 @@ export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormDa
         <input type="hidden" name="theme" value={data.theme ?? 'clean_blue'} />
       </div>
 
-      {/* TODO: requires DB migration to add stay_threshold column to hotels table */}
       <div>
         <label className="block text-sm font-medium mb-1">ימי שהייה לפני משוב (stay_threshold)</label>
         <input
@@ -93,6 +93,21 @@ export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormDa
         />
         <p className="text-xs text-gray-500 mt-1">
           מספר ימים מכניסת האורח עד שמוצג banner המשוב ב-PWA (ברירת מחדל: 3)
+        </p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Guest PWA URL</label>
+        <input
+          type="url"
+          name="guest_pwa_url"
+          value={data.guest_pwa_url ?? ''}
+          onChange={e => setData({...data, guest_pwa_url: e.target.value})}
+          className="w-full border rounded px-3 py-2"
+          placeholder="https://zesty-queijadas-16c29.netlify.app"
+        />
+        <p className="text-xs text-gray-500 mt-1">
+          ה-URL הבסיסי של אפליקציית האורחים לקודי ה-QR. ריק = ברירת מחדל.
         </p>
       </div>
 

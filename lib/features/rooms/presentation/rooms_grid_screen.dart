@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:hotel_app/core/auth/auth_state.dart';
 import 'package:hotel_app/core/i18n/app_localizations.dart';
 import 'package:hotel_app/features/tickets/domain/ticket_status.dart';
+import 'package:hotel_app/features/tickets/presentation/quick_ticket_dialog.dart';
 import '../providers/rooms_provider.dart';
+import '../domain/room_model.dart';
 import 'room_tile.dart';
 
 class RoomsGridScreen extends ConsumerWidget {
@@ -57,6 +59,7 @@ class RoomsGridScreen extends ConsumerWidget {
                     itemBuilder: (_, i) => RoomTile(
                       room: rooms[i],
                       onTap: () => context.push('/rooms/${rooms[i].id}'),
+                      onLongPress: () => _openQuickTicket(context, rooms[i]),
                     ),
                   ),
                 ],
@@ -81,4 +84,11 @@ class RoomsGridScreen extends ConsumerWidget {
     const SizedBox(width: 4),
     Text(label, style: const TextStyle(fontSize: 12)),
   ]);
+
+  void _openQuickTicket(BuildContext context, Room room) {
+    showDialog<bool>(
+      context: context,
+      builder: (_) => QuickTicketDialog(room: room),
+    );
+  }
 }

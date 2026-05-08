@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:hotel_app/core/auth/auth_state.dart';
+import 'package:hotel_app/core/auth/role_helpers.dart';
 import 'package:hotel_app/features/guest_requests/data/guest_export_service.dart';
 import 'package:hotel_app/features/guest_requests/domain/guest_request_model.dart';
 import 'package:hotel_app/features/guest_requests/providers/guest_request_providers.dart';
@@ -58,25 +60,27 @@ class _GuestFeedbackScreenState extends ConsumerState<GuestFeedbackScreen> {
           ),
         ),
         actions: [
-          if (_exporting)
-            const Padding(
-              padding: EdgeInsets.all(12),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2, color: Color(0xFFC9A84C)),
+          if (canExportData(ref.watch(authRepositoryProvider).role)) ...[
+            if (_exporting)
+              const Padding(
+                padding: EdgeInsets.all(12),
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Color(0xFFC9A84C)),
+                ),
+              )
+            else
+              IconButton(
+                icon: const Icon(Icons.file_download, color: Color(0xFFC9A84C)),
+                tooltip: 'ייצוא Excel',
+                onPressed: () {
+                  final items = feedbackAsync.value;
+                  if (items != null && items.isNotEmpty) _export(items);
+                },
               ),
-            )
-          else
-            IconButton(
-              icon: const Icon(Icons.file_download, color: Color(0xFFC9A84C)),
-              tooltip: 'ייצוא Excel',
-              onPressed: () {
-                final items = feedbackAsync.value;
-                if (items != null && items.isNotEmpty) _export(items);
-              },
-            ),
+          ],
         ],
       ),
       body: SafeArea(

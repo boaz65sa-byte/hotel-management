@@ -15,8 +15,9 @@ const _roleToDept = {
 };
 
 const _managerRoles = {
+  'ceo',
   'reception_manager', 'hotel_admin', 'super_admin',
-  'housekeeping_manager', 'maintenance_manager',
+  'housekeeping_manager', 'maintenance_manager', 'security_manager',
 };
 
 class PushService {

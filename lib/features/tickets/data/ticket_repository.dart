@@ -156,21 +156,6 @@ class TicketRepository {
     return (res as List).map((j) => TicketPhoto.fromJson(j as Map<String, dynamic>)).toList();
   }
 
-  Future<void> acceptTicket(String ticketId, String userId) async {
-    await supabase.from('tickets').update({
-      'status': 'in_progress',
-      'claimed_by': userId,
-      'accepted_at': DateTime.now().toIso8601String(),
-    }).eq('id', ticketId);
-  }
-
-  Future<void> quickResolveTicket(String ticketId) async {
-    await supabase.from('tickets').update({
-      'status': 'resolved',
-      'resolved_at': DateTime.now().toIso8601String(),
-    }).eq('id', ticketId);
-  }
-
   Future<void> setPhotoBefore(String ticketId, String photoUrl) async {
     await supabase.from('tickets').update({
       'photo_before_url': photoUrl,

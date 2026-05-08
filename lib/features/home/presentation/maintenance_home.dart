@@ -76,7 +76,7 @@ class _MaintenanceQueueState extends ConsumerState<_MaintenanceQueue> {
           // ── Gradient header ──────────────────────────────────────────────
           ticketsAsync.maybeWhen(
             data: (tickets) => _MaintenanceHeader(tickets: tickets),
-            orElse: () => _MaintenanceHeader(tickets: const []),
+              orElse: () => const _MaintenanceHeader(tickets: []),
           ),
 
           // ── Priority filter chips ────────────────────────────────────────

@@ -1,6 +1,7 @@
 // lib/core/auth/auth_repository.dart
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../supabase/supabase_client.dart';
+import '../push/push_service.dart';
 
 class AuthRepository {
   Future<AuthResponse> signIn(String email, String password) async {
@@ -8,6 +9,9 @@ class AuthRepository {
   }
 
   Future<void> signOut() async {
+    // Clear OneSignal tags first so this device stops receiving notifications
+    // for the previous user. Push errors are swallowed inside clearOnLogout.
+    await PushService.clearOnLogout();
     await supabase.auth.signOut();
   }
 

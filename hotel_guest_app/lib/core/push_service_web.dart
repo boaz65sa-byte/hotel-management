@@ -26,7 +26,7 @@ class PushServiceWeb {
         '''
       ]);
     } catch (e) {
-      debugPrint('PushServiceWeb.showNativePrompt error: \$e');
+      debugPrint('PushServiceWeb.showNativePrompt error: $e');
     }
   }
 
@@ -51,7 +51,7 @@ class PushServiceWeb {
         '''
       ]);
     } catch (e) {
-      debugPrint('PushServiceWeb.setGuestTags error: \$e');
+      debugPrint('PushServiceWeb.setGuestTags error: $e');
     }
   }
 }
