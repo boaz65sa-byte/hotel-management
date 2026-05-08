@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ROLES } from '@/lib/roles'
+import { LogoPicker } from '@/components/logo-picker'
 import { setupHotelAction, type WizardInput, type WizardResult } from './actions'
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -218,19 +219,11 @@ function Step1({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">לוגו URL</label>
-          <input
-            type="url"
-            value={hotel.logo_url ?? ''}
-            onChange={e => set('logo_url', e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            placeholder="https://example.com/logo.png"
+          <label className="block text-sm font-medium mb-2">לוגו המלון</label>
+          <LogoPicker
+            value={hotel.logo_url ?? null}
+            onChange={(url) => set('logo_url', url ?? '')}
           />
-          <p className="text-xs text-gray-500 mt-1">לוגו המלון — מוצג באפליקציית האורחים. ריק = אייקון ברירת מחדל.</p>
-          {hotel.logo_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={hotel.logo_url} alt="Logo preview" className="mt-2 h-16 w-16 object-cover rounded-lg border" />
-          )}
         </div>
 
         <div>
