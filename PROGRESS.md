@@ -1,10 +1,20 @@
 # Hotel Management App - Progress Tracker
 
 ## Current Status
-**Phase**: ✅ **Production-Ready + 4 Languages** — Admin live on Vercel, code-side polish complete, RU added.
-**Date**: 2026-05-08
+**Phase**: ✅ **Live in production** — Admin on Vercel, PWA on Netlify, Staff App code-complete.
+**Date**: 2026-05-08 (end of day)
 
-**Latest (2026-05-08, evening)** — Admin live + Russian everywhere:
+> 👉 **חוזרים מחר?** פתח [`RESUME.md`](./RESUME.md) — שני צעדים קטנים מסיימים הכל.
+
+**Latest (2026-05-08, night)** — Hotel-wide QR + new PWA URL:
+- 🆕 **Hotel-wide lobby QR** + **A4 printable poster** with logo, hotel name, big 120mm QR, 4-language welcome instructions. New routes `/qr-codes` (hero section) and `/qr-codes/poster`.
+- 🆕 **3-step Hotel Setup Wizard** in Admin — details → rooms (auto-numbering with skip-list) → users (bulk email invites).
+- 🆕 **Logo file upload** (`hotel-logos` Supabase Storage bucket, 2MB, PNG/JPG/WebP/SVG) + `LogoPicker` component.
+- 🆕 **Hotel branding on PWA landing** — logo + name fetched from Supabase by `?hotel=<id>`.
+- 🆕 **Hotel contact info** columns (address/city/country/phone/email).
+- 🚀 **Guest PWA redeployed** to `https://exquisite-cocada-7966bd.netlify.app` (Netlify Drop created a new site; all code references + migration `20260508000004` switch to it).
+
+**Earlier (2026-05-08, evening)** — Admin live + Russian everywhere:
 - ✅ **Admin deployed to Vercel** at `hotel-management-rho-two.vercel.app` (Root Directory = `admin`, all 4 Supabase env vars set, build green).
 - 🇷🇺 **Russian (ru) added to Staff Flutter app** — 35 keys in `lib/core/i18n/arb/app_ru.arb` + dropdown in profile screen.
 - 🇷🇺🇮🇱🇬🇧🇸🇦 **Guest PWA i18n built from scratch** — 40 strings extracted, 4 ARB files (he/en/ar/ru), Riverpod `localeProvider` + `shared_preferences`, flag dropdown on home header, `flutter gen-l10n` succeeded → 0 analyzer issues.
@@ -24,10 +34,11 @@
 **Previous session (2026-05-03)**: Closed 20 prioritized items (5 critical / 7 important / 8 features).
 
 **Remaining (operational / config — outside the codebase):**
-1. **Mandatory** — run new migrations in Supabase (`20260503000001_fix_auth_users_null_tokens.sql`, `20260503000002_hotel_guest_pwa_url.sql`, `20260504000001_guest_feedback_staff_notes.sql`).
-2. **Mandatory** — verify the JWT hook `public.custom_jwt_claims` is registered as Custom Access Token under Authentication → Auth Hooks.
-3. **OneSignal** — secrets (`ONESIGNAL_APP_ID`, `ONESIGNAL_REST_API_KEY`, `WEBHOOK_SECRET`), `supabase functions deploy send-push`, 5 DB webhooks, replace `YOUR_ONESIGNAL_APP_ID` in `hotel_guest_app/web/index.html` and rebuild PWA.
-4. **Optional** — TOTP factor on super admin user; iOS APNs `.p8` for OneSignal.
+1. **Mandatory tomorrow** — run migration `20260508000004_hotels_pwa_url_new_default.sql` in Supabase to flip all hotels to the new Netlify URL. (Earlier 6 migrations from 2026-05-03/04/08 already executed by user.)
+2. **Verify** JWT hook `public.custom_jwt_claims` registered as Custom Access Token under Authentication → Auth Hooks.
+3. **Add a logo** to Hotel Alpha to test the upload pipeline + branding.
+4. **OneSignal** (optional, V1.1) — secrets (`ONESIGNAL_APP_ID`, `ONESIGNAL_REST_API_KEY`, `WEBHOOK_SECRET`), `supabase functions deploy send-push`, 5 DB webhooks, replace `YOUR_ONESIGNAL_APP_ID` in `hotel_guest_app/web/index.html` and rebuild PWA.
+5. **Optional** — TOTP factor on super admin user; iOS APNs `.p8`; Play Store / App Store builds.
 
 ---
 
