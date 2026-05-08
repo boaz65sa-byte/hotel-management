@@ -45,7 +45,15 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
           href={`/dashboard/hotels/${hotel.id}/qr-codes`}
           className="inline-flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700"
         >
-          🔲 QR Codes לחדרים
+          🔲 QR למלון + לחדרים
+        </a>
+        <a
+          href={`/dashboard/hotels/${hotel.id}/qr-codes/poster`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-amber-600"
+        >
+          🖨️ פוסטר קבלה (A4)
         </a>
         <DeleteHotelButton hotelId={hotel.id} hotelName={hotel.name} />
       </div>
