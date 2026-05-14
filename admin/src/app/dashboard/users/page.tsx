@@ -1,12 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { revalidatePath } from 'next/cache'
 import Link from 'next/link'
-
-type HotelRel = { name?: string } | { name?: string }[] | null
-function hotelName(rel: HotelRel): string | undefined {
-  if (!rel) return undefined
-  return Array.isArray(rel) ? rel[0]?.name : rel.name
-}
+import { ROLES, roleLabel, isHotelAdmin } from '@/lib/roles'
 
 type UserRow = {
   id: string
@@ -15,27 +10,9 @@ type UserRow = {
   role: string | null
   is_active: boolean
   hotel_id: string | null
-  hotel?: HotelRel
 }
 
 type HotelLite = { id: string; name: string; logo_url: string | null }
-
-const ROLE_LABEL: Record<string, string> = {
-  super_admin:    '👑 סופר אדמין',
-  hotel_admin:    '🛡️ אדמין מלון',
-  hotel_manager:  '👔 מנהל מלון',
-  dept_manager:   '📋 מנהל מחלקה',
-  reception:      '📞 קבלה',
-  maintenance:    '🔧 אחזקה',
-  housekeeping:   '🧹 משק בית',
-  security:       '🛡️ ביטחון',
-  staff:          '👤 עובד',
-}
-
-function roleBadge(role: string | null) {
-  if (!role) return '—'
-  return ROLE_LABEL[role] ?? role
-}
 
 async function toggleActive(fd: FormData) {
   'use server'
@@ -54,7 +31,7 @@ export default async function UsersPage({
 
   let query = supabaseAdmin
     .from('users')
-    .select('id, full_name, email, role, is_active, hotel_id, hotel:hotels(name)')
+    .select('id, full_name, email, role, is_active, hotel_id')
     .order('full_name', { ascending: true })
 
   if (hotel) query = query.eq('hotel_id', hotel)
@@ -122,8 +99,9 @@ export default async function UsersPage({
         </select>
         <select name="role" defaultValue={role ?? ''} className="border rounded px-3 py-2 text-sm">
           <option value="">כל התפקידים</option>
-          {Object.entries(ROLE_LABEL).map(([v, l]) => (
-            <option key={v} value={v}>{l}</option>
+          <option value="super_admin">👑 סופר אדמין</option>
+          {ROLES.map(r => (
+            <option key={r.value} value={r.value}>{r.icon} {r.label}</option>
           ))}
         </select>
         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
@@ -239,34 +217,44 @@ function HotelSection({
             </tr>
           </thead>
           <tbody className="divide-y">
-            {users.map(u => (
-              <tr key={u.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2.5 font-medium">{u.full_name ?? '—'}</td>
-                <td className="px-4 py-2.5 text-gray-600" dir="ltr">{u.email ?? '—'}</td>
-                <td className="px-4 py-2.5">
-                  <span className="bg-gray-100 text-xs px-2 py-1 rounded-full">{roleBadge(u.role)}</span>
-                </td>
-                <td className="px-4 py-2.5">
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    u.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                  }`}>
-                    {u.is_active ? 'פעיל' : 'מושעה'}
-                  </span>
-                </td>
-                <td className="px-4 py-2.5 flex items-center gap-3">
-                  <Link href={`/dashboard/users/${u.id}`} className="text-sm text-blue-600 hover:underline">
-                    ערוך
-                  </Link>
-                  <form action={toggleActive}>
-                    <input type="hidden" name="id" value={u.id} />
-                    <input type="hidden" name="active" value={String(u.is_active)} />
-                    <button type="submit" className="text-sm text-gray-500 hover:underline">
-                      {u.is_active ? 'השעה' : 'הפעל'}
-                    </button>
-                  </form>
-                </td>
-              </tr>
-            ))}
+            {users.map(u => {
+              const admin = isHotelAdmin(u.role)
+              return (
+                <tr key={u.id} className={`hover:bg-gray-50 ${admin ? 'bg-amber-50/40' : ''}`}>
+                  <td className="px-4 py-2.5 font-medium">
+                    {admin && <span title="גישת ניהול למלון" className="me-1">⭐</span>}
+                    {u.full_name ?? '—'}
+                  </td>
+                  <td className="px-4 py-2.5 text-gray-600" dir="ltr">{u.email ?? '—'}</td>
+                  <td className="px-4 py-2.5">
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      admin ? 'bg-amber-100 text-amber-800 font-semibold' : 'bg-gray-100'
+                    }`}>
+                      {roleLabel(u.role)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      u.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    }`}>
+                      {u.is_active ? 'פעיל' : 'מושעה'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 flex items-center gap-3">
+                    <Link href={`/dashboard/users/${u.id}`} className="text-sm text-blue-600 hover:underline">
+                      ערוך
+                    </Link>
+                    <form action={toggleActive}>
+                      <input type="hidden" name="id" value={u.id} />
+                      <input type="hidden" name="active" value={String(u.is_active)} />
+                      <button type="submit" className="text-sm text-gray-500 hover:underline">
+                        {u.is_active ? 'השעה' : 'הפעל'}
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>

@@ -460,8 +460,38 @@ function Step3({
 
   return (
     <div className="space-y-6" dir="rtl">
+      <div className="bg-gradient-to-br from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-xl p-5">
+        <div className="flex items-start gap-3">
+          <span className="text-2xl">⭐</span>
+          <div className="flex-1">
+            <h3 className="font-bold text-gray-900 mb-1">2 התפקידים החיוניים לכל מלון</h3>
+            <p className="text-sm text-gray-700 mb-3">
+              לפני הכל — הוסיפו את <strong>מנכ"ל המלון</strong> ואת <strong>מנהל התוכנה</strong>.
+              הם יקבלו גישה מלאה לניהול המלון: הוספת עובדים, צפייה בכל הנתונים, ושינוי הגדרות —
+              <strong> אך ורק למלון הזה</strong>.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => addUser('ceo')}
+                className="bg-amber-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-amber-600 font-medium"
+              >
+                👔 + הוסף מנכ"ל מלון
+              </button>
+              <button
+                type="button"
+                onClick={() => addUser('software_manager')}
+                className="bg-amber-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-amber-600 font-medium"
+              >
+                🛠️ + הוסף מנהל תוכנה
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="bg-white rounded-xl border p-6 space-y-5">
-        <h2 className="text-lg font-semibold text-gray-800">הזמנת משתמשים</h2>
+        <h2 className="text-lg font-semibold text-gray-800">משתמשים נוספים (אופציונלי)</h2>
         <p className="text-sm text-gray-500">
           כל משתמש יקבל הזמנה במייל עם קישור להגדרת סיסמה. ניתן לדלג ולהוסיף משתמשים לאחר יצירת המלון.
         </p>
@@ -472,21 +502,35 @@ function Step3({
             onClick={() => addUser('reception_manager')}
             className="bg-blue-50 border border-blue-200 text-blue-700 text-sm px-4 py-2 rounded-lg hover:bg-blue-100 font-medium"
           >
-            + הוסף מנהל
+            📞 + מנהל קבלה
+          </button>
+          <button
+            type="button"
+            onClick={() => addUser('maintenance_manager')}
+            className="bg-blue-50 border border-blue-200 text-blue-700 text-sm px-4 py-2 rounded-lg hover:bg-blue-100 font-medium"
+          >
+            🔧 + מנהל אחזקה
+          </button>
+          <button
+            type="button"
+            onClick={() => addUser('housekeeping_manager')}
+            className="bg-blue-50 border border-blue-200 text-blue-700 text-sm px-4 py-2 rounded-lg hover:bg-blue-100 font-medium"
+          >
+            🧹 + מנהל משק
           </button>
           <button
             type="button"
             onClick={() => addUser('receptionist')}
             className="bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-2 rounded-lg hover:bg-green-100 font-medium"
           >
-            + הוסף עובד
+            🧑‍💼 + עובד קבלה
           </button>
           <button
             type="button"
-            onClick={() => addUser(ROLES[0].value)}
-            className="bg-gray-50 border border-gray-200 text-gray-600 text-sm px-4 py-2 rounded-lg hover:bg-gray-100"
+            onClick={() => addUser('maintenance_tech')}
+            className="bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-2 rounded-lg hover:bg-green-100 font-medium"
           >
-            + הוסף משתמש
+            🔩 + טכנאי
           </button>
         </div>
 
@@ -520,9 +564,21 @@ function Step3({
                     onChange={e => updateUser(i, 'role', e.target.value)}
                     className="border rounded px-2 py-1.5 text-sm bg-white"
                   >
-                    {ROLES.map(r => (
-                      <option key={r.value} value={r.value}>{r.label}</option>
-                    ))}
+                    <optgroup label="🟦 ניהול המלון">
+                      {ROLES.filter(r => r.tier === 'hotel_admin').map(r => (
+                        <option key={r.value} value={r.value}>{r.icon} {r.label}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="🟢 מנהלי מחלקות">
+                      {ROLES.filter(r => r.tier === 'dept_manager').map(r => (
+                        <option key={r.value} value={r.value}>{r.icon} {r.label}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="⚪ צוות">
+                      {ROLES.filter(r => r.tier === 'staff').map(r => (
+                        <option key={r.value} value={r.value}>{r.icon} {r.label}</option>
+                      ))}
+                    </optgroup>
                   </select>
                 </div>
                 <div className="pt-5">

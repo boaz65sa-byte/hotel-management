@@ -1,12 +1,27 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { ROLES } from '@/lib/roles'
+import { ROLES, type Role } from '@/lib/roles'
+
+type Hotel = { id: string; name: string }
+
+const TIER_HEADERS: Record<Role['tier'], string> = {
+  super_admin:  '🟣 פלטפורמה',
+  hotel_admin:  '🟦 ניהול המלון (גישה מלאה למלון אחד)',
+  dept_manager: '🟢 מנהלי מחלקות',
+  staff:        '⚪ צוות מבצעי',
+}
 
 export default function NewUserPage() {
   const router = useRouter()
-  const [form, setForm] = useState({ full_name: '', email: '', password: '', role: 'receptionist', hotel_id: '' })
-  const [hotels, setHotels] = useState<{ id: string; name: string }[]>([])
+  const [form, setForm] = useState({
+    full_name: '',
+    email:     '',
+    password:  '',
+    role:      'ceo',
+    hotel_id:  '',
+  })
+  const [hotels, setHotels] = useState<Hotel[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -16,6 +31,17 @@ export default function NewUserPage() {
       .then((data) => setHotels(Array.isArray(data) ? data : []))
       .catch(() => setHotels([]))
   }, [])
+
+  const grouped = useMemo(() => {
+    const m = new Map<Role['tier'], Role[]>()
+    for (const r of ROLES) {
+      if (!m.has(r.tier)) m.set(r.tier, [])
+      m.get(r.tier)!.push(r)
+    }
+    return m
+  }, [])
+
+  const currentRole = ROLES.find(r => r.value === form.role)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -38,49 +64,88 @@ export default function NewUserPage() {
   }
 
   return (
-    <div className="max-w-lg">
-      <h1 className="text-2xl font-bold mb-6">Create User</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-xl border">
-        <div>
-          <label className="block text-sm font-medium mb-1">Full Name *</label>
-          <input required className="w-full border rounded-lg px-3 py-2 text-sm"
-            value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} />
+    <div className="max-w-2xl" dir="rtl">
+      <h1 className="text-2xl font-bold mb-2">הוספת משתמש חדש</h1>
+      <p className="text-sm text-gray-500 mb-6">
+        סופר אדמין שמור לבועז בלבד — נוצר ב-SQL ולא מופיע כאן. כאן יוצרים מנכ"ל / מנהל תוכנה /
+        מנהלי מחלקות / צוות עבור מלון ספציפי.
+      </p>
+
+      <form onSubmit={handleSubmit} className="space-y-5 bg-white p-6 rounded-xl border">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">שם מלא *</label>
+            <input required className="w-full border rounded-lg px-3 py-2 text-sm"
+              value={form.full_name}
+              onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">מייל *</label>
+            <input required type="email" dir="ltr"
+              className="w-full border rounded-lg px-3 py-2 text-sm"
+              value={form.email}
+              onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+            />
+          </div>
         </div>
+
         <div>
-          <label className="block text-sm font-medium mb-1">Email *</label>
-          <input required type="email" className="w-full border rounded-lg px-3 py-2 text-sm"
-            value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
+          <label className="block text-sm font-medium mb-1">סיסמה ראשונית *</label>
+          <input required type="password" minLength={8}
+            className="w-full border rounded-lg px-3 py-2 text-sm"
+            value={form.password}
+            onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+            placeholder="לפחות 8 תווים"
+          />
+          <p className="text-xs text-gray-400 mt-1">
+            המשתמש יוכל לשנות לאחר ההתחברות הראשונה.
+          </p>
         </div>
+
         <div>
-          <label className="block text-sm font-medium mb-1">Password *</label>
-          <input required type="password" minLength={8} className="w-full border rounded-lg px-3 py-2 text-sm"
-            value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-            placeholder="Min 8 characters" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Role *</label>
-          <select required className="w-full border rounded-lg px-3 py-2 text-sm"
-            value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))}>
-            {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+          <label className="block text-sm font-medium mb-1">תפקיד *</label>
+          <select required className="w-full border rounded-lg px-3 py-2 text-sm bg-white"
+            value={form.role}
+            onChange={e => setForm(f => ({ ...f, role: e.target.value }))}>
+            {(['hotel_admin','dept_manager','staff'] as Role['tier'][]).map(tier => (
+              <optgroup key={tier} label={TIER_HEADERS[tier]}>
+                {(grouped.get(tier) ?? []).map(r => (
+                  <option key={r.value} value={r.value}>
+                    {r.icon} {r.label}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
           </select>
+          {currentRole?.description && (
+            <p className="text-xs text-gray-500 mt-1">{currentRole.description}</p>
+          )}
         </div>
+
         <div>
-          <label className="block text-sm font-medium mb-1">Hotel *</label>
-          <select required className="w-full border rounded-lg px-3 py-2 text-sm"
-            value={form.hotel_id} onChange={e => setForm(f => ({ ...f, hotel_id: e.target.value }))}>
-            <option value="">Select hotel...</option>
+          <label className="block text-sm font-medium mb-1">מלון *</label>
+          <select required className="w-full border rounded-lg px-3 py-2 text-sm bg-white"
+            value={form.hotel_id}
+            onChange={e => setForm(f => ({ ...f, hotel_id: e.target.value }))}>
+            <option value="">בחרו מלון…</option>
             {hotels.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
           </select>
+          <p className="text-xs text-gray-500 mt-1">
+            המשתמש יראה רק נתונים של המלון הזה. סופר אדמין רואה את כולם.
+          </p>
         </div>
+
         {error && <p className="text-red-600 text-sm">{error}</p>}
-        <div className="flex gap-3 pt-2">
+
+        <div className="flex gap-3 pt-2 border-t">
           <button type="submit" disabled={loading}
             className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 disabled:opacity-50">
-            {loading ? 'Creating...' : 'Create User'}
+            {loading ? 'יוצר…' : 'צור משתמש'}
           </button>
           <button type="button" onClick={() => router.back()}
             className="border px-4 py-2 rounded-lg text-sm hover:bg-gray-50">
-            Cancel
+            ביטול
           </button>
         </div>
       </form>
