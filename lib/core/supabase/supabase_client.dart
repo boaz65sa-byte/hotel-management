@@ -1,9 +1,12 @@
 // lib/core/supabase/supabase_client.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> initSupabase() async {
-  await dotenv.load();
+  if (dotenv.env.isEmpty) {
+    await dotenv.load(fileName: kIsWeb ? 'assets/env' : '.env');
+  }
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,

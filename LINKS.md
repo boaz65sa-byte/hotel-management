@@ -10,7 +10,7 @@
 |---|---|---|
 | **Admin Panel** (סופר אדמין) | <https://hotel-management-rho-two.vercel.app> | בועז + מנהלים |
 | **Guest PWA** (אורחים) | <https://exquisite-cocada-7966bd.netlify.app> | האורחים — סורקים QR |
-| **Staff App** (עובדים) | _להעלות עכשיו ל-Netlify_ (ראה מטה) | קבלה, אחזקה, משק בית |
+| **Staff App** (עובדים) | <https://transcendent-mooncake-71c5b7.netlify.app> | קבלה, אחזקה, משק בית |
 | **GitHub** | <https://github.com/boaz65sa-byte/hotel-management> | קוד מקור |
 | **Supabase** | <https://supabase.com/dashboard/project/vetwlonyzyzvhrtdwbzj> | DB + Auth |
 
@@ -58,13 +58,14 @@
 
 ---
 
-## 🚀 איך להעלות את Staff App ל-Netlify
+## 🚀 לעדכן את Staff App אחרי שינויי קוד
 
-1. הבילד מוכן ב-`build/web` (כבר פתחתי לך Finder)
-2. עבור ל-<https://app.netlify.com/drop>
-3. גרור את התיקייה `web` (לא הקבצים בודדים)
-4. תקבל URL חדש (משהו כמו `xxx.netlify.app`)
-5. שמור את ה-URL כאן בקובץ במקום "_להעלות עכשיו..._"
+1. `cd /Users/boazsaada/manegmant\ resapceon && flutter build web --release`
+2. פתח <https://app.netlify.com/projects/transcendent-mooncake-71c5b7/deploys>
+3. גרור את התיקייה `build/web` אל "Drag and drop your project folder here to deploy new changes"
+4. חכה ל-Published (כ-30 שניות)
+
+⚠️ **אל** תשתמש ב-Netlify Drop הכללי — זה יוצר אתר חדש עם URL אחר!
 
 ---
 

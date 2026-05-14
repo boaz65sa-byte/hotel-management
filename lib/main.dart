@@ -15,7 +15,9 @@ void main() async {
   if (kIsWeb) {
     databaseFactory = databaseFactoryFfiWeb;
   }
-  await dotenv.load();
+  // Web hosts (e.g. Netlify) refuse to serve dotfiles such as ".env",
+  // so we ship a duplicate at "assets/env" and prefer it on web.
+  await dotenv.load(fileName: kIsWeb ? 'assets/env' : '.env');
   final oneSignalAppId = dotenv.env['ONESIGNAL_APP_ID'] ?? '';
   if (oneSignalAppId.isNotEmpty) {
     PushService.initOneSignal(oneSignalAppId);
