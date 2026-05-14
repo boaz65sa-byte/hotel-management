@@ -1,4 +1,10 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import {
+  assertHotelMutationAllowed,
+  requireDashboardViewer,
+  verifyDashboardViewerForAction,
+} from '@/lib/auth-guard'
+import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 const STATUS_LABELS: Record<string, string> = {
@@ -33,13 +39,21 @@ export default async function GuestRequestsAdminPage({
 }: {
   searchParams: Promise<{ hotel?: string; status?: string; from?: string; to?: string }>
 }) {
-  const params = await searchParams
-  const { hotel: hotelFilter, status: statusFilter, from: fromFilter, to: toFilter } = params
+  const raw = await searchParams
+  let { hotel: hotelFilter } = raw
+  const { status: statusFilter, from: fromFilter, to: toFilter } = raw
 
-  const { data: hotels } = await supabaseAdmin
-    .from('hotels')
-    .select('id, name')
-    .order('name')
+  const viewer = await requireDashboardViewer()
+
+  if (viewer.isHotelTierAdmin && viewer.hotelId) {
+    hotelFilter = viewer.hotelId
+  }
+
+  let hotelsQuery = supabaseAdmin.from('hotels').select('id, name').order('name')
+  if (viewer.isHotelTierAdmin && viewer.hotelId) {
+    hotelsQuery = hotelsQuery.eq('id', viewer.hotelId)
+  }
+  const { data: hotels } = await hotelsQuery
 
   let query = supabaseAdmin
     .from('guest_requests')
@@ -60,9 +74,21 @@ export default async function GuestRequestsAdminPage({
 
   async function updateRequestStatus(fd: FormData) {
     'use server'
+    const viewerAction = await verifyDashboardViewerForAction()
+    if (!viewerAction) redirect('/login')
+
     const id = fd.get('id') as string
     const status = fd.get('status') as string
     if (!id || !status) return
+
+    const { data: row } = await supabaseAdmin
+      .from('guest_requests')
+      .select('hotel_id')
+      .eq('id', id)
+      .maybeSingle()
+    if (!row?.hotel_id) return
+    assertHotelMutationAllowed(viewerAction, row.hotel_id)
+
     await supabaseAdmin
       .from('guest_requests')
       .update({ status, updated_at: new Date().toISOString() })
@@ -70,14 +96,21 @@ export default async function GuestRequestsAdminPage({
     revalidatePath('/dashboard/guest-requests')
   }
 
+  const hotelTier = viewer.isHotelTierAdmin && viewer.hotelId
+
   return (
     <div className="p-6" dir="rtl">
       <h1 className="text-2xl font-bold mb-6">🛎️ בקשות אורחים</h1>
 
       {/* Filters */}
       <form method="GET" className="flex flex-wrap gap-3 mb-6 bg-gray-50 p-4 rounded-xl border">
-        <select name="hotel" defaultValue={hotelFilter ?? ''} className="border rounded-lg px-3 py-2 text-sm">
-          <option value="">כל המלונות</option>
+        <select
+          name="hotel"
+          defaultValue={hotelFilter ?? ''}
+          className="border rounded-lg px-3 py-2 text-sm"
+          disabled={!!hotelTier}
+        >
+          {!hotelTier && <option value="">כל המלונות</option>}
           {(hotels ?? []).map(h => (
             <option key={h.id} value={h.id}>{h.name}</option>
           ))}

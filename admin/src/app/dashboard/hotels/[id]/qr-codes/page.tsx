@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { assertHotelAccess, requireDashboardViewer } from '@/lib/auth-guard'
 import { notFound } from 'next/navigation'
 import QRCode from 'qrcode'
 import { DownloadZipButton } from './download-zip-button'
@@ -20,6 +21,9 @@ export default async function HotelQrCodesPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
+
+  const viewer = await requireDashboardViewer()
+  assertHotelAccess(viewer, id)
 
   const { data: hotel } = await supabaseAdmin
     .from('hotels')
@@ -101,7 +105,7 @@ export default async function HotelQrCodesPage({
               hotelId={id}
             />
             <p className="text-xs text-gray-500">
-              לחיצה על "פוסטר להדפסה" פותחת עמוד A4 מוכן עם הלוגו ושם המלון — מתאים להדפסה בקבלה.
+              לחיצה על {'\u2018'}פוסטר להדפסה{'\u2019'} פותחת עמוד A4 מוכן עם הלוגו ושם המלון — מתאים להדפסה בקבלה.
             </p>
           </div>
         </div>

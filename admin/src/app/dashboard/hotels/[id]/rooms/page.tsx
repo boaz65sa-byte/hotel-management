@@ -1,5 +1,11 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { notFound } from 'next/navigation'
+import {
+  assertHotelAccess,
+  assertHotelMutationAllowed,
+  requireDashboardViewer,
+  verifyDashboardViewerForAction,
+} from '@/lib/auth-guard'
+import { redirect, notFound } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { RoomsManager } from './rooms-manager'
 
@@ -9,6 +15,9 @@ export default async function HotelRoomsPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
+
+  const viewer = await requireDashboardViewer()
+  assertHotelAccess(viewer, id)
 
   const { data: hotel } = await supabaseAdmin
     .from('hotels')
@@ -26,6 +35,9 @@ export default async function HotelRoomsPage({
 
   async function createRoom(formData: FormData) {
     'use server'
+    const viewer = await verifyDashboardViewerForAction()
+    if (!viewer) redirect('/login')
+    assertHotelMutationAllowed(viewer, id)
     const room_number = String(formData.get('room_number') ?? '').trim()
     const floor = formData.get('floor')
     const room_type = String(formData.get('room_type') ?? '').trim()
@@ -43,6 +55,9 @@ export default async function HotelRoomsPage({
 
   async function updateRoom(formData: FormData) {
     'use server'
+    const viewer = await verifyDashboardViewerForAction()
+    if (!viewer) redirect('/login')
+    assertHotelMutationAllowed(viewer, id)
     const roomId = String(formData.get('room_id') ?? '')
     if (!roomId) return
     const room_number = String(formData.get('room_number') ?? '').trim()
@@ -63,6 +78,9 @@ export default async function HotelRoomsPage({
 
   async function deleteRoom(formData: FormData) {
     'use server'
+    const viewer = await verifyDashboardViewerForAction()
+    if (!viewer) redirect('/login')
+    assertHotelMutationAllowed(viewer, id)
     const roomId = String(formData.get('room_id') ?? '')
     if (!roomId) return
     await supabaseAdmin.from('rooms').delete().eq('id', roomId)
@@ -73,6 +91,9 @@ export default async function HotelRoomsPage({
     formData: FormData,
   ): Promise<{ ok: boolean; created: number; skipped: number; error?: string }> {
     'use server'
+    const viewer = await verifyDashboardViewerForAction()
+    if (!viewer) redirect('/login')
+    assertHotelMutationAllowed(viewer, id)
     const floors           = Math.max(1, Number(formData.get('floors')        ?? 1))
     const rooms_per_floor  = Math.max(1, Number(formData.get('rooms_per_floor') ?? 1))
     const start_per_floor  = Math.max(1, Number(formData.get('start_per_floor') ?? 1))

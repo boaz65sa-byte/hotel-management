@@ -1,54 +1,123 @@
-// Server-side helper: checks if the request has a valid super_admin session
+// Server-side auth for the Next.js admin panel — super_admin (platform owner)
+// OR hotel-tier admins (מנכל / מנהל תוכנה / hotel_admin legacy) scoped to one hotel.
+
 import { cookies } from 'next/headers'
-import { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { cache } from 'react'
 
-// For API routes — returns session or null (no redirect)
-export async function authGuard(req: NextRequest): Promise<{ access_token: string } | null> {
-  const cookieHeader = req.headers.get('cookie') ?? ''
-  const match = cookieHeader.match(/sb-access-token=([^;]+)/)
-  const accessToken = match?.[1]
-  if (!accessToken) return null
+import {
+  canManageAdmin,
+  isHotelAdmin,
+  isSuperAdmin,
+} from '@/lib/roles'
 
-  const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  )
-  const { data: { user }, error } = await supabase.auth.getUser(accessToken)
+export type DashboardViewer = {
+  userId: string
+  email: string | null
+  fullName: string | null
+  role: string
+  hotelId: string | null
+  isSuperAdmin: boolean
+  isHotelTierAdmin: boolean
+}
+
+export type ApiAuthSession = DashboardViewer & { access_token: string }
+
+const supabaseService = () =>
+  createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+
+async function loadViewer(accessToken: string): Promise<DashboardViewer | null> {
+  const supabase = supabaseService()
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser(accessToken)
   if (error || !user) return null
 
   const { data: profile } = await supabase
-    .from('users').select('role').eq('id', user.id).single()
-  if (profile?.role !== 'super_admin') return null
+    .from('users')
+    .select('role, hotel_id, full_name')
+    .eq('id', user.id)
+    .maybeSingle()
 
-  return { access_token: accessToken }
+  if (!profile?.role) return null
+  const role = profile.role as string
+  if (!canManageAdmin(role)) return null
+
+  if (isHotelAdmin(role) && !(profile.hotel_id as string | null)) return null
+
+  return {
+    userId: user.id,
+    email: user.email ?? null,
+    fullName: (profile.full_name as string | null) ?? null,
+    role,
+    hotelId: (profile.hotel_id as string | null) ?? null,
+    isSuperAdmin: isSuperAdmin(role),
+    isHotelTierAdmin: isHotelAdmin(role),
+  }
 }
 
-export async function requireSuperAdmin() {
+async function viewerFromCookies(): Promise<DashboardViewer | null> {
   const cookieStore = await cookies()
-  const accessToken = cookieStore.get('sb-access-token')?.value
-  // refreshToken is intentionally not used here — the client refreshes on its own
-  // and we only need a fresh access token to verify role on each request.
+  const token = cookieStore.get('sb-access-token')?.value
+  if (!token) return null
+  return loadViewer(token)
+}
 
-  if (!accessToken) redirect('/login')
+/** Per-request memoization for layouts + pages during a single navigation. */
+export const getDashboardViewer = cache(async (): Promise<DashboardViewer | null> => {
+  return viewerFromCookies()
+})
 
-  // Verify token using service role (to check role claim)
-  const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  )
+/** Throws redirect to login if unauthenticated / disallowed role. */
+export async function requireDashboardViewer(): Promise<DashboardViewer> {
+  const v = await getDashboardViewer()
+  if (!v) redirect('/login')
+  return v
+}
 
-  const { data: { user }, error } = await supabase.auth.getUser(accessToken)
-  if (error || !user) redirect('/login')
+/** Platform owner only (legacy API name). Redirects unauthorized users away from admin. */
+export async function requireSuperAdmin(): Promise<DashboardViewer> {
+  const v = await requireDashboardViewer()
+  if (!v.isSuperAdmin) redirect('/dashboard')
+  return v
+}
 
-  // Check role from DB (not JWT, for server-side accuracy)
-  const { data: profile } = await supabase
-    .from('users').select('role').eq('id', user.id).single()
+/**
+ * Restrict to a hotel id. Super admin passes through; hotel admin must match.
+ */
+export function assertHotelAccess(viewer: DashboardViewer, hotelId: string) {
+  if (viewer.isSuperAdmin) return
+  if (!viewer.hotelId || viewer.hotelId !== hotelId) notFound()
+}
 
-  if (profile?.role !== 'super_admin') redirect('/login')
+/** Server actions — throw instead of masking as 404. */
+export function assertHotelMutationAllowed(viewer: DashboardViewer, hotelId: string) {
+  if (viewer.isSuperAdmin) return
+  if (!viewer.hotelId || viewer.hotelId !== hotelId) {
+    throw new Error('Forbidden')
+  }
+}
 
-  return user
+/**
+ * Cookie-based bearer for REST route handlers (+ optional cookie string fallback).
+ */
+export async function authGuard(req: NextRequest): Promise<ApiAuthSession | null> {
+  const token =
+    req.cookies.get('sb-access-token')?.value ??
+    req.headers.get('cookie')?.match(/sb-access-token=([^;]+)/)?.[1]
+  if (!token) return null
+
+  const v = await loadViewer(token)
+  if (!v) return null
+  return { ...v, access_token: token }
+}
+
+/** Viewer for server actions (no React cache — each POST is isolated). */
+export async function verifyDashboardViewerForAction(): Promise<DashboardViewer | null> {
+  return viewerFromCookies()
 }

@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { assertHotelAccess, requireDashboardViewer } from '@/lib/auth-guard'
 import { notFound } from 'next/navigation'
 import QRCode from 'qrcode'
 import { PrintButton } from './print-button'
@@ -11,6 +12,9 @@ export default async function HotelPosterPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
+
+  const viewer = await requireDashboardViewer()
+  assertHotelAccess(viewer, id)
 
   const { data: hotel } = await supabaseAdmin
     .from('hotels')

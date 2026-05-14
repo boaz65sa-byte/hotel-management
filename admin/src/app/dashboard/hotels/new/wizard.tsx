@@ -466,7 +466,7 @@ function Step3({
           <div className="flex-1">
             <h3 className="font-bold text-gray-900 mb-1">2 התפקידים החיוניים לכל מלון</h3>
             <p className="text-sm text-gray-700 mb-3">
-              לפני הכל — הוסיפו את <strong>מנכ"ל המלון</strong> ואת <strong>מנהל התוכנה</strong>.
+              לפני הכל — הוסיפו את <strong>{'מנכ\u05f4ל המלון'}</strong> ואת <strong>מנהל התוכנה</strong>.
               הם יקבלו גישה מלאה לניהול המלון: הוספת עובדים, צפייה בכל הנתונים, ושינוי הגדרות —
               <strong> אך ורק למלון הזה</strong>.
             </p>
@@ -476,7 +476,7 @@ function Step3({
                 onClick={() => addUser('ceo')}
                 className="bg-amber-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-amber-600 font-medium"
               >
-                👔 + הוסף מנכ"ל מלון
+                👔 + הוסף {'מנכ\u05f4ל מלון'}
               </button>
               <button
                 type="button"

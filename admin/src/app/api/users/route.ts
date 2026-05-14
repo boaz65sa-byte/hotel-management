@@ -10,6 +10,27 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
+  const { action } = body as { action?: string }
+
+  if (!session.isSuperAdmin && session.hotelId) {
+    if (action === 'create') {
+      if (body.hotel_id !== session.hotelId) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+    }
+    if (action === 'update') {
+      if (typeof body.role === 'string' && body.role === 'super_admin') {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+      if (
+        typeof body.hotel_id === 'string' &&
+        body.hotel_id.length > 0 &&
+        body.hotel_id !== session.hotelId
+      ) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+    }
+  }
 
   const res = await fetch(`${SUPABASE_URL}/functions/v1/manage-user`, {
     method: 'POST',

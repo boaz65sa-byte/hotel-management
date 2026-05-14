@@ -7,15 +7,18 @@ type Props = {
   totalUsers: number
   activeUsers: number
   openTickets: number
+  /** When true, scope copy refers to the viewer's hotel only. */
+  hotelScoped?: boolean
 }
 
 export function OverviewCards(props: Props) {
   const { t } = useLang()
+  const ticketSub = props.hotelScoped ? t.inYourHotel : t.acrossAllHotels
 
   const cards = [
     { label: t.totalHotels,  value: props.totalHotels,  sub: `${props.activeHotels} ${t.active}` },
     { label: t.totalUsers,   value: props.totalUsers,   sub: `${props.activeUsers} ${t.active}` },
-    { label: t.openTickets,  value: props.openTickets,  sub: t.acrossAllHotels },
+    { label: t.openTickets,  value: props.openTickets,  sub: ticketSub },
   ]
 
   return (

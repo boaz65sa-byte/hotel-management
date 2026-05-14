@@ -1,5 +1,11 @@
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import {
+  assertHotelMutationAllowed,
+  requireDashboardViewer,
+  verifyDashboardViewerForAction,
+} from '@/lib/auth-guard'
+import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 
 type GuestFeedbackRow = {
   id: string
@@ -30,12 +36,19 @@ export default async function GuestFeedbackAdminPage({
   searchParams: Promise<{ hotel?: string }>
 }) {
   const params = await searchParams
-  const { hotel: hotelFilter } = params
+  let { hotel: hotelFilter } = params
 
-  const { data: hotels } = await supabaseAdmin
-    .from('hotels')
-    .select('id, name')
-    .order('name')
+  const viewer = await requireDashboardViewer()
+
+  if (viewer.isHotelTierAdmin && viewer.hotelId) {
+    hotelFilter = viewer.hotelId
+  }
+
+  let hotelsQuery = supabaseAdmin.from('hotels').select('id, name').order('name')
+  if (viewer.isHotelTierAdmin && viewer.hotelId) {
+    hotelsQuery = hotelsQuery.eq('id', viewer.hotelId)
+  }
+  const { data: hotels } = await hotelsQuery
 
   let fbQuery = supabaseAdmin
     .from('guest_feedback')
@@ -53,9 +66,21 @@ export default async function GuestFeedbackAdminPage({
 
   async function saveStaffNotes(fd: FormData) {
     'use server'
+    const viewerAction = await verifyDashboardViewerForAction()
+    if (!viewerAction) redirect('/login')
+
     const id = String(fd.get('id') ?? '')
     const notes = String(fd.get('staff_notes') ?? '')
     if (!id) return
+
+    const { data: row } = await supabaseAdmin
+      .from('guest_feedback')
+      .select('hotel_id')
+      .eq('id', id)
+      .maybeSingle()
+    if (!row?.hotel_id) return
+    assertHotelMutationAllowed(viewerAction, row.hotel_id)
+
     await supabaseAdmin
       .from('guest_feedback')
       .update({ staff_notes: notes.trim() || null })
@@ -65,8 +90,20 @@ export default async function GuestFeedbackAdminPage({
 
   async function deleteFeedback(fd: FormData) {
     'use server'
+    const viewerAction = await verifyDashboardViewerForAction()
+    if (!viewerAction) redirect('/login')
+
     const id = String(fd.get('id') ?? '')
     if (!id) return
+
+    const { data: row } = await supabaseAdmin
+      .from('guest_feedback')
+      .select('hotel_id')
+      .eq('id', id)
+      .maybeSingle()
+    if (!row?.hotel_id) return
+    assertHotelMutationAllowed(viewerAction, row.hotel_id)
+
     await supabaseAdmin.from('guest_feedback').delete().eq('id', id)
     revalidatePath('/dashboard/guest-feedback')
   }
@@ -80,14 +117,21 @@ export default async function GuestFeedbackAdminPage({
     ratingByHotel[f.hotel_id].count++
   }
 
+  const hotelTier = viewer.isHotelTierAdmin && viewer.hotelId
+
   return (
     <div className="p-6" dir="rtl">
       <h1 className="text-2xl font-bold mb-6">⭐ משובי אורחים</h1>
 
       {/* Filter */}
       <form method="GET" className="flex gap-3 mb-6">
-        <select name="hotel" defaultValue={hotelFilter ?? ''} className="border rounded-lg px-3 py-2 text-sm">
-          <option value="">כל המלונות</option>
+        <select
+          name="hotel"
+          defaultValue={hotelFilter ?? ''}
+          className="border rounded-lg px-3 py-2 text-sm"
+          disabled={!!hotelTier}
+        >
+          {!hotelTier && <option value="">כל המלונות</option>}
           {(hotels ?? []).map(h => (
             <option key={h.id} value={h.id}>{h.name}</option>
           ))}
@@ -99,8 +143,8 @@ export default async function GuestFeedbackAdminPage({
       {/* Average per hotel */}
       {Object.keys(ratingByHotel).length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-          {Object.entries(ratingByHotel).map(([id, { name, total, count }]) => (
-            <div key={id} className="border rounded-xl p-4 bg-white shadow-sm">
+          {Object.entries(ratingByHotel).map(([hid, { name, total, count }]) => (
+            <div key={hid} className="border rounded-xl p-4 bg-white shadow-sm">
               <p className="font-semibold text-gray-700 mb-1">{name}</p>
               <p className="text-2xl font-bold text-yellow-500">
                 {(total / count).toFixed(1)} ★

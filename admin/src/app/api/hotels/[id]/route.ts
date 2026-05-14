@@ -1,24 +1,34 @@
-// admin/src/app/api/hotels/[id]/route.ts
-import { supabaseAdmin } from '@/lib/supabase-admin'
-import { requireSuperAdmin } from '@/lib/auth-guard'
+// admin/src/app/api/hotels/[id]/route.ts — theme/name for hotel-tier; full patch for super.
+import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 
-const ALLOWED_FIELDS = ['theme', 'name', 'is_active'] as const
-type AllowedField = typeof ALLOWED_FIELDS[number]
+import { authGuard } from '@/lib/auth-guard'
+import { supabaseAdmin } from '@/lib/supabase-admin'
+
+const SUPER_FIELDS = ['theme', 'name', 'is_active'] as const
+const HOTEL_TIER_FIELDS = ['theme', 'name'] as const
 
 export async function PATCH(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  await requireSuperAdmin()
-  const body = await req.json()
+  const session = await authGuard(req)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // Whitelist — never allow arbitrary DB writes
-  const safe: Partial<Record<AllowedField, unknown>> = {}
-  for (const key of ALLOWED_FIELDS) {
-    if (key in body) safe[key] = body[key]
+  const body = await req.json()
+  const { id } = await params
+
+  const keys = session.isSuperAdmin ? SUPER_FIELDS : HOTEL_TIER_FIELDS
+  if (!session.isSuperAdmin) {
+    if (!session.hotelId || session.hotelId !== id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
   }
 
-  const { id } = await params
+  const safe: Record<string, unknown> = {}
+  for (const key of keys) {
+    if (key in body) safe[key] = body[key]
+  }
 
   const { data, error } = await supabaseAdmin
     .from('hotels')
@@ -27,6 +37,6 @@ export async function PATCH(
     .select()
     .single()
 
-  if (error) return Response.json({ error: error.message }, { status: 400 })
-  return Response.json(data)
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  return NextResponse.json(data)
 }

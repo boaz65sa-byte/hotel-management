@@ -1,11 +1,20 @@
+import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { requireSuperAdmin } from '@/lib/auth-guard'
+
+import { authGuard } from '@/lib/auth-guard'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
-export async function GET(req: Request) {
-  await requireSuperAdmin()
+export async function GET(req: NextRequest) {
+  const session = await authGuard(req)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const { searchParams } = new URL(req.url)
-  const hotelId = searchParams.get('hotel_id')
+  let hotelId = searchParams.get('hotel_id')
+
+  if (!session.isSuperAdmin) {
+    if (!session.hotelId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    hotelId = session.hotelId
+  }
 
   let query = supabaseAdmin
     .from('scheduled_tasks')
@@ -19,13 +28,21 @@ export async function GET(req: Request) {
   return NextResponse.json(data)
 }
 
-export async function POST(req: Request) {
-  await requireSuperAdmin()
+export async function POST(req: NextRequest) {
+  const session = await authGuard(req)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const body = await req.json()
   const { hotel_id, room_id, title, description, recurrence, assigned_role, next_run_at } = body
 
   if (!hotel_id || !title || !recurrence || !assigned_role || !next_run_at) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+  }
+
+  if (!session.isSuperAdmin) {
+    if (!session.hotelId || hotel_id !== session.hotelId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
   }
 
   const { data, error } = await supabaseAdmin

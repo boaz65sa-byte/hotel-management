@@ -3,6 +3,8 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { redirect } from 'next/navigation'
 
+import { verifyDashboardViewerForAction } from '@/lib/auth-guard'
+
 /**
  * Permanently deletes a hotel and all its dependent data.
  *
@@ -13,6 +15,11 @@ export async function deleteHotel(
   hotelId: string,
   confirmName: string,
 ): Promise<{ ok: boolean; error?: string }> {
+  const viewer = await verifyDashboardViewerForAction()
+  if (!viewer?.isSuperAdmin) {
+    return { ok: false, error: 'Forbidden' }
+  }
+
   if (!hotelId || !confirmName) {
     return { ok: false, error: 'Missing arguments' }
   }

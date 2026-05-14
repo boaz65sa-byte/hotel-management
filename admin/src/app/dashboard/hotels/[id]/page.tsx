@@ -1,10 +1,15 @@
-import { supabaseAdmin } from '@/lib/supabase-admin'
-import { HotelForm } from '@/components/hotel-form'
-import { redirect, notFound } from 'next/navigation'
 import { DeleteHotelButton } from './delete-hotel-button'
+import { HotelForm } from '@/components/hotel-form'
+import { assertHotelAccess, requireDashboardViewer } from '@/lib/auth-guard'
+import { supabaseAdmin } from '@/lib/supabase-admin'
+import { notFound } from 'next/navigation'
+import { updateHotelScoped } from './hotel-actions'
 
 export default async function EditHotelPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const viewer = await requireDashboardViewer()
+  assertHotelAccess(viewer, id)
+
   const { data: hotel } = await supabaseAdmin
     .from('hotels')
     .select('*')
@@ -13,23 +18,7 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
 
   if (!hotel) notFound()
 
-  async function updateHotel(fd: FormData) {
-    'use server'
-    const guestPwaUrl = ((fd.get('guest_pwa_url') as string) ?? '').trim()
-    const logoUrl = ((fd.get('logo_url') as string) ?? '').trim()
-    await supabaseAdmin.from('hotels').update({
-      name:              fd.get('name') as string,
-      subscription_plan: fd.get('subscription_plan') as string,
-      default_sla_hours: Number(fd.get('default_sla_hours')),
-      default_language:  fd.get('default_language') as string,
-      theme:             (fd.get('theme') as string) || 'clean_blue',
-      is_active:         fd.get('is_active') === 'on',
-      stay_threshold:    Number(fd.get('stay_threshold')) || 3,
-      ...(guestPwaUrl ? { guest_pwa_url: guestPwaUrl } : {}),
-      logo_url:          logoUrl || null,
-    }).eq('id', id)
-    redirect('/dashboard/hotels')
-  }
+  const boundUpdate = updateHotelScoped.bind(null, id)
 
   return (
     <div>
@@ -55,20 +44,26 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
         >
           🖨️ פוסטר קבלה (A4)
         </a>
-        <DeleteHotelButton hotelId={hotel.id} hotelName={hotel.name} />
+        {viewer.isSuperAdmin && (
+          <DeleteHotelButton hotelId={hotel.id} hotelName={hotel.name} />
+        )}
       </div>
-      <HotelForm hotel={{
-        id: hotel.id,
-        name: hotel.name,
-        subscription_plan: hotel.subscription_plan,
-        default_sla_hours: hotel.default_sla_hours,
-        default_language: hotel.default_language,
-        is_active: hotel.is_active,
-        theme: hotel.theme,
-        stay_threshold: hotel.stay_threshold ?? 3,
-        guest_pwa_url: hotel.guest_pwa_url ?? null,
-        logo_url: hotel.logo_url ?? null,
-      }} action={updateHotel} />
+      <HotelForm
+        hotel={{
+          id: hotel.id,
+          name: hotel.name,
+          subscription_plan: hotel.subscription_plan,
+          default_sla_hours: hotel.default_sla_hours,
+          default_language: hotel.default_language,
+          is_active: hotel.is_active,
+          theme: hotel.theme,
+          stay_threshold: hotel.stay_threshold ?? 3,
+          guest_pwa_url: hotel.guest_pwa_url ?? null,
+          logo_url: hotel.logo_url ?? null,
+        }}
+        action={boundUpdate}
+        variant={viewer.isSuperAdmin ? 'super' : 'hotel'}
+      />
     </div>
   )
 }

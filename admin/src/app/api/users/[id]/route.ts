@@ -10,5 +10,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params
   const { data } = await supabaseAdmin.from('users').select('*').eq('id', id).single()
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+  if (!session.isSuperAdmin) {
+    if (!session.hotelId || data.hotel_id !== session.hotelId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
   return NextResponse.json(data)
 }

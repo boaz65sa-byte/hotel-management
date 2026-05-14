@@ -10,7 +10,16 @@ type Hotel = { id?: string; name: string; subscription_plan: string
                guest_pwa_url?: string | null
                logo_url?: string | null }
 
-export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormData) => Promise<void> }) {
+export function HotelForm({
+  hotel,
+  action,
+  variant = 'super',
+}: {
+  hotel: Hotel
+  action: (fd: FormData) => Promise<void>
+  /** `hotel` — hide plan + active (handled only by super on server). */
+  variant?: 'super' | 'hotel'
+}) {
   const [data, setData] = useState(hotel)
   const router = useRouter()
 
@@ -24,17 +33,19 @@ export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormDa
           className="w-full border rounded px-3 py-2" required />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Plan</label>
-          <select name="subscription_plan" value={data.subscription_plan}
-            onChange={e => setData({...data, subscription_plan: e.target.value})}
-            className="w-full border rounded px-3 py-2">
-            <option value="basic">Basic (10GB)</option>
-            <option value="pro">Pro (50GB)</option>
-            <option value="enterprise">Enterprise (200GB)</option>
-          </select>
-        </div>
+      <div className={`grid gap-4 ${variant === 'super' ? 'grid-cols-3' : 'grid-cols-2'}`}>
+        {variant === 'super' && (
+          <div>
+            <label className="block text-sm font-medium mb-1">Plan</label>
+            <select name="subscription_plan" value={data.subscription_plan}
+              onChange={e => setData({...data, subscription_plan: e.target.value})}
+              className="w-full border rounded px-3 py-2">
+              <option value="basic">Basic (10GB)</option>
+              <option value="pro">Pro (50GB)</option>
+              <option value="enterprise">Enterprise (200GB)</option>
+            </select>
+          </div>
+        )}
         <div>
           <label className="block text-sm font-medium mb-1">SLA (hours)</label>
           <input type="number" name="default_sla_hours" value={data.default_sla_hours}
@@ -122,11 +133,13 @@ export function HotelForm({ hotel, action }: { hotel: Hotel; action: (fd: FormDa
         </p>
       </div>
 
-      <div className="flex items-center gap-3">
-        <input type="checkbox" name="is_active" id="is_active"
-          checked={data.is_active} onChange={e => setData({...data, is_active: e.target.checked})} />
-        <label htmlFor="is_active" className="text-sm font-medium">Active</label>
-      </div>
+      {variant === 'super' && (
+        <div className="flex items-center gap-3">
+          <input type="checkbox" name="is_active" id="is_active"
+            checked={data.is_active} onChange={e => setData({...data, is_active: e.target.checked})} />
+          <label htmlFor="is_active" className="text-sm font-medium">Active</label>
+        </div>
+      )}
 
       <div className="flex gap-3">
         <button type="submit"

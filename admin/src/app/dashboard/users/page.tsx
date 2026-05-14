@@ -1,7 +1,10 @@
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import Link from 'next/link'
+
+import { requireDashboardViewer, verifyDashboardViewerForAction } from '@/lib/auth-guard'
 import { ROLES, roleLabel, isHotelAdmin } from '@/lib/roles'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 
 type UserRow = {
   id: string
@@ -16,8 +19,24 @@ type HotelLite = { id: string; name: string; logo_url: string | null }
 
 async function toggleActive(fd: FormData) {
   'use server'
+  const viewerAction = await verifyDashboardViewerForAction()
+  if (!viewerAction) redirect('/login')
+
   const id = fd.get('id') as string
   const active = fd.get('active') === 'true'
+  const { data: target } = await supabaseAdmin
+    .from('users')
+    .select('hotel_id, role')
+    .eq('id', id)
+    .maybeSingle()
+  if (!target) return
+
+  if (!viewerAction.isSuperAdmin) {
+    if (target.role === 'super_admin' || !target.hotel_id || target.hotel_id !== viewerAction.hotelId) {
+      throw new Error('Forbidden')
+    }
+  }
+
   await supabaseAdmin.from('users').update({ is_active: !active }).eq('id', id)
   revalidatePath('/dashboard/users')
 }
@@ -27,15 +46,22 @@ export default async function UsersPage({
 }: {
   searchParams: Promise<{ hotel?: string; role?: string; q?: string }>
 }) {
-  const { hotel, role, q } = await searchParams
+  const viewer = await requireDashboardViewer()
+  const rawParam = await searchParams
+  let { hotel: hotelFilter } = rawParam
+  const { role, q } = rawParam
+
+  if (viewer.isHotelTierAdmin && viewer.hotelId) {
+    hotelFilter = viewer.hotelId
+  }
 
   let query = supabaseAdmin
     .from('users')
     .select('id, full_name, email, role, is_active, hotel_id')
     .order('full_name', { ascending: true })
 
-  if (hotel) query = query.eq('hotel_id', hotel)
-  if (role)  query = query.eq('role', role)
+  if (hotelFilter) query = query.eq('hotel_id', hotelFilter)
+  if (role) query = query.eq('role', role)
 
   const { data: usersRaw } = await query
   let users: UserRow[] = (usersRaw ?? []) as UserRow[]
@@ -48,10 +74,14 @@ export default async function UsersPage({
     )
   }
 
-  const { data: hotelsRaw } = await supabaseAdmin
+  let hotelsQuery = supabaseAdmin
     .from('hotels')
     .select('id, name, logo_url')
     .order('name', { ascending: true })
+  if (viewer.isHotelTierAdmin && viewer.hotelId) {
+    hotelsQuery = hotelsQuery.eq('id', viewer.hotelId)
+  }
+  const { data: hotelsRaw } = await hotelsQuery
   const hotels: HotelLite[] = (hotelsRaw ?? []) as HotelLite[]
 
   const usersByHotel = new Map<string, UserRow[]>()
@@ -65,6 +95,8 @@ export default async function UsersPage({
     usersByHotel.get(u.hotel_id)!.push(u)
   }
 
+  const hotelTier = viewer.isHotelTierAdmin && viewer.hotelId
+
   const total = users.length
   const totalActive = users.filter(u => u.is_active).length
 
@@ -74,7 +106,8 @@ export default async function UsersPage({
         <div>
           <h1 className="text-2xl font-bold">משתמשים — {total}</h1>
           <p className="text-sm text-gray-500 mt-1">
-            פעילים: {totalActive} · לפי {hotels.length} מלונות
+            פעילים: {totalActive} ·{' '}
+            {viewer.isSuperAdmin ? `לפי ${hotels.length} מלונות` : 'במלון שלך'}
           </p>
         </div>
         <Link
@@ -87,19 +120,25 @@ export default async function UsersPage({
 
       <form className="bg-white border rounded-xl p-3 mb-6 flex flex-wrap items-center gap-3">
         <input
-          name="q" defaultValue={q ?? ''}
+          name="q"
+          defaultValue={q ?? ''}
           placeholder="חיפוש לפי שם או מייל…"
           className="flex-1 min-w-[200px] border rounded px-3 py-2 text-sm"
         />
-        <select name="hotel" defaultValue={hotel ?? ''} className="border rounded px-3 py-2 text-sm">
-          <option value="">כל המלונות</option>
+        <select
+          name="hotel"
+          defaultValue={hotelFilter ?? ''}
+          className="border rounded px-3 py-2 text-sm"
+          disabled={!!hotelTier}
+        >
+          {viewer.isSuperAdmin && <option value="">כל המלונות</option>}
           {hotels.map(h => (
             <option key={h.id} value={h.id}>{h.name}</option>
           ))}
         </select>
         <select name="role" defaultValue={role ?? ''} className="border rounded px-3 py-2 text-sm">
           <option value="">כל התפקידים</option>
-          <option value="super_admin">👑 סופר אדמין</option>
+          {viewer.isSuperAdmin && <option value="super_admin">👑 סופר אדמין</option>}
           {ROLES.map(r => (
             <option key={r.value} value={r.value}>{r.icon} {r.label}</option>
           ))}
@@ -107,14 +146,16 @@ export default async function UsersPage({
         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
           סנן
         </button>
-        {(q || hotel || role) && (
+        {(Boolean(q?.trim()) ||
+          Boolean(role) ||
+          (!!viewer.isSuperAdmin && !!(rawParam.hotel && rawParam.hotel.trim()))) && (
           <Link href="/dashboard/users" className="text-sm text-gray-500 hover:underline">
             איפוס
           </Link>
         )}
       </form>
 
-      {superAdmins.length > 0 && (
+      {superAdmins.length > 0 && viewer.isSuperAdmin && (
         <HotelSection
           icon="👑"
           name="סופר אדמינים — גישה לכל המלונות"
@@ -137,20 +178,21 @@ export default async function UsersPage({
           />
         ))}
 
-      {Array.from(usersByHotel.keys())
-        .filter(hid => !hotels.find(h => h.id === hid))
-        .map(orphanHotelId => {
-          const orphanUsers = usersByHotel.get(orphanHotelId) ?? []
-          return (
-            <HotelSection
-              key={orphanHotelId}
-              icon="⚠️"
-              name={`מלון לא ידוע (${orphanHotelId.slice(0, 8)}…)`}
-              users={orphanUsers}
-              tone="amber"
-            />
-          )
-        })}
+      {viewer.isSuperAdmin &&
+        Array.from(usersByHotel.keys())
+          .filter(hid => !hotels.find(h => h.id === hid))
+          .map(orphanHotelId => {
+            const orphanUsers = usersByHotel.get(orphanHotelId) ?? []
+            return (
+              <HotelSection
+                key={orphanHotelId}
+                icon="⚠️"
+                name={`מלון לא ידוע (${orphanHotelId.slice(0, 8)}…)`}
+                users={orphanUsers}
+                tone="amber"
+              />
+            )
+          })}
 
       {total === 0 && (
         <div className="bg-white border rounded-xl p-12 text-center text-gray-500">
@@ -165,7 +207,12 @@ export default async function UsersPage({
 }
 
 function HotelSection({
-  icon, logo, name, hotelId, users, tone,
+  icon,
+  logo,
+  name,
+  hotelId,
+  users,
+  tone,
 }: {
   icon?: string
   logo?: string

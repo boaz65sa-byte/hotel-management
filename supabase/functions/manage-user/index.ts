@@ -9,8 +9,16 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const managerRoles = ['ceo', 'reception_manager', 'maintenance_manager',
-                      'housekeeping_manager', 'security_manager', 'super_admin']
+const managerRoles = [
+  'ceo',
+  'software_manager',
+  'hotel_admin',
+  'reception_manager',
+  'maintenance_manager',
+  'housekeeping_manager',
+  'security_manager',
+  'super_admin',
+]
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
@@ -47,6 +55,10 @@ Deno.serve(async (req) => {
 
     if (!email || !full_name || !password || !role || !hotel_id) {
       return json({ error: 'Missing fields' }, 400)
+    }
+
+    if (role === 'super_admin' && !isSuperAdmin) {
+      return new Response('Forbidden', { status: 403 })
     }
 
     // Hotel admins can only create for their own hotel
@@ -93,7 +105,12 @@ Deno.serve(async (req) => {
 
     const updates: Record<string, unknown> = {}
     if (full_name !== undefined) updates.full_name = full_name
-    if (role      !== undefined) updates.role      = role
+    if (role !== undefined) {
+      if (!isSuperAdmin && role === 'super_admin') {
+        return new Response('Forbidden', { status: 403 })
+      }
+      updates.role = role
+    }
     if (hotel_id  !== undefined && isSuperAdmin) updates.hotel_id = hotel_id
     if (is_active !== undefined) updates.is_active  = is_active
 

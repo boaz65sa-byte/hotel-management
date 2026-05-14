@@ -1,31 +1,38 @@
+import { requireDashboardViewer } from '@/lib/auth-guard'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export default async function AnalyticsPage() {
-  const { data: ticketsByHotel } = await supabaseAdmin
-    .from('tickets')
-    .select('hotel_id, status, hotels(name)')
+  const viewer = await requireDashboardViewer()
+
+  let tq = supabaseAdmin.from('tickets').select('hotel_id, status, hotels(name)')
+  if (viewer.isHotelTierAdmin && viewer.hotelId) {
+    tq = tq.eq('hotel_id', viewer.hotelId)
+  }
+  const { data: ticketsByHotel } = await tq
 
   const hotelMap: Record<string, { name: string; total: number; open: number; resolved: number }> = {}
   for (const t of ticketsByHotel ?? []) {
-    const id = t.hotel_id
+    const hid = t.hotel_id as string
     const hotelRel = t.hotels as { name?: string } | { name?: string }[] | null
-    const name = (Array.isArray(hotelRel) ? hotelRel[0]?.name : hotelRel?.name) ?? id
-    if (!hotelMap[id]) hotelMap[id] = { name, total: 0, open: 0, resolved: 0 }
-    hotelMap[id].total++
-    if (['resolved','closed'].includes(t.status)) hotelMap[id].resolved++
-    else hotelMap[id].open++
+    const name = (Array.isArray(hotelRel) ? hotelRel[0]?.name : hotelRel?.name) ?? hid
+    if (!hotelMap[hid]) hotelMap[hid] = { name, total: 0, open: 0, resolved: 0 }
+    hotelMap[hid].total++
+    if (['resolved', 'closed'].includes(t.status as string)) hotelMap[hid].resolved++
+    else hotelMap[hid].open++
   }
 
   const rows = Object.values(hotelMap).sort((a, b) => b.total - a.total)
 
+  const title = viewer.isSuperAdmin ? 'Global Analytics' : 'Analytics'
+
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Global Analytics</h1>
+      <h1 className="text-2xl font-bold mb-6">{title}</h1>
       <div className="bg-white rounded-xl border overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
-              {['Hotel','Total Tickets','Open','Resolved','Resolution Rate'].map(h => (
+              {['Hotel', 'Total Tickets', 'Open', 'Resolved', 'Resolution Rate'].map(h => (
                 <th key={h} className="px-4 py-3 text-left text-sm font-medium text-gray-500">{h}</th>
               ))}
             </tr>

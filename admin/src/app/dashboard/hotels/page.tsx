@@ -1,8 +1,17 @@
-import { supabaseAdmin } from '@/lib/supabase-admin'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
+
 import { ThemePicker } from '@/components/theme-picker'
+import { requireDashboardViewer } from '@/lib/auth-guard'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export default async function HotelsPage() {
+  const viewer = await requireDashboardViewer()
+
+  if (viewer.isHotelTierAdmin && viewer.hotelId) {
+    redirect(`/dashboard/hotels/${viewer.hotelId}`)
+  }
+
   const { data: hotels } = await supabaseAdmin
     .from('hotels')
     .select('id, name, subscription_plan, is_active, created_at, theme')
