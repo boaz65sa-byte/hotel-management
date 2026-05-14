@@ -69,6 +69,61 @@ export default async function HotelRoomsPage({
     revalidatePath(`/dashboard/hotels/${id}/rooms`)
   }
 
+  async function bulkAddRooms(
+    formData: FormData,
+  ): Promise<{ ok: boolean; created: number; skipped: number; error?: string }> {
+    'use server'
+    const floors           = Math.max(1, Number(formData.get('floors')        ?? 1))
+    const rooms_per_floor  = Math.max(1, Number(formData.get('rooms_per_floor') ?? 1))
+    const start_per_floor  = Math.max(1, Number(formData.get('start_per_floor') ?? 1))
+    const skip_raw         = String(formData.get('skip_numbers') ?? '').trim()
+    const room_type        = String(formData.get('room_type') ?? '').trim()
+
+    const skip_numbers: number[] = skip_raw
+      ? skip_raw.split(/[\s,]+/).map((n) => Number(n)).filter((n) => Number.isFinite(n))
+      : []
+    const skipSet = new Set(skip_numbers)
+
+    const planned: string[] = []
+    for (let f = 1; f <= floors; f++) {
+      for (let r = 0; r < rooms_per_floor; r++) {
+        const idx = start_per_floor + r
+        if (skipSet.has(idx)) continue
+        planned.push(`${f}${String(idx).padStart(2, '0')}`)
+      }
+    }
+    if (planned.length === 0) {
+      return { ok: false, created: 0, skipped: 0, error: 'No rooms to add' }
+    }
+
+    const { data: existing } = await supabaseAdmin
+      .from('rooms')
+      .select('room_number')
+      .eq('hotel_id', id)
+      .in('room_number', planned)
+    const existingSet = new Set((existing ?? []).map((r) => r.room_number as string))
+
+    const rows = planned
+      .filter((n) => !existingSet.has(n))
+      .map((n) => ({
+        hotel_id:    id,
+        room_number: n,
+        floor:       Number(n.charAt(0)),
+        room_type:   room_type || null,
+        status:      'available',
+      }))
+
+    if (rows.length > 0) {
+      const { error } = await supabaseAdmin.from('rooms').insert(rows)
+      if (error) {
+        return { ok: false, created: 0, skipped: planned.length, error: error.message }
+      }
+    }
+
+    revalidatePath(`/dashboard/hotels/${id}/rooms`)
+    return { ok: true, created: rows.length, skipped: planned.length - rows.length }
+  }
+
   return (
     <div className="p-6" dir="rtl">
       <div className="flex items-center justify-between mb-6">
@@ -87,10 +142,12 @@ export default async function HotelRoomsPage({
       </div>
 
       <RoomsManager
+        hotelId={id}
         rooms={rooms ?? []}
         createRoom={createRoom}
         updateRoom={updateRoom}
         deleteRoom={deleteRoom}
+        bulkAddRooms={bulkAddRooms}
       />
     </div>
   )

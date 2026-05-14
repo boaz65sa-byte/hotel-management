@@ -9,17 +9,19 @@ class HotelBranding {
 
 class GuestRepository {
   /// Fetches the hotel's public branding (name + logo).
+  /// Uses a SECURITY DEFINER RPC so that anonymous PWA visitors can see
+  /// the hotel name and logo without us opening up RLS on the full hotels row.
   /// Returns null if hotelId is invalid or the row is missing.
   Future<HotelBranding?> getHotelBranding(String hotelId) async {
     try {
-      final row = await supabase
-          .from('hotels')
-          .select('name, logo_url')
-          .eq('id', hotelId)
-          .maybeSingle();
-      if (row == null) return null;
+      final data = await supabase
+          .rpc('get_hotel_branding', params: {'p_hotel_id': hotelId});
+      if (data is! List || data.isEmpty) return null;
+      final row = data.first as Map<String, dynamic>;
+      final name = row['name'];
+      if (name is! String || name.isEmpty) return null;
       return HotelBranding(
-        name: row['name'] as String,
+        name: name,
         logoUrl: row['logo_url'] as String?,
       );
     } catch (_) {
