@@ -28,7 +28,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+      GoRoute(path: '/login', builder: (_, state) {
+        final hotelId = state.uri.queryParameters['hotel'];
+        return LoginScreen(hotelHint: hotelId);
+      }),
       GoRoute(path: '/', builder: (_, __) => const HomeScreen()),
       GoRoute(path: '/tickets/new', builder: (_, __) => const NewTicketScreen()),
       GoRoute(

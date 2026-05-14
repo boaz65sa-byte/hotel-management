@@ -9,8 +9,18 @@ import 'package:hotel_app/core/theme/theme_provider.dart';
 import 'package:hotel_app/core/supabase/supabase_client.dart';
 import 'package:hotel_app/core/push/push_service.dart';
 
+class _HotelHint {
+  final String name;
+  final String? logoUrl;
+  const _HotelHint({required this.name, this.logoUrl});
+}
+
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  /// Optional hotel_id from URL query (?hotel=<id>) — used to show the hotel
+  /// logo and name above the login form so staff know which hotel they're
+  /// logging into.
+  final String? hotelHint;
+  const LoginScreen({super.key, this.hotelHint});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -22,6 +32,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _loading = false;
   bool _obscurePassword = true;
   String? _error;
+  _HotelHint? _hotelHint;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHotelHint();
+  }
+
+  Future<void> _loadHotelHint() async {
+    final id = widget.hotelHint;
+    if (id == null || id.isEmpty) return;
+    try {
+      final data = await supabase
+          .rpc('get_hotel_branding', params: {'p_hotel_id': id});
+      if (data is List && data.isNotEmpty) {
+        final row = data.first as Map<String, dynamic>;
+        final name = row['name'];
+        if (name is String && name.isNotEmpty && mounted) {
+          setState(() => _hotelHint = _HotelHint(
+                name: name,
+                logoUrl: row['logo_url'] as String?,
+              ));
+        }
+      }
+    } catch (_) {
+      // silently ignore — fall back to the generic login screen
+    }
+  }
 
   Future<void> _login() async {
     setState(() { _loading = true; _error = null; });
@@ -90,6 +128,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (_hotelHint != null) ...[
+                  _HotelHeaderWidget(hint: _hotelHint!),
+                  const SizedBox(height: 24),
+                ],
                 DropdownButton<String>(
                   value: locale.languageCode,
                   items: const [
@@ -137,6 +179,75 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _HotelHeaderWidget extends StatelessWidget {
+  final _HotelHint hint;
+  const _HotelHeaderWidget({required this.hint});
+
+  @override
+  Widget build(BuildContext context) {
+    final logo = hint.logoUrl;
+    return Column(
+      children: [
+        if (logo != null && logo.trim().isNotEmpty)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.network(
+              logo,
+              width: 88,
+              height: 88,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const _FallbackHotelBadge(),
+              loadingBuilder: (_, child, progress) {
+                if (progress == null) return child;
+                return const SizedBox(
+                  width: 88,
+                  height: 88,
+                  child: Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                );
+              },
+            ),
+          )
+        else
+          const _FallbackHotelBadge(),
+        const SizedBox(height: 12),
+        Text(
+          hint.name,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'התחברות צוות',
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey.shade600,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FallbackHotelBadge extends StatelessWidget {
+  const _FallbackHotelBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 88,
+      height: 88,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade300, width: 2),
+      ),
+      child: Icon(Icons.hotel, color: Colors.grey.shade500, size: 44),
     );
   }
 }
