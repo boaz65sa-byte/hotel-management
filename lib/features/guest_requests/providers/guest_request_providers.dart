@@ -26,9 +26,10 @@ final myDeptRequestsProvider = StreamProvider<List<GuestRequest>>((ref) {
 });
 
 String? _roleToDept(String role) => switch (role) {
-  'housekeeping' || 'housekeeping_manager' => 'housekeeping',
-  'maintenance'                             => 'maintenance',
-  'receptionist' || 'hotel_admin' || 'super_admin' => 'reception',
+  'housekeeping' || 'housekeeping_manager'                        => 'housekeeping',
+  'maintenance' || 'maintenance_tech' || 'maintenance_manager'   => 'maintenance',
+  'receptionist' || 'reception_manager' || 'hotel_admin' ||
+  'ceo' || 'software_manager' || 'super_admin'                   => 'reception',
   _ => null,
 };
 

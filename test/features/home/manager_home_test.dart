@@ -6,6 +6,7 @@ void main() {
     const kpis = ManagerKpis(
       openTickets: 5, inProgressTickets: 3,
       overdueTickets: 1, activeAutomations: 0,
+      openGuestRequests: 2, inProgressGuestRequests: 1,
     );
     expect(kpis.openTickets, 5);
     expect(kpis.overdueTickets, 1);
@@ -15,6 +16,7 @@ void main() {
     const kpis = ManagerKpis(
       openTickets: 5, inProgressTickets: 3,
       overdueTickets: 1, activeAutomations: 4,
+      openGuestRequests: 0, inProgressGuestRequests: 0,
     );
     expect(kpis.activeAutomations, 4);
   });
