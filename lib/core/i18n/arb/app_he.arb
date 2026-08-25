@@ -2,6 +2,7 @@
   "@@locale": "he",
   "appName": "ניהול מלון",
   "login": "כניסה",
+  "staffLoginSubtitle": "התחברו כדי להמשיך לניהול המלון",
   "email": "אימייל",
   "password": "סיסמה",
   "logout": "יציאה",

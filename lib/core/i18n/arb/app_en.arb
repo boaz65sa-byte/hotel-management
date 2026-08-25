@@ -2,6 +2,7 @@
   "@@locale": "en",
   "appName": "Hotel Management",
   "login": "Login",
+  "staffLoginSubtitle": "Sign in to continue to hotel management",
   "email": "Email",
   "password": "Password",
   "logout": "Logout",

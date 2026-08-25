@@ -1,3 +1,5 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -11,6 +13,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get login => 'Вход';
+
+  @override
+  String get staffLoginSubtitle => 'Войдите, чтобы перейти к управлению отелем';
 
   @override
   String get email => 'Электронная почта';
@@ -43,7 +48,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get claimTicket => 'Взять заявку';
 
   @override
-  String get claimRequiresConnection => 'Для взятия заявки необходимо интернет-соединение';
+  String get claimRequiresConnection =>
+      'Для взятия заявки необходимо интернет-соединение';
 
   @override
   String get ticketFixed => 'Устранено';
