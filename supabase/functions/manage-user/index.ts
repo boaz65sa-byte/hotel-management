@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
 
   // ── UPDATE ──────────────────────────────────────────────────
   if (action === 'update') {
-    const { user_id, full_name, role, hotel_id, is_active } = body
+    const { user_id, full_name, role, hotel_id, is_active, password } = body
 
     if (!user_id) return json({ error: 'user_id required' }, 400)
 
@@ -101,6 +101,10 @@ Deno.serve(async (req) => {
     if (!target) return json({ error: 'User not found' }, 404)
     if (!isSuperAdmin && target.hotel_id !== caller.hotel_id) {
       return new Response('Forbidden', { status: 403 })
+    }
+
+    if (password !== undefined && password.length < 8) {
+      return json({ error: 'Password must be at least 8 characters' }, 400)
     }
 
     const updates: Record<string, unknown> = {}
@@ -116,12 +120,19 @@ Deno.serve(async (req) => {
 
     await supabase.from('users').update(updates).eq('id', user_id)
 
-    // Sync app_metadata so JWT reflects changes on next login
-    if (role !== undefined || hotel_id !== undefined) {
+    // Sync app_metadata so JWT reflects changes on next login, and/or set a
+    // new password — both go through updateUserById since it accepts either
+    // field independently.
+    if (role !== undefined || hotel_id !== undefined || password !== undefined) {
+      const authUpdate: Record<string, unknown> = {}
       const meta: Record<string, unknown> = {}
       if (role     !== undefined) meta.role     = role
       if (hotel_id !== undefined) meta.hotel_id = hotel_id
-      await supabase.auth.admin.updateUserById(user_id, { app_metadata: meta })
+      if (Object.keys(meta).length > 0) authUpdate.app_metadata = meta
+      if (password !== undefined) authUpdate.password = password
+
+      const { error: authUpdateErr } = await supabase.auth.admin.updateUserById(user_id, authUpdate)
+      if (authUpdateErr) return json({ error: authUpdateErr.message }, 400)
     }
 
     return json({ ok: true })

@@ -22,6 +22,9 @@ export default function EditUserClient({
   const [error, setError] = useState('')
   const [forbidden, setForbidden] = useState(false)
   const [loadError, setLoadError] = useState(false)
+  const [showPasswordField, setShowPasswordField] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -56,8 +59,14 @@ export default function EditUserClient({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
     setError('')
+
+    if (showPasswordField && newPassword.length > 0 && newPassword.length < 8) {
+      setError('הסיסמה חייבת להכיל לפחות 8 תווים')
+      return
+    }
+
+    setLoading(true)
     try {
       const payload: Record<string, unknown> = {
         action: 'update',
@@ -67,6 +76,7 @@ export default function EditUserClient({
         is_active: form.is_active,
       }
       if (isSuperAdmin) payload.hotel_id = form.hotel_id
+      if (showPasswordField && newPassword.length > 0) payload.password = newPassword
       const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -168,6 +178,51 @@ export default function EditUserClient({
             onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))} />
           <label htmlFor="active" className="text-sm font-medium">Active</label>
         </div>
+
+        <div className="border-t pt-4">
+          {!showPasswordField ? (
+            <button
+              type="button"
+              onClick={() => setShowPasswordField(true)}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              🔑 איפוס סיסמה
+            </button>
+          ) : (
+            <div>
+              <label className="block text-sm font-medium mb-1">סיסמה חדשה</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className="w-full border rounded-lg px-3 py-2 text-sm pr-16"
+                  placeholder="לפחות 8 תווים"
+                  minLength={8}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute inset-y-0 left-2 text-xs text-gray-500 hover:text-gray-800"
+                >
+                  {showPassword ? 'הסתר' : 'הצג'}
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setShowPasswordField(false); setNewPassword('') }}
+                className="text-xs text-gray-500 hover:underline mt-1"
+              >
+                ביטול
+              </button>
+              <p className="text-xs text-gray-500 mt-1">
+                המשתמש ייכנס עם הסיסמה החדשה בפעם הבאה. השדה נשאר ריק — לא משנים סיסמה אלא אם ממלאים כאן.
+              </p>
+            </div>
+          )}
+        </div>
+
         {error && <p className="text-red-600 text-sm">{error}</p>}
         <div className="flex gap-3 pt-2">
           <button type="submit" disabled={loading}
