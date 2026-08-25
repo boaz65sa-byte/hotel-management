@@ -2,7 +2,8 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- מסך מלא: מתאים טוב יותר ללפטופים וללא חיתוך תוכן -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Roxon — מערכת ניהול מלון</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/theme/black.css" id="theme" />
@@ -13,50 +14,77 @@
       --navy:  #0A1628;
       --cream: #F5EFE1;
     }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0a0a0a;
+    }
     .reveal { font-family: 'Heebo', sans-serif; }
+    .reveal .slides section {
+      box-sizing: border-box;
+      max-height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+    }
     .reveal .slides { text-align: right; }
     .reveal h1, .reveal h2, .reveal h3, .reveal h4 { color: var(--gold); font-weight: 700; letter-spacing: 0; }
-    .reveal h1 { font-size: 3.2em; }
-    .reveal h2 { font-size: 2.2em; margin-bottom: 0.6em; }
-    .reveal h3 { font-size: 1.6em; }
+    .reveal h1 { font-size: 2.2em; }
+    .reveal h2 { font-size: 1.65em; margin-bottom: 0.45em; }
+    .reveal h3 { font-size: 1.25em; }
     .reveal p, .reveal li { color: #E2E8F0; line-height: 1.6; }
-    .reveal section { padding: 20px; }
+    .reveal section { padding: 12px 16px; }
     .reveal ul, .reveal ol { display: block; margin-right: 30px; }
     .reveal li { margin: 0.5em 0; }
     .pill { display: inline-block; background: rgba(201,168,76,0.15); color: var(--gold); padding: 4px 12px; border-radius: 999px; font-size: 0.7em; margin: 4px; }
-    .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 30px; }
-    .stat { background: rgba(255,255,255,0.04); border-right: 4px solid var(--gold); padding: 20px; border-radius: 8px; }
-    .stat .num { font-size: 2.5em; font-weight: 900; color: var(--gold); }
+    .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px; }
+    .stat { background: rgba(255,255,255,0.04); border-right: 4px solid var(--gold); padding: 12px 14px; border-radius: 8px; }
+    .stat .num { font-size: 1.85em; font-weight: 900; color: var(--gold); }
     .stat .label { font-size: 0.9em; color: #94A3B8; margin-top: 4px; }
-    .flow { display: flex; gap: 20px; align-items: stretch; justify-content: center; flex-wrap: wrap; margin-top: 40px; }
-    .flow-step { background: rgba(255,255,255,0.04); border: 2px solid rgba(201,168,76,0.4); border-radius: 12px; padding: 18px 20px; flex: 1 1 180px; max-width: 220px; text-align: center; }
+    .flow { display: flex; gap: 12px; align-items: stretch; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+    .flow-step { background: rgba(255,255,255,0.04); border: 2px solid rgba(201,168,76,0.4); border-radius: 12px; padding: 12px 14px; flex: 1 1 160px; max-width: 200px; text-align: center; }
     .flow-step .ico { font-size: 2.5em; }
     .flow-step .ttl { color: var(--gold); font-weight: 700; margin-top: 8px; }
     .flow-step .sub { color: #94A3B8; font-size: 0.75em; margin-top: 4px; line-height: 1.4; }
     .flow-arrow { font-size: 2em; color: var(--gold); align-self: center; }
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 20px; }
-    .feature-row { display: flex; align-items: flex-start; gap: 14px; background: rgba(255,255,255,0.03); padding: 14px; border-radius: 8px; margin-bottom: 10px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 12px; }
+    .feature-row { display: flex; align-items: flex-start; gap: 10px; background: rgba(255,255,255,0.03); padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; }
     .feature-row .ico { font-size: 1.8em; flex-shrink: 0; }
     .feature-row .ttl { color: var(--gold); font-weight: 700; font-size: 0.95em; }
     .feature-row .desc { color: #94A3B8; font-size: 0.75em; margin-top: 2px; line-height: 1.4; }
-    .hero { text-align: center; padding-top: 60px; }
-    .hero .logo { font-size: 5em; margin-bottom: 20px; }
-    .hero h1 { font-size: 4em; margin: 0 0 10px; }
-    .hero .tag { color: #94A3B8; font-size: 1.4em; margin-bottom: 40px; }
+    .hero { text-align: center; padding-top: 16px; }
+    .hero .logo { font-size: clamp(2.5rem, 8vw, 3.75rem); margin-bottom: 12px; }
+    .hero h1 { font-size: clamp(2rem, 6vw, 2.85em); margin: 0 0 8px; }
+    .hero .tag { color: #94A3B8; font-size: clamp(0.85rem, 2.2vw, 1.1em); margin-bottom: 22px; }
     .hero .pills { margin-top: 30px; }
-    .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 20px; }
+    .role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 8px; margin-top: 12px; }
     .role { background: rgba(255,255,255,0.04); padding: 14px; border-radius: 10px; border: 1px solid rgba(201,168,76,0.25); }
     .role .ico { font-size: 1.6em; }
     .role .ttl { color: var(--gold); font-weight: 700; font-size: 0.9em; margin-top: 6px; }
     .role .sub { color: #94A3B8; font-size: 0.7em; margin-top: 2px; }
-    .lang-row { display: flex; justify-content: center; gap: 30px; font-size: 1.8em; margin-top: 30px; }
+    .lang-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px 20px; font-size: 1.35em; margin-top: 18px; }
     .check { color: #4ADE80; }
-    .qr-section { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: center; margin-top: 20px; }
+    .qr-section { display: grid; grid-template-columns: minmax(120px, 0.9fr) minmax(200px, 1.1fr); gap: 16px; align-items: start; margin-top: 12px; }
+    @media (max-width: 900px) {
+      .two-col { grid-template-columns: 1fr; gap: 14px; }
+      .qr-section { grid-template-columns: 1fr; }
+    }
     .url-box { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); padding: 14px 20px; border-radius: 8px; font-family: 'Courier New', monospace; direction: ltr; text-align: left; font-size: 0.7em; color: #4ADE80; word-break: break-all; }
-    .closing { text-align: center; padding-top: 80px; }
-    .closing h1 { font-size: 4em; }
-    .closing .tag { color: #94A3B8; font-size: 1.6em; margin-top: 20px; }
-    .reveal .progress { color: var(--gold); }
+    .closing { text-align: center; padding-top: 30px; }
+    .closing h1 { font-size: 2.5em; }
+    .closing .tag { color: #94A3B8; font-size: 1.15em; margin-top: 12px; }
+    .demo-scan-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 16px;
+    }
+    .demo-scan-row img { max-width: min(260px, 38vw); height: auto; }
   </style>
 </head>
 <body>
@@ -155,7 +183,7 @@
         <h2>חוויית האורח — 30 שניות מסריקה לבקשה</h2>
         <div class="qr-section">
           <div>
-            <div style="font-size: 5em; text-align: center;">📱</div>
+            <div style="font-size: clamp(2rem, 10vw, 3.5em); text-align: center;">📱</div>
           </div>
           <div>
             <ol>
@@ -237,6 +265,44 @@
             </div>
           </div>
         </div>
+      </section>
+
+      <!-- SLIDE 6.5: End-to-end workflow -->
+      <section>
+        <h2>מסלול תקלה — מהאורח ועד המנכ"ל</h2>
+        <div class="flow">
+          <div class="flow-step">
+            <div class="ico">🧳</div>
+            <div class="ttl">אורח</div>
+            <div class="sub">סורק QR בחדר, שולח בקשה: "מגבת נוספת" / "מזגן לא עובד"</div>
+          </div>
+          <div class="flow-arrow">←</div>
+          <div class="flow-step">
+            <div class="ico">📞</div>
+            <div class="ttl">קבלה</div>
+            <div class="sub">מקבלת את הבקשה בזמן אמת, מנתבת אוטומטית למחלקה הנכונה לפי קטגוריה</div>
+          </div>
+          <div class="flow-arrow">←</div>
+          <div class="flow-step">
+            <div class="ico">🔧</div>
+            <div class="ttl">אחזקה</div>
+            <div class="sub">מטפל בתקלות טכניות, מתעד תמונה לפני/אחרי, מעדכן סטטוס</div>
+          </div>
+          <div class="flow-step">
+            <div class="ico">🧹</div>
+            <div class="ttl">משק בית</div>
+            <div class="sub">מטפל בבקשות ניקיון/ציוד לחדר, סוגר לפי צ'ק-ליסט</div>
+          </div>
+          <div class="flow-arrow">←</div>
+          <div class="flow-step">
+            <div class="ico">🎩</div>
+            <div class="ttl">מנכ"ל / מנהל</div>
+            <div class="sub">רואה הכל בזמן אמת ב-Dashboard, מקבל אסקלציה אם ה-SLA נחצה</div>
+          </div>
+        </div>
+        <p style="text-align: center; margin-top: 40px; color: #94A3B8; font-size: 0.85em;">
+          כל שלב מתועד — אף בקשה לא "נופלת בין הכיסאות".
+        </p>
       </section>
 
       <!-- SLIDE 7: 10 Roles -->
@@ -382,7 +448,7 @@
         <div class="stat-grid">
           <div class="stat">
             <div class="num">✓</div>
-            <div class="label">Admin Panel — Live ב-Vercel</div>
+            <div class="label">Admin Panel — Live ב-Vercel, כולל מערכת רישוי (סיריאלים למכירה למלונות)</div>
           </div>
           <div class="stat">
             <div class="num">✓</div>
@@ -390,15 +456,15 @@
           </div>
           <div class="stat">
             <div class="num">✓</div>
-            <div class="label">Staff App — Code Complete, מוכן ל-Play/App Store</div>
+            <div class="label">Staff App — נבנה וחתום ל-Android ו-iOS, מוכן להעלאה בפועל לחנויות</div>
           </div>
           <div class="stat">
             <div class="num">✓</div>
-            <div class="label">4 מלונות במערכת (כולל בדיקות)</div>
+            <div class="label">אפליקציית דסקטופ (Windows + Mac) למנהלים</div>
           </div>
         </div>
         <p style="text-align: center; margin-top: 40px; color: #4ADE80; font-size: 1em;">
-          המוצר פעיל — מוכן לפיילוט במלון אמיתי.
+          המוצר פעיל — מוכן לפיילוט במלון אמיתי, ומוכן טכנית למכירה למלון נוסף.
         </p>
       </section>
 
@@ -464,12 +530,12 @@
       <!-- SLIDE 16: Demo Link -->
       <section>
         <h2 style="text-align: center;">הדגמה חיה — סרקו עכשיו</h2>
-        <div style="display: flex; gap: 50px; align-items: center; justify-content: center; margin-top: 30px;">
-          <div style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 8px 30px rgba(201,168,76,0.3);">
-            <img src="assets/qr-demo.png" alt="QR להדגמה" style="display: block; width: 320px; height: 320px;" />
+        <div class="demo-scan-row">
+          <div style="background: white; padding: 14px; border-radius: 16px; box-shadow: 0 8px 30px rgba(201,168,76,0.3);">
+            <img src="assets/qr-demo.png" alt="QR להדגמה" style="display: block; width: 260px; max-width: 100%; height: auto;" />
             <p style="color: #0A1628; text-align: center; margin-top: 12px; font-size: 0.85em; font-weight: 600;">📱 פתחו מצלמה וסרקו</p>
           </div>
-          <div style="flex: 1; max-width: 400px;">
+          <div style="flex: 1; min-width: 220px; max-width: 400px;">
             <div class="feature-row">
               <div class="ico">🏨</div>
               <div><div class="ttl">מלון רוקסון רד סי אילת</div><div class="desc">תראו את שם המלון והלוגו</div></div>
@@ -521,7 +587,14 @@
       controls: true,
       progress: true,
       keyboard: true,
-    });
+      /* קנבס גבוה יותר = פחות חיתוך אנכי; הדפדפן מקטין אוטומטית */
+      width: 1280,
+      height: 900,
+      margin: 0.05,
+      minScale: 0.2,
+      maxScale: 1.35,
+    }).then(() => Reveal.layout());
+    window.addEventListener('resize', () => Reveal.layout());
   </script>
 </body>
 </html>
