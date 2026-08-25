@@ -18,6 +18,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get staffLoginSubtitle => 'سجّل الدخول للمتابعة إلى إدارة الفندق';
 
   @override
+  String get changePassword => 'تغيير كلمة المرور';
+
+  @override
+  String get newPassword => 'كلمة مرور جديدة';
+
+  @override
+  String get confirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get save => 'حفظ';
+
+  @override
+  String get passwordChangedSuccess => 'تم تحديث كلمة المرور بنجاح';
+
+  @override
+  String get passwordsDoNotMatch => 'كلمتا المرور غير متطابقتين';
+
+  @override
+  String get passwordTooShort =>
+      'يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل';
+
+  @override
   String get email => 'البريد الإلكتروني';
 
   @override

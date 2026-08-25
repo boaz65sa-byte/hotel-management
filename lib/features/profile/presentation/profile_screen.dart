@@ -47,6 +47,15 @@ class ProfileScreen extends ConsumerWidget {
               }
             },
           ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: () => showDialog(
+              context: context,
+              builder: (_) => const _ChangePasswordDialog(),
+            ),
+            icon: const Icon(Icons.lock_outline),
+            label: Text(l.changePassword),
+          ),
           const Spacer(),
           OutlinedButton.icon(
             onPressed: () => ref.read(authRepositoryProvider).signOut(),
@@ -56,6 +65,100 @@ class ProfileScreen extends ConsumerWidget {
           ),
         ]),
       ),
+    );
+  }
+}
+
+class _ChangePasswordDialog extends ConsumerStatefulWidget {
+  const _ChangePasswordDialog();
+
+  @override
+  ConsumerState<_ChangePasswordDialog> createState() =>
+      _ChangePasswordDialogState();
+}
+
+class _ChangePasswordDialogState extends ConsumerState<_ChangePasswordDialog> {
+  final _newCtrl = TextEditingController();
+  final _confirmCtrl = TextEditingController();
+  bool _loading = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _newCtrl.dispose();
+    _confirmCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final l = AppLocalizations.of(context)!;
+    if (_newCtrl.text.length < 8) {
+      setState(() => _error = l.passwordTooShort);
+      return;
+    }
+    if (_newCtrl.text != _confirmCtrl.text) {
+      setState(() => _error = l.passwordsDoNotMatch);
+      return;
+    }
+    setState(() { _loading = true; _error = null; });
+    try {
+      await ref.read(authRepositoryProvider).changePassword(_newCtrl.text);
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l.passwordChangedSuccess)),
+        );
+      }
+    } catch (e) {
+      setState(() => _error = e.toString());
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    return AlertDialog(
+      title: Text(l.changePassword),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _newCtrl,
+            obscureText: true,
+            autofocus: true,
+            decoration: InputDecoration(labelText: l.newPassword),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _confirmCtrl,
+            obscureText: true,
+            decoration: InputDecoration(labelText: l.confirmPassword),
+            onSubmitted: (_) => _loading ? null : _submit(),
+          ),
+          if (_error != null) ...[
+            const SizedBox(height: 12),
+            Text(_error!, style: const TextStyle(color: Colors.red)),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: _loading ? null : () => Navigator.of(context).pop(),
+          child: Text(l.cancel),
+        ),
+        FilledButton(
+          onPressed: _loading ? null : _submit,
+          child: _loading
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(l.save),
+        ),
+      ],
     );
   }
 }

@@ -18,6 +18,27 @@ class AppLocalizationsHe extends AppLocalizations {
   String get staffLoginSubtitle => 'התחברו כדי להמשיך לניהול המלון';
 
   @override
+  String get changePassword => 'שינוי סיסמה';
+
+  @override
+  String get newPassword => 'סיסמה חדשה';
+
+  @override
+  String get confirmPassword => 'אימות סיסמה';
+
+  @override
+  String get save => 'שמירה';
+
+  @override
+  String get passwordChangedSuccess => 'הסיסמה עודכנה בהצלחה';
+
+  @override
+  String get passwordsDoNotMatch => 'הסיסמאות אינן תואמות';
+
+  @override
+  String get passwordTooShort => 'הסיסמה חייבת להכיל לפחות 8 תווים';
+
+  @override
   String get email => 'אימייל';
 
   @override

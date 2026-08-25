@@ -18,6 +18,27 @@ class AppLocalizationsRu extends AppLocalizations {
   String get staffLoginSubtitle => 'Войдите, чтобы перейти к управлению отелем';
 
   @override
+  String get changePassword => 'Изменить пароль';
+
+  @override
+  String get newPassword => 'Новый пароль';
+
+  @override
+  String get confirmPassword => 'Подтвердите пароль';
+
+  @override
+  String get save => 'Сохранить';
+
+  @override
+  String get passwordChangedSuccess => 'Пароль успешно обновлён';
+
+  @override
+  String get passwordsDoNotMatch => 'Пароли не совпадают';
+
+  @override
+  String get passwordTooShort => 'Пароль должен содержать не менее 8 символов';
+
+  @override
   String get email => 'Электронная почта';
 
   @override

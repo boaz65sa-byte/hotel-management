@@ -18,6 +18,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get staffLoginSubtitle => 'Sign in to continue to hotel management';
 
   @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get newPassword => 'New Password';
+
+  @override
+  String get confirmPassword => 'Confirm Password';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get passwordChangedSuccess => 'Password updated successfully';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get passwordTooShort => 'Password must be at least 8 characters';
+
+  @override
   String get email => 'Email';
 
   @override

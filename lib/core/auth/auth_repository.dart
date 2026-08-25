@@ -8,6 +8,11 @@ class AuthRepository {
     return supabase.auth.signInWithPassword(email: email, password: password);
   }
 
+  /// Changes the current (logged-in) user's own password.
+  Future<void> changePassword(String newPassword) async {
+    await supabase.auth.updateUser(UserAttributes(password: newPassword));
+  }
+
   Future<void> signOut() async {
     // Clear OneSignal tags first so this device stops receiving notifications
     // for the previous user. Push errors are swallowed inside clearOnLogout.
