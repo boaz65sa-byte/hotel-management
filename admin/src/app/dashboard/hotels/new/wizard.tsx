@@ -72,11 +72,15 @@ function StepBar({ current }: { current: 1 | 2 | 3 }) {
 // ─── step 1: hotel details ────────────────────────────────────────────────────
 
 function Step1({
+  serialCode,
+  setSerialCode,
   hotel,
   setHotel,
   onNext,
   onCancel,
 }: {
+  serialCode: string
+  setSerialCode: (v: string) => void
   hotel: WizardInput['hotel']
   setHotel: (h: WizardInput['hotel']) => void
   onNext: () => void
@@ -87,6 +91,24 @@ function Step1({
 
   return (
     <div className="space-y-6" dir="rtl">
+      <div className="bg-white rounded-xl border p-6 space-y-5">
+        <h2 className="text-lg font-semibold text-gray-800">קוד רישיון</h2>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">קוד רישיון (סיריאל) *</label>
+          <input
+            value={serialCode}
+            onChange={e => setSerialCode(e.target.value.toUpperCase())}
+            className="w-full border rounded px-3 py-2 font-mono tracking-wider"
+            placeholder="ROXN-XXXX-XXXX-XXXX"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            קוד חד-פעמי לכל מלון חדש. נוצר תחת{' '}
+            <a href="/dashboard/licenses" className="text-blue-600 underline">רישיונות</a>.
+          </p>
+        </div>
+      </div>
+
       <div className="bg-white rounded-xl border p-6 space-y-5">
         <h2 className="text-lg font-semibold text-gray-800">פרטי המלון</h2>
 
@@ -274,7 +296,7 @@ function Step1({
         <button
           type="button"
           onClick={onNext}
-          disabled={!hotel.name.trim()}
+          disabled={!hotel.name.trim() || !serialCode.trim()}
           className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-sm flex items-center gap-2"
         >
           הבא ←
@@ -643,9 +665,34 @@ function ResultView({
   onGoToHotel: () => void
   onStay: () => void
 }) {
-  const userErrors = result.errors?.filter(e => e.step === 'users') ?? []
-  const roomError  = result.errors?.find(e => e.step === 'rooms')
-  const hasIssues  = (result.errors?.length ?? 0) > 0
+  const userErrors    = result.errors?.filter(e => e.step === 'users') ?? []
+  const roomError      = result.errors?.find(e => e.step === 'rooms')
+  const licenseError   = result.errors?.find(e => e.step === 'license')
+  const blockingError  = result.errors?.find(e => e.step === 'license' || e.step === 'hotel')
+  const hasIssues      = (result.errors?.length ?? 0) > 0
+
+  if (!result.ok && blockingError) {
+    return (
+      <div className="space-y-6" dir="rtl">
+        <div className="bg-white rounded-xl border border-red-300 p-6 space-y-2">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">❌</span>
+            <h2 className="text-lg font-bold text-gray-800">המלון לא נוצר</h2>
+          </div>
+          <p className="text-sm text-red-700">{blockingError.message}</p>
+        </div>
+        <div className="flex gap-3 justify-center">
+          <button
+            type="button"
+            onClick={onStay}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 text-sm font-semibold"
+          >
+            חזרה
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -661,6 +708,12 @@ function ResultView({
         </div>
 
         <div className="space-y-2 text-sm">
+          {licenseError && (
+            <div className="flex items-center gap-2">
+              <span className="text-red-500 text-base">❌</span>
+              <span className="text-red-700">רישיון: {licenseError.message}</span>
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <span className="text-green-500 text-base">✅</span>
             <span>המלון נוצר</span>
@@ -732,6 +785,7 @@ export function Wizard() {
   const [result, setResult] = useState<WizardResult | null>(null)
   const [redirectTimer, setRedirectTimer] = useState<ReturnType<typeof setTimeout> | null>(null)
 
+  const [serialCode, setSerialCode] = useState('')
   const [hotel, setHotel] = useState<WizardInput['hotel']>({
     name: '',
     subscription_plan: 'basic',
@@ -761,6 +815,7 @@ export function Wizard() {
       .filter(n => !isNaN(n))
 
     const res = await setupHotelAction({
+      serialCode,
       hotel,
       rooms: createRooms ? { ...rooms, skip_numbers: skipNumbers } : null,
       users,
@@ -806,6 +861,8 @@ export function Wizard() {
 
       {step === 1 && (
         <Step1
+          serialCode={serialCode}
+          setSerialCode={setSerialCode}
           hotel={hotel}
           setHotel={setHotel}
           onNext={() => setStep(2)}

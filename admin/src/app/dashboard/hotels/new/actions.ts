@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { revalidatePath } from 'next/cache'
 
 export type WizardInput = {
+  serialCode: string
   hotel: {
     name: string
     subscription_plan: string
@@ -33,11 +34,33 @@ export type WizardResult = {
   ok: boolean
   hotelId?: string
   roomsCreated?: number
-  errors?: { step: 'hotel' | 'rooms' | 'users'; message: string; userIndex?: number }[]
+  errors?: { step: 'license' | 'hotel' | 'rooms' | 'users'; message: string; userIndex?: number }[]
 }
 
 export async function setupHotelAction(input: WizardInput): Promise<WizardResult> {
   const errors: WizardResult['errors'] = []
+
+  // 0. Verify the license code up front — a hotel is only ever created
+  // against a real, unused serial. Final redemption (the atomic flip) still
+  // happens after the hotel exists, via redeem_hotel_license(), since the
+  // license row is linked by hotel_id.
+  const serialCode = input.serialCode.trim()
+  if (!serialCode) {
+    return { ok: false, errors: [{ step: 'license', message: 'Missing license code' }] }
+  }
+
+  const { data: licenseRow, error: licenseCheckErr } = await supabaseAdmin
+    .from('hotel_licenses')
+    .select('status')
+    .eq('serial_code', serialCode)
+    .maybeSingle()
+
+  if (licenseCheckErr) {
+    return { ok: false, errors: [{ step: 'license', message: licenseCheckErr.message }] }
+  }
+  if (!licenseRow || licenseRow.status !== 'unused') {
+    return { ok: false, errors: [{ step: 'license', message: 'קוד רישיון לא תקין או שכבר נוצל' }] }
+  }
 
   // 1. Insert hotel
   const storageQuota =
@@ -78,6 +101,16 @@ export async function setupHotelAction(input: WizardInput): Promise<WizardResult
 
   const hotelId = hotelRow.id
   let roomsCreated = 0
+
+  // 1b. Redeem the license against the new hotel (atomic, guards against a
+  // race between two admins using the same code).
+  const { error: redeemErr } = await supabaseAdmin.rpc('redeem_hotel_license', {
+    p_serial: serialCode,
+    p_hotel_id: hotelId,
+  })
+  if (redeemErr) {
+    errors.push({ step: 'license', message: redeemErr.message })
+  }
 
   // 2. Bulk insert rooms
   if (input.rooms) {
