@@ -25,6 +25,11 @@ export function Sidebar({ viewer }: { viewer: SidebarViewer }) {
   const superNav: NavDef[] = [
     overview,
     { href: '/dashboard/hotels', label: t.hotels, icon: '🏨' },
+    {
+      href: '/dashboard/licenses',
+      label: lang === 'he' ? 'רישיונות' : 'Licenses',
+      icon: '🔑',
+    },
     { href: '/dashboard/users', label: t.users, icon: '👥' },
     { href: '/dashboard/analytics', label: t.analytics, icon: '📈' },
     { href: '/dashboard/logs', label: t.auditLogs, icon: '📋' },
