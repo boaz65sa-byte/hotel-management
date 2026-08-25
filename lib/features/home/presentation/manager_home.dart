@@ -48,31 +48,75 @@ class _ManagerDashboard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final kpis = ref.watch(managerKpisProvider);
-    return kpis.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('שגיאה: $e')),
-      data: (k) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 52),
-            Text('דשבורד מנהל', style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: 24),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                _KpiCard(label: 'קריאות פתוחות',    value: k.openTickets,              color: Colors.blue),
-                _KpiCard(label: 'בטיפול',            value: k.inProgressTickets,        color: Colors.orange),
-                _KpiCard(label: 'חריגות SLA',        value: k.overdueTickets,           color: Colors.red),
-                _KpiCard(label: 'אוטומציות פעילות', value: k.activeAutomations,        color: Colors.purple),
-                _KpiCard(label: 'בקשות אורחים',     value: k.openGuestRequests,        color: const Color(0xFFC9A84C)),
-                _KpiCard(label: 'בקשות בטיפול',     value: k.inProgressGuestRequests,  color: const Color(0xFF4ADE80)),
-              ],
+    final cs = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _DashboardHeader(),
+        Expanded(
+          child: kpis.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(child: Text('שגיאה: $e')),
+            data: (k) => SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  _KpiCard(label: 'קריאות פתוחות',    value: k.openTickets,              color: cs.secondary),
+                  _KpiCard(label: 'בטיפול',            value: k.inProgressTickets,        color: const Color(0xFFFB923C)),
+                  _KpiCard(label: 'חריגות SLA',        value: k.overdueTickets,           color: cs.error),
+                  _KpiCard(label: 'אוטומציות פעילות', value: k.activeAutomations,        color: const Color(0xFFA78BFA)),
+                  _KpiCard(label: 'בקשות אורחים',     value: k.openGuestRequests,        color: cs.primary),
+                  _KpiCard(label: 'בקשות בטיפול',     value: k.inProgressGuestRequests,  color: const Color(0xFF4ADE80)),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
+      ],
+    );
+  }
+}
+
+class _DashboardHeader extends StatelessWidget {
+  const _DashboardHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [cs.surface, cs.primaryContainer],
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(
+          16, MediaQuery.of(context).padding.top + 16, 16, 14),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: cs.primary.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(Icons.dashboard_rounded, color: cs.primary, size: 24),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            'לוח בקרה',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: cs.onSurface,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -88,7 +132,11 @@ class _KpiCard extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox(
     width: 150,
     child: Card(
-      color: color.withOpacity(0.12),
+      color: color.withValues(alpha: 0.12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: color.withValues(alpha: 0.35)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(children: [
