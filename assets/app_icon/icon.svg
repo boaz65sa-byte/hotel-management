@@ -1,0 +1,56 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#132a52"/>
+      <stop offset="55%" stop-color="#0c1e3d"/>
+      <stop offset="100%" stop-color="#070f22"/>
+    </linearGradient>
+    <linearGradient id="bell" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f0d488"/>
+      <stop offset="45%" stop-color="#d4af5e"/>
+      <stop offset="100%" stop-color="#b3892f"/>
+    </linearGradient>
+    <linearGradient id="bellShine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff6de" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#fff6de" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="38%" r="55%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect width="1024" height="1024" fill="url(#glow)"/>
+
+  <!-- concierge bell (scaled/recentered to fill more of the canvas) -->
+  <g transform="translate(512 548) scale(1.22) translate(-512 -512)">
+    <!-- base plate -->
+    <ellipse cx="512" cy="700" rx="230" ry="34" fill="#8a6a24"/>
+    <rect x="282" y="672" width="460" height="40" rx="20" fill="url(#bell)"/>
+
+    <!-- bell dome -->
+    <path d="M 300 672
+             C 300 470 400 340 512 340
+             C 624 340 724 470 724 672
+             Z" fill="url(#bell)"/>
+
+    <!-- dome shine -->
+    <path d="M 360 640
+             C 366 470 440 380 500 356
+             C 430 400 388 500 380 640
+             Z" fill="url(#bellShine)"/>
+
+    <!-- top knob -->
+    <rect x="492" y="272" width="40" height="76" rx="18" fill="url(#bell)"/>
+    <circle cx="512" cy="266" r="34" fill="url(#bell)"/>
+    <circle cx="500" cy="252" r="11" fill="#fff6de" opacity="0.55"/>
+
+    <!-- service ping arcs -->
+    <g stroke="#e7c477" stroke-width="14" stroke-linecap="round" fill="none" opacity="0.9">
+      <path d="M 200 300 A 340 340 0 0 1 300 176"/>
+      <path d="M 824 300 A 340 340 0 0 0 724 176"/>
+    </g>
+  </g>
+</svg>
