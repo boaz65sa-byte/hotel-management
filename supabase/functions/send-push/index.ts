@@ -124,6 +124,26 @@ Deno.serve(async (req) => {
         break
       }
 
+      // ── New amenity order (spa/restaurant/room service) ──────────────────
+      case 'amenity_order_insert': {
+        const { hotel_id, room_number } = record
+
+        // Orders aren't tied to a maintenance/housekeeping dept the way
+        // tickets are — reception coordinates fulfillment, same as they do
+        // for any ad-hoc guest request today.
+        await sendNotification(appId, restKey,
+          [tagFilter('hotel_id', hotel_id), AND, tagFilter('dept', 'reception')],
+          `הזמנה חדשה · חדר ${room_number}`,
+          'הזמנת שירות נוסף',
+        )
+        await sendNotification(appId, restKey,
+          [tagFilter('hotel_id', hotel_id), AND, tagFilter('dept', 'managers')],
+          `הזמנה חדשה · חדר ${room_number}`,
+          'הזמנת שירות נוסף',
+        )
+        break
+      }
+
       // ── Guest request status changed ─────────────────────────────────────
       case 'guest_request_status': {
         const newStatus = record.status
