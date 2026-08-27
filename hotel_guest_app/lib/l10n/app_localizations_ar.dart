@@ -1,3 +1,5 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -36,7 +38,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get landingErrorMissingFields => 'يرجى إدخال الاسم ورقم الغرفة';
 
   @override
-  String get landingErrorMissingHotel => 'رمز الفندق مفقود — امسح رمز QR مجدداً';
+  String get landingErrorMissingHotel =>
+      'رمز الفندق مفقود — امسح رمز QR مجدداً';
 
   @override
   String homeGreeting(String name) {
@@ -136,4 +139,40 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get errorNoSession => 'لا توجد جلسة';
+
+  @override
+  String get homeAmenitiesButton => 'خدمات إضافية';
+
+  @override
+  String get amenitiesTitle => 'خدمات إضافية';
+
+  @override
+  String get amenitiesEmpty => 'لا توجد عناصر متاحة حاليًا';
+
+  @override
+  String get categoryRestaurant => 'مطعم';
+
+  @override
+  String get categorySpa => 'سبا';
+
+  @override
+  String get categoryRoomService => 'خدمة الغرف';
+
+  @override
+  String get amenitiesOrderButton => 'اطلب';
+
+  @override
+  String get amenitiesQuantityLabel => 'الكمية';
+
+  @override
+  String get amenitiesNotesHint => 'ملاحظات (اختياري)';
+
+  @override
+  String get amenitiesOrderSuccessTitle => 'تم إرسال الطلب!';
+
+  @override
+  String get amenitiesOrderSuccessSubtitle => 'سيتولى فريقنا الأمر قريبًا';
+
+  @override
+  String get amenitiesBackToMenu => 'رجوع';
 }

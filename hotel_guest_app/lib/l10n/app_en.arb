@@ -4,7 +4,11 @@
   "landingWelcome": "Welcome",
   "landingWelcomeWithName": "Welcome to {hotel}",
   "@landingWelcomeWithName": {
-    "placeholders": { "hotel": { "type": "String" } }
+    "placeholders": {
+      "hotel": {
+        "type": "String"
+      }
+    }
   },
   "landingSubtitle": "Fill in your details to get started",
   "landingNameHint": "Your full name",
@@ -15,11 +19,19 @@
   "landingErrorMissingHotel": "Hotel code missing — scan the QR again",
   "homeGreeting": "Hello, {name} 👋",
   "@homeGreeting": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "homeRoom": "Room {room}",
   "@homeRoom": {
-    "placeholders": { "room": { "type": "String" } }
+    "placeholders": {
+      "room": {
+        "type": "String"
+      }
+    }
   },
   "homeFeedbackTitle": "How was your stay?",
   "homeFeedbackSubtitle": "Leave us a quick review",
@@ -50,7 +62,23 @@
   "feedbackErrorNoRating": "Please select a rating",
   "errorGeneric": "Error: {error}",
   "@errorGeneric": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
-  "errorNoSession": "No session"
+  "errorNoSession": "No session",
+  "homeAmenitiesButton": "More Services",
+  "amenitiesTitle": "More Services",
+  "amenitiesEmpty": "No items available right now",
+  "categoryRestaurant": "Restaurant",
+  "categorySpa": "Spa",
+  "categoryRoomService": "Room Service",
+  "amenitiesOrderButton": "Order",
+  "amenitiesQuantityLabel": "Quantity",
+  "amenitiesNotesHint": "Notes (optional)",
+  "amenitiesOrderSuccessTitle": "Order sent!",
+  "amenitiesOrderSuccessSubtitle": "Our team will take care of it shortly",
+  "amenitiesBackToMenu": "Back"
 }

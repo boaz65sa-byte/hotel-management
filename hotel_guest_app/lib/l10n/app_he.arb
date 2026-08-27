@@ -1,137 +1,199 @@
 {
   "@@locale": "he",
   "appTitle": "Hotel Guest",
-  "@appTitle": { "description": "Application title" },
-
+  "@appTitle": {
+    "description": "Application title"
+  },
   "landingWelcome": "ברוכים הבאים",
-  "@landingWelcome": { "description": "Landing screen welcome heading" },
-
+  "@landingWelcome": {
+    "description": "Landing screen welcome heading"
+  },
   "landingWelcomeWithName": "ברוכים הבאים ל{hotel}",
   "@landingWelcomeWithName": {
     "description": "Landing screen welcome with hotel name",
-    "placeholders": { "hotel": { "type": "String" } }
+    "placeholders": {
+      "hotel": {
+        "type": "String"
+      }
+    }
   },
-
   "landingSubtitle": "מלאו את הפרטים כדי להתחיל",
-  "@landingSubtitle": { "description": "Landing screen subtitle" },
-
+  "@landingSubtitle": {
+    "description": "Landing screen subtitle"
+  },
   "landingNameHint": "שמך המלא",
-  "@landingNameHint": { "description": "Name field placeholder" },
-
+  "@landingNameHint": {
+    "description": "Name field placeholder"
+  },
   "landingRoomHint": "מספר חדר",
-  "@landingRoomHint": { "description": "Room number field placeholder" },
-
+  "@landingRoomHint": {
+    "description": "Room number field placeholder"
+  },
   "landingEnter": "כניסה →",
-  "@landingEnter": { "description": "Check-in button label" },
-
+  "@landingEnter": {
+    "description": "Check-in button label"
+  },
   "landingAddToHome": "+ ניתן להוסיף לדף הבית לגישה מהירה",
-  "@landingAddToHome": { "description": "PWA install hint" },
-
+  "@landingAddToHome": {
+    "description": "PWA install hint"
+  },
   "landingErrorMissingFields": "נא למלא שם ומספר חדר",
-  "@landingErrorMissingFields": { "description": "Validation error when name or room is empty" },
-
+  "@landingErrorMissingFields": {
+    "description": "Validation error when name or room is empty"
+  },
   "landingErrorMissingHotel": "קוד מלון חסר — סרקו שוב את ה-QR",
-  "@landingErrorMissingHotel": { "description": "Error when hotel ID is absent from URL" },
-
+  "@landingErrorMissingHotel": {
+    "description": "Error when hotel ID is absent from URL"
+  },
   "homeGreeting": "שלום {name} 👋",
   "@homeGreeting": {
     "description": "Greeting on home screen",
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
-
   "homeRoom": "חדר {room}",
   "@homeRoom": {
     "description": "Room number label on home screen",
-    "placeholders": { "room": { "type": "String" } }
+    "placeholders": {
+      "room": {
+        "type": "String"
+      }
+    }
   },
-
   "homeFeedbackTitle": "איך הייתה השהייה?",
-  "@homeFeedbackTitle": { "description": "Feedback banner heading on home screen" },
-
+  "@homeFeedbackTitle": {
+    "description": "Feedback banner heading on home screen"
+  },
   "homeFeedbackSubtitle": "השאירו לנו משוב קצר",
-  "@homeFeedbackSubtitle": { "description": "Feedback banner subtext" },
-
+  "@homeFeedbackSubtitle": {
+    "description": "Feedback banner subtext"
+  },
   "homePushBanner": "הפעל התראות ועקוב אחר הבקשות שלך",
-  "@homePushBanner": { "description": "Push notification opt-in banner text" },
-
+  "@homePushBanner": {
+    "description": "Push notification opt-in banner text"
+  },
   "homePushEnable": "הפעל",
-  "@homePushEnable": { "description": "Push enable button label" },
-
+  "@homePushEnable": {
+    "description": "Push enable button label"
+  },
   "homeNewRequest": "בקשה חדשה",
-  "@homeNewRequest": { "description": "New request button on home screen" },
-
+  "@homeNewRequest": {
+    "description": "New request button on home screen"
+  },
   "homeMyRequests": "הבקשות שלי",
-  "@homeMyRequests": { "description": "Section heading for the requests list" },
-
+  "@homeMyRequests": {
+    "description": "Section heading for the requests list"
+  },
   "homeNoRequests": "אין בקשות עדיין",
-  "@homeNoRequests": { "description": "Empty state for the requests list" },
-
+  "@homeNoRequests": {
+    "description": "Empty state for the requests list"
+  },
   "categoryHousekeeping": "חדרניות",
-  "@categoryHousekeeping": { "description": "Housekeeping category name" },
-
+  "@categoryHousekeeping": {
+    "description": "Housekeeping category name"
+  },
   "categoryMaintenance": "תחזוקה",
-  "@categoryMaintenance": { "description": "Maintenance category name" },
-
+  "@categoryMaintenance": {
+    "description": "Maintenance category name"
+  },
   "categoryReception": "קבלה",
-  "@categoryReception": { "description": "Reception category name" },
-
+  "@categoryReception": {
+    "description": "Reception category name"
+  },
   "statusOpen": "פתוחה",
-  "@statusOpen": { "description": "Request status: open" },
-
+  "@statusOpen": {
+    "description": "Request status: open"
+  },
   "statusInProgress": "בטיפול",
-  "@statusInProgress": { "description": "Request status: assigned / in progress" },
-
+  "@statusInProgress": {
+    "description": "Request status: assigned / in progress"
+  },
   "statusResolved": "טופלה ✓",
-  "@statusResolved": { "description": "Request status: resolved" },
-
+  "@statusResolved": {
+    "description": "Request status: resolved"
+  },
   "statusCancelled": "בוטלה",
-  "@statusCancelled": { "description": "Request status: cancelled" },
-
+  "@statusCancelled": {
+    "description": "Request status: cancelled"
+  },
   "newRequestTitle": "בקשה חדשה",
-  "@newRequestTitle": { "description": "New request screen AppBar title" },
-
+  "@newRequestTitle": {
+    "description": "New request screen AppBar title"
+  },
   "newRequestCategoryLabel": "קטגוריה",
-  "@newRequestCategoryLabel": { "description": "Category section label" },
-
+  "@newRequestCategoryLabel": {
+    "description": "Category section label"
+  },
   "newRequestDetailsLabel": "פרטים (אופציונלי)",
-  "@newRequestDetailsLabel": { "description": "Details section label" },
-
+  "@newRequestDetailsLabel": {
+    "description": "Details section label"
+  },
   "newRequestDetailsHint": "ספרו לנו במה תרצו עזרה...",
-  "@newRequestDetailsHint": { "description": "Details text field hint" },
-
+  "@newRequestDetailsHint": {
+    "description": "Details text field hint"
+  },
   "newRequestSubmit": "שלח בקשה",
-  "@newRequestSubmit": { "description": "Submit request button" },
-
+  "@newRequestSubmit": {
+    "description": "Submit request button"
+  },
   "feedbackTitle": "משוב שהייה",
-  "@feedbackTitle": { "description": "Feedback screen AppBar title" },
-
+  "@feedbackTitle": {
+    "description": "Feedback screen AppBar title"
+  },
   "feedbackQuestion": "איך הייתה השהייה?",
-  "@feedbackQuestion": { "description": "Feedback question heading" },
-
+  "@feedbackQuestion": {
+    "description": "Feedback question heading"
+  },
   "feedbackCommentHint": "ספרו לנו על החוויה שלכם (אופציונלי)...",
-  "@feedbackCommentHint": { "description": "Feedback comment text field hint" },
-
+  "@feedbackCommentHint": {
+    "description": "Feedback comment text field hint"
+  },
   "feedbackSubmit": "שלח משוב",
-  "@feedbackSubmit": { "description": "Submit feedback button" },
-
+  "@feedbackSubmit": {
+    "description": "Submit feedback button"
+  },
   "feedbackThanksTitle": "תודה על המשוב!",
-  "@feedbackThanksTitle": { "description": "Post-submit thank-you heading" },
-
+  "@feedbackThanksTitle": {
+    "description": "Post-submit thank-you heading"
+  },
   "feedbackThanksSubtitle": "תודה שבחרתם בנו 🙏",
-  "@feedbackThanksSubtitle": { "description": "Post-submit thank-you subtext" },
-
+  "@feedbackThanksSubtitle": {
+    "description": "Post-submit thank-you subtext"
+  },
   "feedbackBackHome": "חזרה לדף הבית",
-  "@feedbackBackHome": { "description": "Back to home button after feedback" },
-
+  "@feedbackBackHome": {
+    "description": "Back to home button after feedback"
+  },
   "feedbackErrorNoRating": "נא לבחור דירוג",
-  "@feedbackErrorNoRating": { "description": "Validation error when no star rating selected" },
-
+  "@feedbackErrorNoRating": {
+    "description": "Validation error when no star rating selected"
+  },
   "errorGeneric": "שגיאה: {error}",
   "@errorGeneric": {
     "description": "Generic error snackbar text",
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
-
   "errorNoSession": "אין סשן",
-  "@errorNoSession": { "description": "Error when no guest session exists" }
+  "@errorNoSession": {
+    "description": "Error when no guest session exists"
+  },
+  "homeAmenitiesButton": "שירותים נוספים",
+  "amenitiesTitle": "שירותים נוספים",
+  "amenitiesEmpty": "אין כרגע פריטים זמינים",
+  "categoryRestaurant": "מסעדה",
+  "categorySpa": "ספא",
+  "categoryRoomService": "רום סרוויס",
+  "amenitiesOrderButton": "הזמן",
+  "amenitiesQuantityLabel": "כמות",
+  "amenitiesNotesHint": "הערות (אופציונלי)",
+  "amenitiesOrderSuccessTitle": "ההזמנה נשלחה!",
+  "amenitiesOrderSuccessSubtitle": "הצוות שלנו יטפל בבקשה בהקדם",
+  "amenitiesBackToMenu": "חזרה"
 }

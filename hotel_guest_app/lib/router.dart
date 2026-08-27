@@ -5,6 +5,7 @@ import 'package:hotel_guest_app/presentation/landing_screen.dart';
 import 'package:hotel_guest_app/presentation/home_screen.dart';
 import 'package:hotel_guest_app/presentation/new_request_screen.dart';
 import 'package:hotel_guest_app/presentation/feedback_screen.dart';
+import 'package:hotel_guest_app/presentation/amenities_screen.dart';
 
 GoRouter buildRouter() => GoRouter(
   initialLocation: '/',
@@ -13,7 +14,7 @@ GoRouter buildRouter() => GoRouter(
     final session = await GuestSession.load();
 
     // Routes that require an active guest session
-    const requiresSession = {'/home', '/new', '/feedback'};
+    const requiresSession = {'/home', '/new', '/feedback', '/amenities'};
     if (requiresSession.contains(loc) && session == null) {
       return '/';
     }
@@ -50,6 +51,10 @@ GoRouter buildRouter() => GoRouter(
     GoRoute(
       path: '/feedback',
       builder: (context, state) => const FeedbackScreen(),
+    ),
+    GoRoute(
+      path: '/amenities',
+      builder: (context, state) => const AmenitiesScreen(),
     ),
   ],
 );

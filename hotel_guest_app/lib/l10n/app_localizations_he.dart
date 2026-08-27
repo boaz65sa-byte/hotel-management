@@ -1,3 +1,5 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -136,4 +138,40 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get errorNoSession => 'אין סשן';
+
+  @override
+  String get homeAmenitiesButton => 'שירותים נוספים';
+
+  @override
+  String get amenitiesTitle => 'שירותים נוספים';
+
+  @override
+  String get amenitiesEmpty => 'אין כרגע פריטים זמינים';
+
+  @override
+  String get categoryRestaurant => 'מסעדה';
+
+  @override
+  String get categorySpa => 'ספא';
+
+  @override
+  String get categoryRoomService => 'רום סרוויס';
+
+  @override
+  String get amenitiesOrderButton => 'הזמן';
+
+  @override
+  String get amenitiesQuantityLabel => 'כמות';
+
+  @override
+  String get amenitiesNotesHint => 'הערות (אופציונלי)';
+
+  @override
+  String get amenitiesOrderSuccessTitle => 'ההזמנה נשלחה!';
+
+  @override
+  String get amenitiesOrderSuccessSubtitle => 'הצוות שלנו יטפל בבקשה בהקדם';
+
+  @override
+  String get amenitiesBackToMenu => 'חזרה';
 }

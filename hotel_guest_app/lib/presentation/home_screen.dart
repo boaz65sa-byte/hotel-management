@@ -30,6 +30,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final loc = AppLocalizations.of(context)!;
     final sessionAsync = ref.watch(sessionProvider);
     final requestsAsync = ref.watch(myRequestsProvider);
+    final brandingAsync = ref.watch(hotelBrandingProvider);
+    final amenitiesOrderingEnabled =
+        brandingAsync.valueOrNull?.amenitiesOrderingEnabled ?? false;
 
     return sessionAsync.when(
       loading: () => const Scaffold(
@@ -181,6 +184,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                 ),
+                if (amenitiesOrderingEnabled)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => context.push('/amenities'),
+                        icon: const Text('🍽️',
+                            style: TextStyle(fontSize: 16)),
+                        label: Text(loc.homeAmenitiesButton,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w700)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFFC9A84C),
+                          side: const BorderSide(
+                              color: Color(0xFFC9A84C)),
+                          padding:
+                              const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                      ),
+                    ),
+                  ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
                   child: Text(loc.homeMyRequests,

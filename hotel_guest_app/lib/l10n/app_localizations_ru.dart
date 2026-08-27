@@ -1,3 +1,5 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -30,13 +32,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get landingEnter => 'Войти →';
 
   @override
-  String get landingAddToHome => '+ Добавьте на главный экран для быстрого доступа';
+  String get landingAddToHome =>
+      '+ Добавьте на главный экран для быстрого доступа';
 
   @override
-  String get landingErrorMissingFields => 'Пожалуйста, введите имя и номер комнаты';
+  String get landingErrorMissingFields =>
+      'Пожалуйста, введите имя и номер комнаты';
 
   @override
-  String get landingErrorMissingHotel => 'Код отеля отсутствует — отсканируйте QR снова';
+  String get landingErrorMissingHotel =>
+      'Код отеля отсутствует — отсканируйте QR снова';
 
   @override
   String homeGreeting(String name) {
@@ -112,7 +117,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get feedbackQuestion => 'Как прошло ваше пребывание?';
 
   @override
-  String get feedbackCommentHint => 'Расскажите о своём опыте (необязательно)...';
+  String get feedbackCommentHint =>
+      'Расскажите о своём опыте (необязательно)...';
 
   @override
   String get feedbackSubmit => 'Отправить отзыв';
@@ -136,4 +142,41 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get errorNoSession => 'Нет сеанса';
+
+  @override
+  String get homeAmenitiesButton => 'Дополнительные услуги';
+
+  @override
+  String get amenitiesTitle => 'Дополнительные услуги';
+
+  @override
+  String get amenitiesEmpty => 'Сейчас нет доступных позиций';
+
+  @override
+  String get categoryRestaurant => 'Ресторан';
+
+  @override
+  String get categorySpa => 'Спа';
+
+  @override
+  String get categoryRoomService => 'Room Service';
+
+  @override
+  String get amenitiesOrderButton => 'Заказать';
+
+  @override
+  String get amenitiesQuantityLabel => 'Количество';
+
+  @override
+  String get amenitiesNotesHint => 'Комментарий (необязательно)';
+
+  @override
+  String get amenitiesOrderSuccessTitle => 'Заказ отправлен!';
+
+  @override
+  String get amenitiesOrderSuccessSubtitle =>
+      'Наша команда скоро этим займётся';
+
+  @override
+  String get amenitiesBackToMenu => 'Назад';
 }

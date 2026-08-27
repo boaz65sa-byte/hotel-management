@@ -4,7 +4,11 @@
   "landingWelcome": "Добро пожаловать",
   "landingWelcomeWithName": "Добро пожаловать в {hotel}",
   "@landingWelcomeWithName": {
-    "placeholders": { "hotel": { "type": "String" } }
+    "placeholders": {
+      "hotel": {
+        "type": "String"
+      }
+    }
   },
   "landingSubtitle": "Введите данные, чтобы начать",
   "landingNameHint": "Ваше полное имя",
@@ -15,11 +19,19 @@
   "landingErrorMissingHotel": "Код отеля отсутствует — отсканируйте QR снова",
   "homeGreeting": "Привет, {name} 👋",
   "@homeGreeting": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "homeRoom": "Комната {room}",
   "@homeRoom": {
-    "placeholders": { "room": { "type": "String" } }
+    "placeholders": {
+      "room": {
+        "type": "String"
+      }
+    }
   },
   "homeFeedbackTitle": "Как прошло ваше пребывание?",
   "homeFeedbackSubtitle": "Оставьте нам краткий отзыв",
@@ -50,7 +62,23 @@
   "feedbackErrorNoRating": "Пожалуйста, выберите оценку",
   "errorGeneric": "Ошибка: {error}",
   "@errorGeneric": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
-  "errorNoSession": "Нет сеанса"
+  "errorNoSession": "Нет сеанса",
+  "homeAmenitiesButton": "Дополнительные услуги",
+  "amenitiesTitle": "Дополнительные услуги",
+  "amenitiesEmpty": "Сейчас нет доступных позиций",
+  "categoryRestaurant": "Ресторан",
+  "categorySpa": "Спа",
+  "categoryRoomService": "Room Service",
+  "amenitiesOrderButton": "Заказать",
+  "amenitiesQuantityLabel": "Количество",
+  "amenitiesNotesHint": "Комментарий (необязательно)",
+  "amenitiesOrderSuccessTitle": "Заказ отправлен!",
+  "amenitiesOrderSuccessSubtitle": "Наша команда скоро этим займётся",
+  "amenitiesBackToMenu": "Назад"
 }

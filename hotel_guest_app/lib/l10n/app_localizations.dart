@@ -64,7 +64,8 @@ import 'app_localizations_ru.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -72,7 +73,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -84,7 +86,8 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
@@ -344,9 +347,82 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'אין סשן'**
   String get errorNoSession;
+
+  /// No description provided for @homeAmenitiesButton.
+  ///
+  /// In he, this message translates to:
+  /// **'שירותים נוספים'**
+  String get homeAmenitiesButton;
+
+  /// No description provided for @amenitiesTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'שירותים נוספים'**
+  String get amenitiesTitle;
+
+  /// No description provided for @amenitiesEmpty.
+  ///
+  /// In he, this message translates to:
+  /// **'אין כרגע פריטים זמינים'**
+  String get amenitiesEmpty;
+
+  /// No description provided for @categoryRestaurant.
+  ///
+  /// In he, this message translates to:
+  /// **'מסעדה'**
+  String get categoryRestaurant;
+
+  /// No description provided for @categorySpa.
+  ///
+  /// In he, this message translates to:
+  /// **'ספא'**
+  String get categorySpa;
+
+  /// No description provided for @categoryRoomService.
+  ///
+  /// In he, this message translates to:
+  /// **'רום סרוויס'**
+  String get categoryRoomService;
+
+  /// No description provided for @amenitiesOrderButton.
+  ///
+  /// In he, this message translates to:
+  /// **'הזמן'**
+  String get amenitiesOrderButton;
+
+  /// No description provided for @amenitiesQuantityLabel.
+  ///
+  /// In he, this message translates to:
+  /// **'כמות'**
+  String get amenitiesQuantityLabel;
+
+  /// No description provided for @amenitiesNotesHint.
+  ///
+  /// In he, this message translates to:
+  /// **'הערות (אופציונלי)'**
+  String get amenitiesNotesHint;
+
+  /// No description provided for @amenitiesOrderSuccessTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'ההזמנה נשלחה!'**
+  String get amenitiesOrderSuccessTitle;
+
+  /// No description provided for @amenitiesOrderSuccessSubtitle.
+  ///
+  /// In he, this message translates to:
+  /// **'הצוות שלנו יטפל בבקשה בהקדם'**
+  String get amenitiesOrderSuccessSubtitle;
+
+  /// No description provided for @amenitiesBackToMenu.
+  ///
+  /// In he, this message translates to:
+  /// **'חזרה'**
+  String get amenitiesBackToMenu;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -355,27 +431,29 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['ar', 'en', 'he', 'ru'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['ar', 'en', 'he', 'ru'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'ar': return AppLocalizationsAr();
-    case 'en': return AppLocalizationsEn();
-    case 'he': return AppLocalizationsHe();
-    case 'ru': return AppLocalizationsRu();
+    case 'ar':
+      return AppLocalizationsAr();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'he':
+      return AppLocalizationsHe();
+    case 'ru':
+      return AppLocalizationsRu();
   }
 
   throw FlutterError(
-    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-    'an issue with the localizations generation tool. Please file an issue '
-    'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
-  );
+      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+      'an issue with the localizations generation tool. Please file an issue '
+      'on GitHub with a reproducible sample app and the gen-l10n configuration '
+      'that was used.');
 }

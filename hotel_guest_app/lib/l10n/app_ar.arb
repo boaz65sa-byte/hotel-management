@@ -4,7 +4,11 @@
   "landingWelcome": "مرحباً بكم",
   "landingWelcomeWithName": "مرحباً بكم في {hotel}",
   "@landingWelcomeWithName": {
-    "placeholders": { "hotel": { "type": "String" } }
+    "placeholders": {
+      "hotel": {
+        "type": "String"
+      }
+    }
   },
   "landingSubtitle": "أدخل بياناتك للبدء",
   "landingNameHint": "اسمك الكامل",
@@ -15,11 +19,19 @@
   "landingErrorMissingHotel": "رمز الفندق مفقود — امسح رمز QR مجدداً",
   "homeGreeting": "مرحباً {name} 👋",
   "@homeGreeting": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "homeRoom": "غرفة {room}",
   "@homeRoom": {
-    "placeholders": { "room": { "type": "String" } }
+    "placeholders": {
+      "room": {
+        "type": "String"
+      }
+    }
   },
   "homeFeedbackTitle": "كيف كانت إقامتك؟",
   "homeFeedbackSubtitle": "اترك لنا تقييماً سريعاً",
@@ -50,7 +62,23 @@
   "feedbackErrorNoRating": "يرجى اختيار تقييم",
   "errorGeneric": "خطأ: {error}",
   "@errorGeneric": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
-  "errorNoSession": "لا توجد جلسة"
+  "errorNoSession": "لا توجد جلسة",
+  "homeAmenitiesButton": "خدمات إضافية",
+  "amenitiesTitle": "خدمات إضافية",
+  "amenitiesEmpty": "لا توجد عناصر متاحة حاليًا",
+  "categoryRestaurant": "مطعم",
+  "categorySpa": "سبا",
+  "categoryRoomService": "خدمة الغرف",
+  "amenitiesOrderButton": "اطلب",
+  "amenitiesQuantityLabel": "الكمية",
+  "amenitiesNotesHint": "ملاحظات (اختياري)",
+  "amenitiesOrderSuccessTitle": "تم إرسال الطلب!",
+  "amenitiesOrderSuccessSubtitle": "سيتولى فريقنا الأمر قريبًا",
+  "amenitiesBackToMenu": "رجوع"
 }

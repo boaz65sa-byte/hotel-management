@@ -1,3 +1,5 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -33,10 +35,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get landingAddToHome => '+ Add to home screen for quick access';
 
   @override
-  String get landingErrorMissingFields => 'Please fill in your name and room number';
+  String get landingErrorMissingFields =>
+      'Please fill in your name and room number';
 
   @override
-  String get landingErrorMissingHotel => 'Hotel code missing — scan the QR again';
+  String get landingErrorMissingHotel =>
+      'Hotel code missing — scan the QR again';
 
   @override
   String homeGreeting(String name) {
@@ -112,7 +116,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedbackQuestion => 'How was your stay?';
 
   @override
-  String get feedbackCommentHint => 'Tell us about your experience (optional)...';
+  String get feedbackCommentHint =>
+      'Tell us about your experience (optional)...';
 
   @override
   String get feedbackSubmit => 'Submit Feedback';
@@ -136,4 +141,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorNoSession => 'No session';
+
+  @override
+  String get homeAmenitiesButton => 'More Services';
+
+  @override
+  String get amenitiesTitle => 'More Services';
+
+  @override
+  String get amenitiesEmpty => 'No items available right now';
+
+  @override
+  String get categoryRestaurant => 'Restaurant';
+
+  @override
+  String get categorySpa => 'Spa';
+
+  @override
+  String get categoryRoomService => 'Room Service';
+
+  @override
+  String get amenitiesOrderButton => 'Order';
+
+  @override
+  String get amenitiesQuantityLabel => 'Quantity';
+
+  @override
+  String get amenitiesNotesHint => 'Notes (optional)';
+
+  @override
+  String get amenitiesOrderSuccessTitle => 'Order sent!';
+
+  @override
+  String get amenitiesOrderSuccessSubtitle =>
+      'Our team will take care of it shortly';
+
+  @override
+  String get amenitiesBackToMenu => 'Back';
 }
