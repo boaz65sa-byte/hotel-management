@@ -26,7 +26,40 @@
 זרימת "בקשת אורח מה-PWA → הופעה בזמן אמת אצל הצוות → פוש" עדיין לא אומתה קצה-לקצה בפועל (רק חלקים נבדקו בנפרד: ה-webhook/vault/JWT מאומתים דרך insert ידני; ה-UI בפועל נתקל בבעיית אמינות קליקים בכלי הבדיקה — ראה הערת "resize_window" ב-STATUS.md). ראה טבלת הזרימות המלאה בתוכנית: `~/.claude/plans/in-the-roxon-monorepo-floofy-zebra.md`.
 
 ### הערה: בקשה לעיצוב מחדש (לא התחיל)
-בועז ביקש עיצוב מחדש של מסך "בקשה חדשה" ב-guest PWA — קטלוג כרטיסיות ויזואלי לכל קטגוריה (במקום כפתורים + טקסט חופשי), עם שמירת אופציית טקסט חופשי בתור fallback. נרשם כמשימה נפרדת (chip), לא בוצע.
+בועז ביקש עיצוב מחדש של מסך "בקשה חדשה" ב-guest PWA — קטלוג כרטיסיות ויזואלי לכל קטגוריה (במקום כפתורים + טקסט חופשי), עם שמירת אופציית טקסט חופשי בתור fallback. נרשם כמשימה נפרדת (chip), רץ בסשן נפרד.
+
+---
+
+## 📋 צ'קליסט סופי — מה סגור ומה פתוח (2026-08-27)
+
+### ✅ סגור לחלוטין
+- ✅ **Webhook Secret rotated** — עבר ל-Supabase Vault, כל 6 ה-triggers מתוקנים, verified `200 ok`.
+- ✅ **Push notifications עובדים** — 3 שכבות תוקנו: JWT gate (send-push config), OneSignal key נקי (secrets set), webhook Vault lookup.
+- ✅ **Admin Analytics תוקן** — עכשיו משלב tickets + guest_requests (לא ריק), Vercel פרס אוטומטית.
+- ✅ **JWT Auth Hook מאומת** — הדבקת JWT מכילה `hotel_id` ו-`role` בטענות.
+- ✅ **כל 5 משתמשי בדיקה עובדים** — superadmin, manager, reception, tech, maintenance — כולם מתחברים בהצלחה.
+- ✅ **RLS policies תקינים** — בדיקה ישירה ב-pg_policies; אין drift בין טבלאות ולקוד.
+- ✅ **כל תיעוד מעודכן** — STATUS.md, PROGRESS.md, RESUME.md, DEPLOY.md, LINKS.md.
+
+### 🐛 פתוח — חקור, לא תוקן
+- 🐛 **maintenance_manager** "בקשות" tab → spinner אינסופי (401 + 406 + Dart null-exceptions). נחקר לעומק: RLS זהה ל-tech, קוד זהה, נתונים בסדר. שורש המדויק דורש source-map debugging מה-deployed build (לא זמין ב-Netlify). **כלל: Flutter CanvasKit compiled-to-JS קשה מאד להציע debug יותר מ-console errors עם כלי בדפדפן שלנו.**
+
+### 🕳️ פתוח — Feature Gap
+- 🕳️ **אין UI ל-amenity_orders בצוות** — התכונה קיימת ב-DB (`amenity_orders` table), יש webhook (`whk_fn_amenity_order_insert`), אבל צוות המלון (reception/housekeeping) לא יכול לראות/לטפל בהזמנות ללא כניסה לאדמין. הטבלה כרגע ריקה (אין test data) — צריך להחליט אם זה חוסם השקה או feature V1.1.
+
+### ⏸️ הופסק למשחק עתיד
+- ⏸️ **שדרוג מפתחות `service_role`/`anon`** (לאחר תקרית חשיפה בסוכן מחקר) — **לא אושר שהושלם עדיין**. תיעוד בהערה בתחתית.
+- ⏸️ **עיצוב מחדש guest PWA** (קטלוג כרטיסיות + fallback טקסט חופשי) — chip בנפרד, task_7f330b9e, רץ עכשיו בסשן אחר.
+- ⏸️ **iOS APNs .p8 setup** — דחוי בעצמנו (לא חוסם web/Android), לתעד כהחלטה מודעת.
+
+---
+
+## הערות אחרונות
+
+**הוודא לפני הדמו**:
+1. שדרוג מפתחות API (אם לא בוצע עדיין) — run `supabase projects api-keys` **לעולם לא שוב** בלי אזהרה, זה חוסם!
+2. אם maintenance_manager עדיין צורך את הדמו — שקול להציע workaround (שימוש כ-tech או super_admin) עד שתוקן.
+3. אם amenity_orders צורך את הדמו — החלטה מודעת: בנות UI עכשיו (2-3 שעות) או postpone ל-V1.1?
 
 ---
 
