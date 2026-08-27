@@ -31,6 +31,12 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
           🛏️ נהל חדרים
         </a>
         <a
+          href={`/dashboard/hotels/${hotel.id}/amenities`}
+          className="inline-flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700"
+        >
+          🍽️ שירותים נוספים
+        </a>
+        <a
           href={`/dashboard/hotels/${hotel.id}/qr-codes`}
           className="inline-flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700"
         >
@@ -60,6 +66,7 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
           stay_threshold: hotel.stay_threshold ?? 3,
           guest_pwa_url: hotel.guest_pwa_url ?? null,
           logo_url: hotel.logo_url ?? null,
+          enabled_features: hotel.enabled_features ?? null,
         }}
         action={boundUpdate}
         variant={viewer.isSuperAdmin ? 'super' : 'hotel'}

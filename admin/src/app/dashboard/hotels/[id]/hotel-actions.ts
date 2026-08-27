@@ -34,6 +34,15 @@ export async function updateHotelScoped(hotelId: string, fd: FormData) {
   if (viewer.isSuperAdmin) {
     payload.subscription_plan = fd.get('subscription_plan') as string
     payload.is_active = fd.get('is_active') === 'on'
+
+    const featuresRaw = fd.get('enabled_features') as string | null
+    if (featuresRaw) {
+      try {
+        payload.enabled_features = JSON.parse(featuresRaw)
+      } catch {
+        // malformed — leave enabled_features untouched rather than corrupt it
+      }
+    }
   }
 
   await supabaseAdmin.from('hotels').update(payload).eq('id', hotelId)

@@ -3,12 +3,17 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { LogoPicker } from '@/components/logo-picker'
 
+type EnabledFeatures = { amenities_ordering: boolean; guided_menu: boolean }
+
 type Hotel = { id?: string; name: string; subscription_plan: string
                default_sla_hours: number; default_language: string
                is_active: boolean; theme?: string | null
                stay_threshold?: number
                guest_pwa_url?: string | null
-               logo_url?: string | null }
+               logo_url?: string | null
+               enabled_features?: EnabledFeatures | null }
+
+const DEFAULT_FEATURES: EnabledFeatures = { amenities_ordering: false, guided_menu: false }
 
 export function HotelForm({
   hotel,
@@ -20,8 +25,17 @@ export function HotelForm({
   /** `hotel` — hide plan + active (handled only by super on server). */
   variant?: 'super' | 'hotel'
 }) {
-  const [data, setData] = useState(hotel)
+  const [data, setData] = useState({
+    ...hotel,
+    enabled_features: hotel.enabled_features ?? DEFAULT_FEATURES,
+  })
   const router = useRouter()
+
+  const toggleFeature = (key: keyof EnabledFeatures) =>
+    setData({
+      ...data,
+      enabled_features: { ...data.enabled_features, [key]: !data.enabled_features[key] },
+    })
 
   return (
     <form action={action} className="space-y-6 bg-white rounded-xl p-6 border max-w-2xl">
@@ -138,6 +152,38 @@ export function HotelForm({
           <input type="checkbox" name="is_active" id="is_active"
             checked={data.is_active} onChange={e => setData({...data, is_active: e.target.checked})} />
           <label htmlFor="is_active" className="text-sm font-medium">Active</label>
+        </div>
+      )}
+
+      {variant === 'super' && (
+        <div>
+          <label className="block text-sm font-medium mb-2">מודולים פעילים למלון זה</label>
+          <div className="space-y-2">
+            {([
+              ['amenities_ordering', 'הזמנת שירותים נוספים (מסעדה / ספא / רום סרוויס)'],
+              ['guided_menu',        'תפריט מונחה לאורח (מסך פתיחה עם קטגוריות)'],
+            ] as const).map(([key, label]) => (
+              <label key={key} className="flex items-center gap-3 cursor-pointer select-none">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={data.enabled_features[key]}
+                  onClick={() => toggleFeature(key)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${
+                    data.enabled_features[key] ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                      data.enabled_features[key] ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+                <span className="text-sm">{label}</span>
+              </label>
+            ))}
+          </div>
+          <input type="hidden" name="enabled_features" value={JSON.stringify(data.enabled_features)} />
         </div>
       )}
 

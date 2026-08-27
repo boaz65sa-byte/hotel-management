@@ -49,6 +49,11 @@ export function Sidebar({ viewer }: { viewer: SidebarViewer }) {
       icon: '🛎️',
     },
     {
+      href: '/dashboard/guest-orders',
+      label: lang === 'he' ? 'הזמנות אורחים' : 'Guest orders',
+      icon: '🍽️',
+    },
+    {
       href: '/dashboard/guest-feedback',
       label: lang === 'he' ? 'משובים' : 'Feedback',
       icon: '⭐',
