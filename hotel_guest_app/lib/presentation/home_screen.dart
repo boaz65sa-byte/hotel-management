@@ -33,6 +33,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final brandingAsync = ref.watch(hotelBrandingProvider);
     final amenitiesOrderingEnabled =
         brandingAsync.valueOrNull?.amenitiesOrderingEnabled ?? false;
+    final guidedMenuEnabled =
+        brandingAsync.valueOrNull?.guidedMenuEnabled ?? false;
 
     return sessionAsync.when(
       loading: () => const Scaffold(
@@ -165,47 +167,56 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                   ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 4),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: () => context.push('/new'),
-                      icon: const Icon(Icons.add),
-                      label: Text(loc.homeNewRequest,
-                          style: const TextStyle(fontWeight: FontWeight.w700)),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFFC9A84C),
-                        foregroundColor: Colors.black,
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                    ),
-                  ),
-                ),
-                if (amenitiesOrderingEnabled)
+                if (guidedMenuEnabled)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                    child: _GuidedMenuGrid(
+                        amenitiesOrderingEnabled: amenitiesOrderingEnabled),
+                  )
+                else ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 4),
                     child: SizedBox(
                       width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () => context.push('/amenities'),
-                        icon: const Text('🍽️',
-                            style: TextStyle(fontSize: 16)),
-                        label: Text(loc.homeAmenitiesButton,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w700)),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFFC9A84C),
-                          side: const BorderSide(
-                              color: Color(0xFFC9A84C)),
+                      child: FilledButton.icon(
+                        onPressed: () => context.push('/new'),
+                        icon: const Icon(Icons.add),
+                        label: Text(loc.homeNewRequest,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w700)),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFFC9A84C),
+                          foregroundColor: Colors.black,
                           padding:
                               const EdgeInsets.symmetric(vertical: 14),
                         ),
                       ),
                     ),
                   ),
+                  if (amenitiesOrderingEnabled)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () => context.push('/amenities'),
+                          icon: const Text('🍽️',
+                              style: TextStyle(fontSize: 16)),
+                          label: Text(loc.homeAmenitiesButton,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w700)),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFFC9A84C),
+                            side: const BorderSide(
+                                color: Color(0xFFC9A84C)),
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
                   child: Text(loc.homeMyRequests,
@@ -243,6 +254,76 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+class _GuidedMenuGrid extends StatelessWidget {
+  final bool amenitiesOrderingEnabled;
+  const _GuidedMenuGrid({required this.amenitiesOrderingEnabled});
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final tiles = [
+      (icon: '🛎️', label: loc.homeNewRequest, route: '/new'),
+      if (amenitiesOrderingEnabled) ...[
+        (icon: '🍽️', label: loc.categoryRestaurant, route: '/amenities?cat=restaurant'),
+        (icon: '💆', label: loc.categorySpa, route: '/amenities?cat=spa'),
+        (icon: '🧺', label: loc.categoryRoomService, route: '/amenities?cat=room_service'),
+      ],
+    ];
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+      childAspectRatio: 1.5,
+      children: tiles
+          .map((tile) => _GuidedMenuTile(
+                icon: tile.icon,
+                label: tile.label,
+                onTap: () => context.push(tile.route),
+              ))
+          .toList(),
+    );
+  }
+}
+
+class _GuidedMenuTile extends StatelessWidget {
+  final String icon;
+  final String label;
+  final VoidCallback onTap;
+  const _GuidedMenuTile(
+      {required this.icon, required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF0F1F3D),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFF1E3A5F)),
+        ),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 26)),
+            const SizedBox(height: 6),
+            Text(label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    color: Color(0xFFE2E8F0),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700)),
+          ],
+        ),
+      ),
     );
   }
 }

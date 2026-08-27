@@ -54,7 +54,9 @@ GoRouter buildRouter() => GoRouter(
     ),
     GoRoute(
       path: '/amenities',
-      builder: (context, state) => const AmenitiesScreen(),
+      builder: (context, state) => AmenitiesScreen(
+        initialCategory: state.uri.queryParameters['cat'],
+      ),
     ),
   ],
 );

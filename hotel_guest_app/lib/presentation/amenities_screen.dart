@@ -13,7 +13,8 @@ const _categoryIcons = {
 };
 
 class AmenitiesScreen extends ConsumerStatefulWidget {
-  const AmenitiesScreen({super.key});
+  final String? initialCategory;
+  const AmenitiesScreen({super.key, this.initialCategory});
 
   @override
   ConsumerState<AmenitiesScreen> createState() => _AmenitiesScreenState();
@@ -26,7 +27,11 @@ class _AmenitiesScreenState extends ConsumerState<AmenitiesScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _categories.length, vsync: this);
+    final initialIndex = widget.initialCategory != null
+        ? _categories.indexOf(widget.initialCategory!).clamp(0, _categories.length - 1)
+        : 0;
+    _tabController = TabController(
+        length: _categories.length, vsync: this, initialIndex: initialIndex);
   }
 
   @override
