@@ -55,6 +55,12 @@ async function sendNotification(
   titleHe: string,
   bodyHe: string,
 ) {
+  const badChars = [...restKey].filter((c) => c.charCodeAt(0) < 0x20 || c.charCodeAt(0) > 0x7e)
+  if (badChars.length > 0) {
+    throw new Error(
+      `ONESIGNAL_REST_API_KEY contains non-ASCII/control chars: ${badChars.map((c) => c.charCodeAt(0)).join(',')} (len=${restKey.length})`,
+    )
+  }
   const res = await fetch(ONESIGNAL_URL, {
     method: 'POST',
     headers: {
@@ -82,14 +88,15 @@ function tagFilter(key: string, value: string): OneSignalFilter {
 const AND: OneSignalFilter = { operator: 'AND' }
 
 Deno.serve(async (req) => {
+  try {
   // Authenticate webhook call
   const secret = Deno.env.get('WEBHOOK_SECRET') ?? ''
   if (req.headers.get('x-webhook-secret') !== secret) {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const appId   = Deno.env.get('ONESIGNAL_APP_ID') ?? ''
-  const restKey = Deno.env.get('ONESIGNAL_REST_API_KEY') ?? ''
+  const appId   = (Deno.env.get('ONESIGNAL_APP_ID') ?? '').trim()
+  const restKey = (Deno.env.get('ONESIGNAL_REST_API_KEY') ?? '').trim()
   if (!appId || !restKey) {
     console.error('Missing OneSignal secrets')
     return new Response('Server error', { status: 500 })
@@ -100,7 +107,6 @@ Deno.serve(async (req) => {
   const record    = payload.record    ?? {}
   const oldRecord = payload.old_record ?? {}
 
-  try {
     switch (eventType) {
 
       // ── New guest request ────────────────────────────────────────────────

@@ -370,6 +370,13 @@ port = 54327
 # Configure one of the supported backends: `postgres`, `bigquery`.
 backend = "postgres"
 
+# send-push is called by Postgres DB triggers via pg_net (no Supabase JWT
+# available in that context) and authenticates instead via its own
+# x-webhook-secret header (see supabase/functions/send-push/index.ts and
+# supabase/migrations/20260828000001_webhook_secret_vault.sql).
+[functions.send-push]
+verify_jwt = false
+
 # Experimental features may be deprecated any time
 [experimental]
 # Configures Postgres storage engine to use OrioleDB (S3)
