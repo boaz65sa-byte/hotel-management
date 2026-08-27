@@ -10,10 +10,11 @@
 ### צעד 1 — לוודא שתיקון ה-push notifications נסגר סופית
 בסבב 2026-08-27 נמצאו ותוקנו 3 באגים חופפים בשרשרת ה-push (webhook secret hardcoded, JWT verification שחסם את כל קריאות ה-pg_net, ותו עברית מוטמע ב-`ONESIGNAL_REST_API_KEY`). לוודא ש-`ONESIGNAL_REST_API_KEY` הוגדר מחדש עם ערך נקי (`supabase secrets set`), ואז לבדוק בפועל: לשלוח בקשת אורח דרך ה-PWA על מלון Alpha/Beta (**לא** המלון האמיתי) ולוודא שהצוות מקבל התראת push.
 
-### צעד 2 — 3 באגים חדשים שנמצאו ב-QA של 2026-08-27, צריך לתעדף
-1. 🐛 **maintenance_manager**: לחיצה על "בקשות" (Requests) ב-staff app נתקעת ב-spinner אינסופי (401 + 406 + Dart null-exceptions בקונסול). עובד תקין ל-super_admin/reception_manager — נראה ספציפי לתפקיד הזה.
-2. 🐛 **Admin Analytics ריק**: `/dashboard/analytics` נטען בלי שגיאות אבל טבלת "Global Analytics" לא מציגה נתונים בכלל.
-3. 🕳️ **אין UI ל-amenity orders**: התכונה קיימת ב-DB ובפוש, אבל שום מסך ב-staff app לא מאפשר לצוות לראות/לטפל בהזמנות amenity. צריך להחליט אם זה חוסם השקה או לא (תלוי אם המלון האמיתי מפעיל את ה-feature toggle הזה).
+### צעד 2 — סטטוס באגים מ-QA של 2026-08-27
+1. ✅ **push notifications עובדים סוף-סוף**: `ONESIGNAL_REST_API_KEY` הוגדר מחדש עם ערך נקי, `send-push` נפרס מחדש, ואומת קצה-לקצה — `net._http_response` מראה `200 ok`. שרשרת ה-push (secret rotation → Vault → JWT gate → OneSignal) שלמה ותקינה.
+2. ✅ **Admin Analytics תוקן ונפרס**: `/dashboard/analytics` היה שואב רק מ-`tickets` (0 שורות) ופספס את `guest_requests` (13 שורות אמיתיות) — תוקן לשלב את שתיהן, נדחף ל-`main` (commit `15f0db6`), Vercel פרס אוטומטית.
+3. 🐛 **עדיין פתוח: maintenance_manager** — לחיצה על "בקשות" (Requests) ב-staff app נתקעת ב-spinner אינסופי (401 + 406 + Dart null-exceptions בקונסול). עובד תקין ל-super_admin/reception_manager — נראה ספציפי לתפקיד הזה. נחקר לעומק (RLS זהה, קוד זהה ל-tech, נתונים תקינים) אבל השורש המדויק דורש כלי דיבוג Flutter חי שאין גישה אליהם מה-build המפורסם.
+4. 🕳️ **אין UI ל-amenity orders** ב-staff app (רק ב-admin יש קישור "הזמנות אורחים"). התכונה קיימת ב-DB ובפוש, אבל צוות המלון (housekeeping/reception בפועל) לא יכול לראות/לטפל בהזמנות amenity ללא כניסה לאדמין. צריך להחליט אם זה חוסם השקה.
 
 ~~JWT Auth Hook~~ — **נבדק ועובד** (2026-08-27): claims כוללים `hotel_id`+`role` תקינים.
 ~~Drift בשמות תפקידים~~ — **נבדק ונסגר**: לא באג, ראה `docs/STATUS.md`.

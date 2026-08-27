@@ -32,7 +32,10 @@
 10. ✅ אדמין: התנהגות "אין realtime, מתעדכן רק ברענון" אומתה כצפוי (לא באג) — insert ידני לא הופיע לפני רענון, הופיע מיד אחריו.
 11. ⚠️ **הערת כלים**: `resize_window` אחרי שדף Flutter (CanvasKit) כבר נטען שובר click hit-testing על אותו דף (נצפה בשני סוכנים שונים באופן עצמאי). אם לחיצות מפסיקות להירשם על staff app/guest PWA, נסה viewport קבוע מההתחלה במקום resize תוך כדי.
 
-**Follow-up נדרש מ-boaz65sa:** לוודא שסיבוב מפתחות ה-service_role/anon בוצע (אם רלוונטי), לבצע סיבוב סופי מוצלח של `ONESIGNAL_REST_API_KEY` דרך `supabase secrets set` עם ערך נקי מ-OneSignal Dashboard, ולתעדף בין 3 הבאגים החדשים (maintenance_manager Requests crash, Analytics ריק, אין UI ל-amenity orders) מול לוח הזמנים להשקה.
+12. ✅ **`ONESIGNAL_REST_API_KEY` תוקן וסובב** — נוצר מפתח חדש נקי ב-OneSignal Dashboard (Settings → Keys & IDs → Add Key), הוגדר דרך `supabase secrets set`, `send-push` נפרס מחדש, ואומת קצה-לקצה: `net._http_response` מראה `200 ok`. **push notifications עובדים בפועל לראשונה בסבב הזה.**
+13. ✅ **Admin Analytics תוקן**: `admin/src/app/dashboard/analytics/page.tsx` היה שואב רק מ-`tickets` (0 שורות בכל המערכת) ופספס את `guest_requests` (13 שורות אמיתיות). תוקן לשלב שתי הטבלאות, `tsc --noEmit` נקי, נדחף (commit `15f0db6`), Vercel פרס אוטומטית.
+
+**Follow-up נדרש מ-boaz65sa:** לוודא שסיבוב מפתחות ה-service_role/anon בוצע (אם רלוונטי — תקרית נפרדת, לא קשורה ל-OneSignal), ולתעדף בין 2 הפריטים הפתוחים שנותרו (maintenance_manager Requests crash — נחקר לעומק, שורש לא נמצא; אין UI ל-amenity orders בצוות) מול לוח הזמנים להשקה.
 
 ---
 
