@@ -1,38 +1,31 @@
 # 📌 Resume Here — Hotel Management
 
-**עודכן:** 2026-05-08, סוף יום
-**מצב:** Production-ready, פעיל בשטח, נשארו 2 צעדי תפעול קטנים.
+**עודכן:** 2026-08-27
+**מצב:** לקראת דמו ללקוח ראשון (Roxon Red Sea Eilat), בלי תאריך סופי קבוע. סבב אבטחה+QA בעיצומו (ראה `docs/STATUS.md` סשן 2026-08-27).
 
 ---
 
 ## 🚦 כשחוזרים — תתחיל מכאן
 
-### צעד 1 — SQL ב-Supabase (30 שניות)
+### צעד 1 — לוודא שתיקון ה-push notifications נסגר סופית
+בסבב 2026-08-27 נמצאו ותוקנו 3 באגים חופפים בשרשרת ה-push (webhook secret hardcoded, JWT verification שחסם את כל קריאות ה-pg_net, ותו עברית מוטמע ב-`ONESIGNAL_REST_API_KEY`). לוודא ש-`ONESIGNAL_REST_API_KEY` הוגדר מחדש עם ערך נקי (`supabase secrets set`), ואז לבדוק בפועל: לשלוח בקשת אורח דרך ה-PWA על מלון Alpha/Beta (**לא** המלון האמיתי) ולוודא שהצוות מקבל התראת push.
 
-פתח [Supabase SQL Editor](https://supabase.com/dashboard/project/vetwlonyzyzvhrtdwbzj/sql/new) והדבק:
+### צעד 2 — 3 באגים חדשים שנמצאו ב-QA של 2026-08-27, צריך לתעדף
+1. 🐛 **maintenance_manager**: לחיצה על "בקשות" (Requests) ב-staff app נתקעת ב-spinner אינסופי (401 + 406 + Dart null-exceptions בקונסול). עובד תקין ל-super_admin/reception_manager — נראה ספציפי לתפקיד הזה.
+2. 🐛 **Admin Analytics ריק**: `/dashboard/analytics` נטען בלי שגיאות אבל טבלת "Global Analytics" לא מציגה נתונים בכלל.
+3. 🕳️ **אין UI ל-amenity orders**: התכונה קיימת ב-DB ובפוש, אבל שום מסך ב-staff app לא מאפשר לצוות לראות/לטפל בהזמנות amenity. צריך להחליט אם זה חוסם השקה או לא (תלוי אם המלון האמיתי מפעיל את ה-feature toggle הזה).
 
-```sql
-ALTER TABLE hotels
-  ALTER COLUMN guest_pwa_url
-  SET DEFAULT 'https://exquisite-cocada-7966bd.netlify.app';
+~~JWT Auth Hook~~ — **נבדק ועובד** (2026-08-27): claims כוללים `hotel_id`+`role` תקינים.
+~~Drift בשמות תפקידים~~ — **נבדק ונסגר**: לא באג, ראה `docs/STATUS.md`.
+~~5 משתמשי הבדיקה~~ — **כולם עובדים** (superadmin/manager/reception/tech/maintenance) — הטבלה הישנה ב-STATUS.md הייתה שגויה/מיושנת.
 
-UPDATE hotels
-   SET guest_pwa_url = 'https://exquisite-cocada-7966bd.netlify.app'
- WHERE guest_pwa_url IS NULL
-    OR guest_pwa_url = 'https://zesty-queijadas-16c29.netlify.app'
-    OR trim(guest_pwa_url) = '';
-```
+- **מפתחות API של הפרויקט** — לוודא שסיבוב `service_role`/`anon` key בוצע בעקבות תקרית חשיפה בסשן מחקר (ראה `docs/STATUS.md`), ושכל 3 האפליקציות עודכנו בהתאם.
 
-לחץ **Run**. ↩
+### צעד 3 — QA חוצה-אפליקציות שעדיין לא בוצע
+זרימת "בקשת אורח מה-PWA → הופעה בזמן אמת אצל הצוות → פוש" עדיין לא אומתה קצה-לקצה בפועל (רק חלקים נבדקו בנפרד: ה-webhook/vault/JWT מאומתים דרך insert ידני; ה-UI בפועל נתקל בבעיית אמינות קליקים בכלי הבדיקה — ראה הערת "resize_window" ב-STATUS.md). ראה טבלת הזרימות המלאה בתוכנית: `~/.claude/plans/in-the-roxon-monorepo-floofy-zebra.md`.
 
-### צעד 2 — בדיקה מקצה-לקצה (דקה)
-
-1. פתח בטלפון: <https://exquisite-cocada-7966bd.netlify.app> — אמור לראות מסך ברוכים הבאים, יכול לבחור שפה.
-2. ב-Admin → Hotels → Alpha → "החלף קובץ" → העלה לוגו (PNG/JPG, עד 2MB).
-3. ב-Admin → Hotels → Alpha → "🖨️ פוסטר קבלה (A4)" — אמור לראות פוסטר עם הלוגו, שם המלון ו-QR גדול.
-4. סרוק את ה-QR מהפוסטר עם הטלפון → אמור לנחות במסך הברוכים-הבאים עם הלוגו ושם המלון.
-
-אם הכל עובד — **המוצר חי**. ✅
+### הערה: בקשה לעיצוב מחדש (לא התחיל)
+בועז ביקש עיצוב מחדש של מסך "בקשה חדשה" ב-guest PWA — קטלוג כרטיסיות ויזואלי לכל קטגוריה (במקום כפתורים + טקסט חופשי), עם שמירת אופציית טקסט חופשי בתור fallback. נרשם כמשימה נפרדת (chip), לא בוצע.
 
 ---
 

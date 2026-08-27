@@ -63,7 +63,13 @@ supabase link --project-ref vetwlonyzyzvhrtdwbzj
 supabase db push
 
 # 3. Deploy edge functions
-supabase functions deploy send-push
+# send-push is called by pg_net DB triggers, which never carry a Supabase
+# JWT — it authenticates via its own x-webhook-secret header instead, so it
+# must be deployed without JWT verification. This is now also declared in
+# supabase/config.toml ([functions.send-push] verify_jwt = false), but pass
+# the flag explicitly too — deploying without it once already caused every
+# push webhook to fail with 401 UNAUTHORIZED_NO_AUTH_HEADER in production.
+supabase functions deploy send-push --no-verify-jwt
 supabase functions deploy invite-user
 supabase functions deploy manage-user
 supabase functions deploy export-excel
@@ -77,22 +83,44 @@ Authentication → **Auth Hooks** → Add hook:
 
 Without this, JWTs won't contain `hotel_id` and RLS will reject most queries.
 
-### Database Webhooks (5 total — for OneSignal push)
-Database → Webhooks → all hit `{SUPABASE_URL}/functions/v1/send-push` with header `x-webhook-secret: {WEBHOOK_SECRET}`.
+### Database Webhooks (6 total — for OneSignal push)
+Implemented as `pg_net`/`net.http_post` calls inside `SECURITY DEFINER` trigger functions (see `supabase/migrations/20260515000003_send_push_webhooks.sql`, `20260827000003_amenities_ordering.sql`, and `20260828000001_webhook_secret_vault.sql`), not as Dashboard-configured Database Webhooks — all hit `{SUPABASE_URL}/functions/v1/send-push` with header `x-webhook-secret` set to the value looked up at runtime from Supabase Vault (secret name `webhook_secret`), never a literal in the migration file.
 
 | Name | Table | Event | Header `x-event-type` |
 |------|-------|-------|------------------------|
-| push_guest_request_insert | guest_requests | INSERT | guest_request_insert |
-| push_guest_request_update | guest_requests | UPDATE | guest_request_status |
-| push_ticket_insert | tickets | INSERT | ticket_insert |
-| push_ticket_assigned | ticket_assignments | INSERT | ticket_assigned |
-| push_room_assigned | rooms | UPDATE | room_assigned |
+| whk_guest_request_insert | guest_requests | INSERT | guest_request_insert |
+| whk_guest_request_status | guest_requests | UPDATE | guest_request_status |
+| whk_ticket_insert | tickets | INSERT | ticket_insert |
+| whk_ticket_assigned | ticket_assignments | INSERT | ticket_assigned |
+| whk_room_assigned | rooms | UPDATE | room_assigned |
+| whk_amenity_order_insert | amenity_orders | INSERT | amenity_order_insert |
 
 ### Edge Function Secrets
 ```bash
 supabase secrets set ONESIGNAL_APP_ID=...
 supabase secrets set ONESIGNAL_REST_API_KEY=...
-supabase secrets set WEBHOOK_SECRET=$(openssl rand -hex 32)
+```
+
+`WEBHOOK_SECRET` is rotated separately — see "Rotating the webhook secret" below; never set it directly here without also updating Vault, or the two sides will disagree and every push will 401.
+
+### Rotating the webhook secret
+The 6 trigger functions above read their auth header from Supabase Vault (`vault.decrypted_secrets`, name `webhook_secret`) rather than a hardcoded literal — this replaced an earlier version that had the plaintext secret committed directly in a migration file (`20260515000003_send_push_webhooks.sql`), which is why it must never go back to a literal. To rotate:
+```bash
+NEW_SECRET=$(openssl rand -hex 32)
+# 1. Update the Edge Function side FIRST, so there's no window where the
+#    trigger sends a new secret to a function still expecting the old one.
+supabase secrets set WEBHOOK_SECRET="$NEW_SECRET"
+# 2. Update the Vault side (use vault.update_secret if 'webhook_secret'
+#    already exists, vault.create_secret only the first time):
+supabase db query --linked "select vault.update_secret(
+  (select id from vault.secrets where name = 'webhook_secret'),
+  '$NEW_SECRET'
+);"
+unset NEW_SECRET
+```
+Verify by inserting a test row on Hotel Alpha/Beta (never the real customer hotel) and checking `net._http_response` for a 200 instead of 401:
+```sql
+select id, status_code, content from net._http_response order by id desc limit 3;
 ```
 
 ---

@@ -1,6 +1,38 @@
 # סטטוס פרויקט — מה עובד ומה נשאר
 
-**עודכן:** 2026-05-08
+**עודכן:** 2026-08-27
+
+> ⚠️ הסטטוס הזה היה תקוע על 2026-05-08 (3.5 חודשים) בזמן שהריפו התקדם משמעותית (ריברנד ל-Roxon, מערכת רישוי, RBAC חדש, dashboard לאדמין-על, Tauri desktop). הבלוק הזה מתעד רק את מה שאומת בפועל בסבב האבטחה/QA של 2026-08-27 — לא ריענון מלא של כל הפרויקט.
+
+---
+
+## 🆕 סשן 2026-08-27 — אבטחה: סוד webhook בטקסט גלוי + תיקוני push (בוצע ב-2 סשנים מקבילים)
+
+**הרקע:** `supabase/migrations/20260515000003_send_push_webhooks.sql` הכיל את `WEBHOOK_SECRET` כליטרל בטקסט גלוי ב-5 מקומות (ולמעשה 6, ראה למטה) — הסוד הזה כבר היה ב-git history שנדחפה ל-origin. תוך כדי הטיפול התגלתה גם תקרית נוספת: סוכן מחקר הריץ בטעות `supabase projects api-keys` שמדפיס מפתחות API חיים של הפרויקט — **מומלץ לסובב את `service_role`/`anon` keys של הפרויקט כאמצעי זהירות** (ראוי לבדוק עם boaz65sa אם זה בוצע).
+
+**מה תוקן ואומת בפועל:**
+1. ✅ `WEBHOOK_SECRET` סובב; כל 6 פונקציות ה-trigger (5 המקוריות + `whk_fn_amenity_order_insert` שנוסף ב-`20260827000003_amenities_ordering.sql`) עודכנו במיגרציה `20260828000001_webhook_secret_vault.sql` לקרוא את הסוד מ-Supabase Vault (`vault.decrypted_secrets`, שם `webhook_secret`) בזמן ריצה, במקום ליטרל — לא לחזור לליטרל בעתיד.
+2. ✅ **נמצא ותוקן באג נפרד וקדום**: פונקציית `send-push` דרשה JWT verification בברירת מחדל, אבל קריאות ה-`pg_net` מה-triggers אף פעם לא נושאות JWT (רק `x-webhook-secret`) — כל קריאה קיבלה 401 `UNAUTHORIZED_NO_AUTH_HEADER`, כנראה **מאז ומתמיד**, לפני שנפרס תיקון כלשהו של הסבב הזה. תוקן: `[functions.send-push]\nverify_jwt = false` ב-`supabase/config.toml` + פריסה מחדש עם `--no-verify-jwt`.
+3. ✅ **נמצא ותוקן עוד באג נפרד וקדום**: `ONESIGNAL_REST_API_KEY` שהוגדר בפרויקט הכיל 2 תווי עברית מוטמעים בטעות (ככל הנראה מהעתקה מה-UI של OneSignal) — גרם ל-`Failed to construct 'Request': 'headers'... is not a valid ByteString` בכל ניסיון שליחת פוש. **המשמעות: ייתכן שהתראות Push מעולם לא עבדו בפרודקשן**, גם לפני הסבב הזה. תוקן ע"י הגדרה מחדש נקייה של `ONESIGNAL_REST_API_KEY` (בוצע בסשן המקביל).
+4. ✅ עודכן `DEPLOY.md`: טבלת webhooks מ-5 ל-6, הוראות `--no-verify-jwt`, ו-runbook לסיבוב סוד עתידי.
+5. ✅ **נבדק ונסגר — אין drift בפועל**: שאילתה חיה על `users.role` (`select role, count(*) from users group by role`) מראה שכל המשתמשים החיים עדיין בסכימה הישנה — `super_admin`(2), `ceo`(1), `reception_manager`(2), `maintenance_manager`(1), `receptionist`(2), `maintenance_tech`(1). כל התפקידים האלה מכוסים נכון גם ב-`lib/core/push/push_service.dart` (`_roleToDept`/`_managerRoles`) וגם ב-`supabase/functions/send-push/index.ts` (`ROLE_TO_DEPT`). התיאור ב-`LINKS.md` של `hotel_manager`/`dept_manager`/`staff` הוא כנראה תכנון עתידי שעדיין לא מומש בפועל ב-DB — לא באג פעיל, אבל שווה להבהיר את זה ב-LINKS.md כדי שלא יטעה מישהו שיקרא אותו.
+6. ✅ **JWT Auth Hook — אומת בפועל ועובד**: התחברות עם `reception@hotel.com` והדבקת ה-JWT הראתה `app_metadata.hotel_id` ו-`app_metadata.role` תקינים. אין צורך בפעולה נוספת כאן.
+7. ✅ **כל 5 משתמשי הבדיקה על Hotel Alpha נבדקו בפועל ועובדים** (בניגוד לחשש הישן ב-STATUS.md מ-5/2026):
+
+   | Role | Email | Login | מסך בית | תקין? |
+   |---|---|---|---|---|
+   | super_admin | superadmin@hotel.com | ✅ | Manager Dashboard + Users/Analytics | ✅ |
+   | reception_manager | manager@hotel.com | ✅ (הסיסמה בתוקף, לא ישנה כפי שחששו) | חדרים + ניהול חדרים | ✅ |
+   | receptionist | reception@hotel.com | ✅ | חדרים | ✅ |
+   | maintenance_tech | tech@hotel.com | ✅ | קריאות אחזקה | ✅ |
+   | maintenance_manager | maintenance@hotel.com | ✅ login | קריאות אחזקה | ⚠️ **באג**: לחיצה על "בקשות" (Requests) נתקעת ב-spinner אינסופי; קונסול מראה 401 + 406 + 2 Dart null-reference exceptions. אותו טאב נטען מיידית אצל super_admin/reception_manager — נראה כמו באג הרשאות/query ספציפי ל-maintenance_manager. גם אין הבדל UI בין maintenance_manager ל-tech (לבדוק אם זה בכוונה). |
+
+8. 🐛 **באג חדש שנמצא: עמוד Analytics הגלובלי באדמין ריק**. `/dashboard/analytics` נטען בלי שגיאות קונסול, אבל טבלת "Global Analytics" מציגה רק כותרות עמודות בלי שורות נתונים, למרות שיש פעילות בקשות אמיתית במלונות. כנראה בעיית query/מיפוי נתונים.
+9. 🕳️ **פער פיצ'ר מאושר**: לא נמצא בקוד (`grep -ril amenity lib/`) ולא ב-UI (נבדק כל טאב זמין ל-super_admin ול-reception_manager) שום מסך לטיפול בהזמנות amenity/room-service/spa. הסכמה קיימת (`hotel_amenities`/`amenity_orders`) והפוש מוגדר, אבל אין לצוות דרך לראות/לטפל בהזמנות כאלה.
+10. ✅ אדמין: התנהגות "אין realtime, מתעדכן רק ברענון" אומתה כצפוי (לא באג) — insert ידני לא הופיע לפני רענון, הופיע מיד אחריו.
+11. ⚠️ **הערת כלים**: `resize_window` אחרי שדף Flutter (CanvasKit) כבר נטען שובר click hit-testing על אותו דף (נצפה בשני סוכנים שונים באופן עצמאי). אם לחיצות מפסיקות להירשם על staff app/guest PWA, נסה viewport קבוע מההתחלה במקום resize תוך כדי.
+
+**Follow-up נדרש מ-boaz65sa:** לוודא שסיבוב מפתחות ה-service_role/anon בוצע (אם רלוונטי), לבצע סיבוב סופי מוצלח של `ONESIGNAL_REST_API_KEY` דרך `supabase secrets set` עם ערך נקי מ-OneSignal Dashboard, ולתעדף בין 3 הבאגים החדשים (maintenance_manager Requests crash, Analytics ריק, אין UI ל-amenity orders) מול לוח הזמנים להשקה.
 
 ---
 

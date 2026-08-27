@@ -1,12 +1,20 @@
 # Hotel Management App - Progress Tracker
 
 ## Current Status
-**Phase**: ✅ **Live in production** — Admin on Vercel, PWA on Netlify, Staff App code-complete.
-**Date**: 2026-05-08 (end of day)
+**Phase**: 🟡 **Pre-launch security + QA pass** — preparing for first real customer demo (Roxon Red Sea Eilat), no fixed date yet.
+**Date**: 2026-08-27
 
-> 👉 **חוזרים מחר?** פתח [`RESUME.md`](./RESUME.md) — שני צעדים קטנים מסיימים הכל.
+> 👉 **חוזרים?** פתח [`RESUME.md`](./RESUME.md) — הצעדים הבאים בפועל.
 
-**Latest (2026-05-08, night)** — Hotel-wide QR + new PWA URL:
+**Latest (2026-08-27)** — Webhook secret rotation + push notification pipeline fixes (2 parallel sessions):
+- 🔒 Hardcoded plaintext `WEBHOOK_SECRET` (committed in `20260515000003_send_push_webhooks.sql`) rotated and moved to Supabase Vault lookup via new migration `20260828000001_webhook_secret_vault.sql`, covering all 6 push-trigger functions (5 original + the new `amenity_order_insert` one).
+- 🐛 Found and fixed: `send-push` Edge Function required JWT verification by default, which silently 401'd every `pg_net` trigger call (they never carry a JWT) — likely broken since it was first deployed. Fixed via `verify_jwt = false` in `supabase/config.toml`.
+- 🐛 Found and fixed: `ONESIGNAL_REST_API_KEY` secret had 2 stray Hebrew characters embedded in it (copy-paste artifact), causing every push send to throw a ByteString header error — push notifications may never have actually worked end-to-end before this.
+- ⚠️ Incident: a research subagent ran `supabase projects api-keys`, printing live project API keys to its own tool output. Recommended the project's `service_role`/`anon` keys be rotated as a precaution — **not yet confirmed done**.
+- 📄 `DEPLOY.md` updated: 6 webhooks (was 5), explicit `--no-verify-jwt` deploy instruction, and a webhook-secret rotation runbook.
+- ❓ Not yet verified: JWT Auth Hook registration, live test-user logins against the new `hotel_manager`/`dept_manager`/`staff` role scheme, and whether `push_service.dart`/`send-push/index.ts`'s old role→dept maps are out of sync with it (see `docs/STATUS.md` 2026-08-27 session for detail).
+
+**Earlier (2026-05-08, night)** — Hotel-wide QR + new PWA URL:
 - 🆕 **Hotel-wide lobby QR** + **A4 printable poster** with logo, hotel name, big 120mm QR, 4-language welcome instructions. New routes `/qr-codes` (hero section) and `/qr-codes/poster`.
 - 🆕 **3-step Hotel Setup Wizard** in Admin — details → rooms (auto-numbering with skip-list) → users (bulk email invites).
 - 🆕 **Logo file upload** (`hotel-logos` Supabase Storage bucket, 2MB, PNG/JPG/WebP/SVG) + `LogoPicker` component.

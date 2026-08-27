@@ -5,13 +5,15 @@ export default async function AnalyticsPage() {
   const viewer = await requireDashboardViewer()
 
   let tq = supabaseAdmin.from('tickets').select('hotel_id, status, hotels(name)')
+  let gq = supabaseAdmin.from('guest_requests').select('hotel_id, status, hotels(name)')
   if (viewer.isHotelTierAdmin && viewer.hotelId) {
     tq = tq.eq('hotel_id', viewer.hotelId)
+    gq = gq.eq('hotel_id', viewer.hotelId)
   }
-  const { data: ticketsByHotel } = await tq
+  const [{ data: ticketsByHotel }, { data: requestsByHotel }] = await Promise.all([tq, gq])
 
   const hotelMap: Record<string, { name: string; total: number; open: number; resolved: number }> = {}
-  for (const t of ticketsByHotel ?? []) {
+  for (const t of [...(ticketsByHotel ?? []), ...(requestsByHotel ?? [])]) {
     const hid = t.hotel_id as string
     const hotelRel = t.hotels as { name?: string } | { name?: string }[] | null
     const name = (Array.isArray(hotelRel) ? hotelRel[0]?.name : hotelRel?.name) ?? hid
@@ -32,7 +34,7 @@ export default async function AnalyticsPage() {
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
-              {['Hotel', 'Total Tickets', 'Open', 'Resolved', 'Resolution Rate'].map(h => (
+              {['Hotel', 'Total Items', 'Open', 'Resolved', 'Resolution Rate'].map(h => (
                 <th key={h} className="px-4 py-3 text-left text-sm font-medium text-gray-500">{h}</th>
               ))}
             </tr>
