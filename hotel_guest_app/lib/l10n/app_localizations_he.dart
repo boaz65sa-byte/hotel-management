@@ -108,6 +108,72 @@ class AppLocalizationsHe extends AppLocalizations {
   String get newRequestSubmit => 'שלח בקשה';
 
   @override
+  String get newRequestQuickSelectLabel => 'בחירה מהירה';
+
+  @override
+  String get newRequestSomethingElse => 'משהו אחר';
+
+  @override
+  String get newRequestNoteLabel => 'הוסיפו הערה (אופציונלי)';
+
+  @override
+  String get newRequestNoteHint => 'יש עוד משהו שכדאי שנדע? (אופציונלי)';
+
+  @override
+  String get serviceExtraTowels => 'מגבות נוספות';
+
+  @override
+  String get serviceExtraPillows => 'כריות נוספות';
+
+  @override
+  String get serviceCleanRoom => 'ניקיון החדר עכשיו';
+
+  @override
+  String get serviceDoNotDisturb => 'נא לא להפריע';
+
+  @override
+  String get serviceToiletries => 'מוצרי טיפוח';
+
+  @override
+  String get serviceIceWater => 'קרח ומים';
+
+  @override
+  String get serviceAcIssue => 'מיזוג לא עובד';
+
+  @override
+  String get serviceTvIssue => 'טלוויזיה לא עובדת';
+
+  @override
+  String get serviceWifiIssue => 'בעיית WiFi';
+
+  @override
+  String get servicePlumbingIssue => 'בעיית אינסטלציה';
+
+  @override
+  String get serviceLightBulb => 'נורה שרופה';
+
+  @override
+  String get servicePowerOutlet => 'שקע חשמל';
+
+  @override
+  String get serviceLateCheckout => 'צ\'ק-אאוט מאוחר';
+
+  @override
+  String get serviceExtraKey => 'מפתח נוסף';
+
+  @override
+  String get serviceTaxiRequest => 'הזמנת מונית';
+
+  @override
+  String get serviceLuggageHelp => 'עזרה עם מזוודות';
+
+  @override
+  String get serviceWakeUpCall => 'שיחת השכמה';
+
+  @override
+  String get serviceInvoiceRequest => 'חשבונית / קבלה';
+
+  @override
   String get feedbackTitle => 'משוב שהייה';
 
   @override

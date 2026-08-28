@@ -109,6 +109,72 @@ class AppLocalizationsAr extends AppLocalizations {
   String get newRequestSubmit => 'إرسال الطلب';
 
   @override
+  String get newRequestQuickSelectLabel => 'اختيار سريع';
+
+  @override
+  String get newRequestSomethingElse => 'شيء آخر';
+
+  @override
+  String get newRequestNoteLabel => 'أضف ملاحظة (اختياري)';
+
+  @override
+  String get newRequestNoteHint => 'هل هناك ما تريد إخبارنا به؟ (اختياري)';
+
+  @override
+  String get serviceExtraTowels => 'مناشف إضافية';
+
+  @override
+  String get serviceExtraPillows => 'وسائد إضافية';
+
+  @override
+  String get serviceCleanRoom => 'تنظيف الغرفة الآن';
+
+  @override
+  String get serviceDoNotDisturb => 'الرجاء عدم الإزعاج';
+
+  @override
+  String get serviceToiletries => 'مستلزمات الحمام';
+
+  @override
+  String get serviceIceWater => 'ثلج وماء';
+
+  @override
+  String get serviceAcIssue => 'التكييف لا يعمل';
+
+  @override
+  String get serviceTvIssue => 'التلفاز لا يعمل';
+
+  @override
+  String get serviceWifiIssue => 'مشكلة في الواي فاي';
+
+  @override
+  String get servicePlumbingIssue => 'مشكلة سباكة';
+
+  @override
+  String get serviceLightBulb => 'لمبة إضاءة';
+
+  @override
+  String get servicePowerOutlet => 'مقبس كهرباء';
+
+  @override
+  String get serviceLateCheckout => 'تسجيل خروج متأخر';
+
+  @override
+  String get serviceExtraKey => 'مفتاح إضافي';
+
+  @override
+  String get serviceTaxiRequest => 'حجز سيارة أجرة';
+
+  @override
+  String get serviceLuggageHelp => 'مساعدة في الأمتعة';
+
+  @override
+  String get serviceWakeUpCall => 'مكالمة إيقاظ';
+
+  @override
+  String get serviceInvoiceRequest => 'فاتورة / إيصال';
+
+  @override
   String get feedbackTitle => 'تقييم الإقامة';
 
   @override

@@ -288,6 +288,138 @@ abstract class AppLocalizations {
   /// **'שלח בקשה'**
   String get newRequestSubmit;
 
+  /// Quick-select service tiles section label
+  ///
+  /// In he, this message translates to:
+  /// **'בחירה מהירה'**
+  String get newRequestQuickSelectLabel;
+
+  /// Fallback tile for a request not covered by the predefined tiles
+  ///
+  /// In he, this message translates to:
+  /// **'משהו אחר'**
+  String get newRequestSomethingElse;
+
+  /// Note field label shown once a predefined service tile is selected
+  ///
+  /// In he, this message translates to:
+  /// **'הוסיפו הערה (אופציונלי)'**
+  String get newRequestNoteLabel;
+
+  /// Note field hint shown once a predefined service tile is selected
+  ///
+  /// In he, this message translates to:
+  /// **'יש עוד משהו שכדאי שנדע? (אופציונלי)'**
+  String get newRequestNoteHint;
+
+  /// Housekeeping quick-select tile: extra towels
+  ///
+  /// In he, this message translates to:
+  /// **'מגבות נוספות'**
+  String get serviceExtraTowels;
+
+  /// Housekeeping quick-select tile: extra pillows
+  ///
+  /// In he, this message translates to:
+  /// **'כריות נוספות'**
+  String get serviceExtraPillows;
+
+  /// Housekeeping quick-select tile: clean the room now
+  ///
+  /// In he, this message translates to:
+  /// **'ניקיון החדר עכשיו'**
+  String get serviceCleanRoom;
+
+  /// Housekeeping quick-select tile: do not disturb
+  ///
+  /// In he, this message translates to:
+  /// **'נא לא להפריע'**
+  String get serviceDoNotDisturb;
+
+  /// Housekeeping quick-select tile: toiletries
+  ///
+  /// In he, this message translates to:
+  /// **'מוצרי טיפוח'**
+  String get serviceToiletries;
+
+  /// Housekeeping quick-select tile: ice and water
+  ///
+  /// In he, this message translates to:
+  /// **'קרח ומים'**
+  String get serviceIceWater;
+
+  /// Maintenance quick-select tile: AC not working
+  ///
+  /// In he, this message translates to:
+  /// **'מיזוג לא עובד'**
+  String get serviceAcIssue;
+
+  /// Maintenance quick-select tile: TV not working
+  ///
+  /// In he, this message translates to:
+  /// **'טלוויזיה לא עובדת'**
+  String get serviceTvIssue;
+
+  /// Maintenance quick-select tile: WiFi issue
+  ///
+  /// In he, this message translates to:
+  /// **'בעיית WiFi'**
+  String get serviceWifiIssue;
+
+  /// Maintenance quick-select tile: plumbing issue
+  ///
+  /// In he, this message translates to:
+  /// **'בעיית אינסטלציה'**
+  String get servicePlumbingIssue;
+
+  /// Maintenance quick-select tile: light bulb
+  ///
+  /// In he, this message translates to:
+  /// **'נורה שרופה'**
+  String get serviceLightBulb;
+
+  /// Maintenance quick-select tile: power outlet
+  ///
+  /// In he, this message translates to:
+  /// **'שקע חשמל'**
+  String get servicePowerOutlet;
+
+  /// Reception quick-select tile: late checkout
+  ///
+  /// In he, this message translates to:
+  /// **'צ\'ק-אאוט מאוחר'**
+  String get serviceLateCheckout;
+
+  /// Reception quick-select tile: extra key
+  ///
+  /// In he, this message translates to:
+  /// **'מפתח נוסף'**
+  String get serviceExtraKey;
+
+  /// Reception quick-select tile: book a taxi
+  ///
+  /// In he, this message translates to:
+  /// **'הזמנת מונית'**
+  String get serviceTaxiRequest;
+
+  /// Reception quick-select tile: luggage help
+  ///
+  /// In he, this message translates to:
+  /// **'עזרה עם מזוודות'**
+  String get serviceLuggageHelp;
+
+  /// Reception quick-select tile: wake-up call
+  ///
+  /// In he, this message translates to:
+  /// **'שיחת השכמה'**
+  String get serviceWakeUpCall;
+
+  /// Reception quick-select tile: invoice or receipt
+  ///
+  /// In he, this message translates to:
+  /// **'חשבונית / קבלה'**
+  String get serviceInvoiceRequest;
+
   /// Feedback screen AppBar title
   ///
   /// In he, this message translates to:

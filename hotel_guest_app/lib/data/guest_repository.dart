@@ -42,6 +42,24 @@ class GuestRepository {
     }
   }
 
+  /// Fetches the set of quick-select request tile keys the super admin has
+  /// hidden for this hotel (e.g. "no room service"), as "category:tile_key"
+  /// strings. Fails open (returns empty = show everything) so a fetch error
+  /// never blocks a guest from submitting a request.
+  Future<Set<String>> getDisabledRequestTiles(String hotelId) async {
+    try {
+      final data = await supabase
+          .from('hotel_request_tiles_disabled')
+          .select('category, tile_key')
+          .eq('hotel_id', hotelId);
+      return (data as List)
+          .map((j) => '${j['category']}:${j['tile_key']}')
+          .toSet();
+    } catch (_) {
+      return const {};
+    }
+  }
+
   /// Fetches the active amenities catalog for a hotel, optionally filtered
   /// to one category (restaurant/spa/room_service).
   Future<List<AmenityItem>> getAmenities(String hotelId, {String? category}) async {

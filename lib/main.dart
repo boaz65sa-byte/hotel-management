@@ -23,6 +23,14 @@ void main() async {
     PushService.initOneSignal(oneSignalAppId);
   }
   await initSupabase();
-  await LocalDb.instance; // pre-warm SQLite
+  try {
+    await LocalDb.instance; // pre-warm SQLite
+  } catch (e) {
+    // Local cache is an optimization (offline queue + cached lists), not a
+    // hard requirement — a network-connected user shouldn't get a blank
+    // white screen because sqflite_common_ffi_web's wasm worker failed to
+    // load (e.g. missing COOP/COEP headers on some hosts).
+    debugPrint('LocalDb pre-warm failed, continuing without offline cache: $e');
+  }
   runApp(const ProviderScope(child: HotelApp()));
 }

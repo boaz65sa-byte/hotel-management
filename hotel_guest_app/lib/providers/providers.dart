@@ -29,6 +29,14 @@ final amenitiesProvider = FutureProvider<List<AmenityItem>>((ref) async {
   return ref.read(guestRepositoryProvider).getAmenities(session.hotelId);
 });
 
+/// Quick-select request tile keys the super admin has hidden for this hotel
+/// (e.g. "no room service"), as "category:tile_key" strings.
+final disabledRequestTilesProvider = FutureProvider<Set<String>>((ref) async {
+  final session = await ref.watch(sessionProvider.future);
+  if (session == null) return const {};
+  return ref.read(guestRepositoryProvider).getDisabledRequestTiles(session.hotelId);
+});
+
 /// Stream of this guest's requests.
 /// Returns empty stream if no session loaded yet.
 final myRequestsProvider = StreamProvider<List<GuestRequest>>((ref) {

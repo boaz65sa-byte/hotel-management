@@ -110,6 +110,72 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newRequestSubmit => 'Submit Request';
 
   @override
+  String get newRequestQuickSelectLabel => 'Quick Select';
+
+  @override
+  String get newRequestSomethingElse => 'Something else';
+
+  @override
+  String get newRequestNoteLabel => 'Add a note (optional)';
+
+  @override
+  String get newRequestNoteHint => 'Anything else we should know? (optional)';
+
+  @override
+  String get serviceExtraTowels => 'Extra Towels';
+
+  @override
+  String get serviceExtraPillows => 'Extra Pillows';
+
+  @override
+  String get serviceCleanRoom => 'Clean Room Now';
+
+  @override
+  String get serviceDoNotDisturb => 'Do Not Disturb';
+
+  @override
+  String get serviceToiletries => 'Toiletries';
+
+  @override
+  String get serviceIceWater => 'Ice & Water';
+
+  @override
+  String get serviceAcIssue => 'AC Not Working';
+
+  @override
+  String get serviceTvIssue => 'TV Not Working';
+
+  @override
+  String get serviceWifiIssue => 'WiFi Issue';
+
+  @override
+  String get servicePlumbingIssue => 'Plumbing Issue';
+
+  @override
+  String get serviceLightBulb => 'Light Bulb';
+
+  @override
+  String get servicePowerOutlet => 'Power Outlet';
+
+  @override
+  String get serviceLateCheckout => 'Late Checkout';
+
+  @override
+  String get serviceExtraKey => 'Extra Key';
+
+  @override
+  String get serviceTaxiRequest => 'Book a Taxi';
+
+  @override
+  String get serviceLuggageHelp => 'Luggage Help';
+
+  @override
+  String get serviceWakeUpCall => 'Wake-up Call';
+
+  @override
+  String get serviceInvoiceRequest => 'Invoice / Receipt';
+
+  @override
   String get feedbackTitle => 'Stay Feedback';
 
   @override

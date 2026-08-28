@@ -139,6 +139,94 @@
   "@newRequestSubmit": {
     "description": "Submit request button"
   },
+  "newRequestQuickSelectLabel": "בחירה מהירה",
+  "@newRequestQuickSelectLabel": {
+    "description": "Quick-select service tiles section label"
+  },
+  "newRequestSomethingElse": "משהו אחר",
+  "@newRequestSomethingElse": {
+    "description": "Fallback tile for a request not covered by the predefined tiles"
+  },
+  "newRequestNoteLabel": "הוסיפו הערה (אופציונלי)",
+  "@newRequestNoteLabel": {
+    "description": "Note field label shown once a predefined service tile is selected"
+  },
+  "newRequestNoteHint": "יש עוד משהו שכדאי שנדע? (אופציונלי)",
+  "@newRequestNoteHint": {
+    "description": "Note field hint shown once a predefined service tile is selected"
+  },
+  "serviceExtraTowels": "מגבות נוספות",
+  "@serviceExtraTowels": {
+    "description": "Housekeeping quick-select tile: extra towels"
+  },
+  "serviceExtraPillows": "כריות נוספות",
+  "@serviceExtraPillows": {
+    "description": "Housekeeping quick-select tile: extra pillows"
+  },
+  "serviceCleanRoom": "ניקיון החדר עכשיו",
+  "@serviceCleanRoom": {
+    "description": "Housekeeping quick-select tile: clean the room now"
+  },
+  "serviceDoNotDisturb": "נא לא להפריע",
+  "@serviceDoNotDisturb": {
+    "description": "Housekeeping quick-select tile: do not disturb"
+  },
+  "serviceToiletries": "מוצרי טיפוח",
+  "@serviceToiletries": {
+    "description": "Housekeeping quick-select tile: toiletries"
+  },
+  "serviceIceWater": "קרח ומים",
+  "@serviceIceWater": {
+    "description": "Housekeeping quick-select tile: ice and water"
+  },
+  "serviceAcIssue": "מיזוג לא עובד",
+  "@serviceAcIssue": {
+    "description": "Maintenance quick-select tile: AC not working"
+  },
+  "serviceTvIssue": "טלוויזיה לא עובדת",
+  "@serviceTvIssue": {
+    "description": "Maintenance quick-select tile: TV not working"
+  },
+  "serviceWifiIssue": "בעיית WiFi",
+  "@serviceWifiIssue": {
+    "description": "Maintenance quick-select tile: WiFi issue"
+  },
+  "servicePlumbingIssue": "בעיית אינסטלציה",
+  "@servicePlumbingIssue": {
+    "description": "Maintenance quick-select tile: plumbing issue"
+  },
+  "serviceLightBulb": "נורה שרופה",
+  "@serviceLightBulb": {
+    "description": "Maintenance quick-select tile: light bulb"
+  },
+  "servicePowerOutlet": "שקע חשמל",
+  "@servicePowerOutlet": {
+    "description": "Maintenance quick-select tile: power outlet"
+  },
+  "serviceLateCheckout": "צ'ק-אאוט מאוחר",
+  "@serviceLateCheckout": {
+    "description": "Reception quick-select tile: late checkout"
+  },
+  "serviceExtraKey": "מפתח נוסף",
+  "@serviceExtraKey": {
+    "description": "Reception quick-select tile: extra key"
+  },
+  "serviceTaxiRequest": "הזמנת מונית",
+  "@serviceTaxiRequest": {
+    "description": "Reception quick-select tile: book a taxi"
+  },
+  "serviceLuggageHelp": "עזרה עם מזוודות",
+  "@serviceLuggageHelp": {
+    "description": "Reception quick-select tile: luggage help"
+  },
+  "serviceWakeUpCall": "שיחת השכמה",
+  "@serviceWakeUpCall": {
+    "description": "Reception quick-select tile: wake-up call"
+  },
+  "serviceInvoiceRequest": "חשבונית / קבלה",
+  "@serviceInvoiceRequest": {
+    "description": "Reception quick-select tile: invoice or receipt"
+  },
   "feedbackTitle": "משוב שהייה",
   "@feedbackTitle": {
     "description": "Feedback screen AppBar title"

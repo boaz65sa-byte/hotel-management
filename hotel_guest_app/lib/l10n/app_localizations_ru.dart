@@ -111,6 +111,73 @@ class AppLocalizationsRu extends AppLocalizations {
   String get newRequestSubmit => 'Отправить запрос';
 
   @override
+  String get newRequestQuickSelectLabel => 'Быстрый выбор';
+
+  @override
+  String get newRequestSomethingElse => 'Что-то другое';
+
+  @override
+  String get newRequestNoteLabel => 'Добавить примечание (необязательно)';
+
+  @override
+  String get newRequestNoteHint =>
+      'Что-нибудь ещё, что нам следует знать? (необязательно)';
+
+  @override
+  String get serviceExtraTowels => 'Дополнительные полотенца';
+
+  @override
+  String get serviceExtraPillows => 'Дополнительные подушки';
+
+  @override
+  String get serviceCleanRoom => 'Убрать номер сейчас';
+
+  @override
+  String get serviceDoNotDisturb => 'Не беспокоить';
+
+  @override
+  String get serviceToiletries => 'Туалетные принадлежности';
+
+  @override
+  String get serviceIceWater => 'Лёд и вода';
+
+  @override
+  String get serviceAcIssue => 'Кондиционер не работает';
+
+  @override
+  String get serviceTvIssue => 'Телевизор не работает';
+
+  @override
+  String get serviceWifiIssue => 'Проблема с Wi-Fi';
+
+  @override
+  String get servicePlumbingIssue => 'Проблема с сантехникой';
+
+  @override
+  String get serviceLightBulb => 'Лампочка перегорела';
+
+  @override
+  String get servicePowerOutlet => 'Розетка не работает';
+
+  @override
+  String get serviceLateCheckout => 'Поздний выезд';
+
+  @override
+  String get serviceExtraKey => 'Дополнительный ключ';
+
+  @override
+  String get serviceTaxiRequest => 'Заказать такси';
+
+  @override
+  String get serviceLuggageHelp => 'Помощь с багажом';
+
+  @override
+  String get serviceWakeUpCall => 'Звонок-будильник';
+
+  @override
+  String get serviceInvoiceRequest => 'Счёт / квитанция';
+
+  @override
   String get feedbackTitle => 'Отзыв о пребывании';
 
   @override
