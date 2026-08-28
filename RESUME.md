@@ -44,8 +44,8 @@
 ### 🐛 פתוח — חקור, לא תוקן
 - 🐛 **maintenance_manager** "בקשות" tab → spinner אינסופי (401 + 406 + Dart null-exceptions). נחקר לעומק: RLS זהה ל-tech, קוד זהה, נתונים בסדר. שורש המדויק דורש source-map debugging מה-deployed build (לא זמין ב-Netlify). **כלל: Flutter CanvasKit compiled-to-JS קשה מאד להציע debug יותר מ-console errors עם כלי בדפדפן שלנו.**
 
-### 🕳️ פתוח — Feature Gap
-- 🕳️ **אין UI ל-amenity_orders בצוות** — התכונה קיימת ב-DB (`amenity_orders` table), יש webhook (`whk_fn_amenity_order_insert`), אבל צוות המלון (reception/housekeeping) לא יכול לראות/לטפל בהזמנות ללא כניסה לאדמין. הטבלה כרגע ריקה (אין test data) — צריך להחליט אם זה חוסם השקה או feature V1.1.
+### ✅ amenity_orders UI — נבנה (commit 38d3995), ממתין לפריסה ידנית
+נוסף טאב "הזמנות" ל-`ReceptionHomeScreen` ול-`ManagerHomeScreen` (`lib/features/amenity_orders/`) — סינון סטטוס (הכל/פתוחות/אושרו/נמסרו), פעולות אישור/מסירה/ביטול, שם וקטגוריה נטענים בנפרד מ-`hotel_amenities` ב-lookup לפי id (realtime `.stream()` לא תומך ב-join). נבדק: `flutter analyze` נקי, `flutter build web --release` הצליח. **לא נבדק ויזואלית** — ניסיון הרצה מקומית (`flutter run -d chrome` debug + `python -m http.server` על ה-release build) נכשל עם מסך ריק/`SqfliteDatabaseException`, כנראה תקלת סביבה מקומית לא קשורה לקוד החדש (ה-build הפרוס בפועל ב-Netlify עבד תקין שוב ושוב הערב לבדיקות אחרות). **צעד הבא**: `flutter build web --release` (כבר בוצע, ב-`build/web`) → גרירה ל-Netlify Drop לפי `LINKS.md` → התחבר כ-reception/manager ובדוק את טאב "הזמנות". שים לב: `amenities_ordering` כבוי כרגע לכל המלונות (כולל האמיתי) — אין דחיפות תפעולית, זה נבנה מראש.
 
 ### ⏸️ הופסק למשחק עתיד
 - ⏸️ **שדרוג מפתחות `service_role`/`anon`** (לאחר תקרית חשיפה בסוכן מחקר) — **לא אושר שהושלם עדיין**. תיעוד בהערה בתחתית.
