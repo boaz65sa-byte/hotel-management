@@ -8,6 +8,7 @@ import 'package:hotel_app/features/users/presentation/users_screen.dart';
 import 'package:hotel_app/features/profile/presentation/profile_screen.dart';
 import 'package:hotel_app/features/guest_requests/presentation/guest_requests_list.dart';
 import 'package:hotel_app/features/guest_requests/presentation/guest_feedback_screen.dart';
+import 'package:hotel_app/features/amenity_orders/presentation/amenity_orders_list_screen.dart';
 
 class ManagerHomeScreen extends ConsumerStatefulWidget {
   const ManagerHomeScreen({super.key});
@@ -24,6 +25,7 @@ class _ManagerHomeScreenState extends ConsumerState<ManagerHomeScreen> {
     final tabs = [
       (icon: Icons.dashboard,    label: 'דשבורד',    screen: const _ManagerDashboard()),
       (icon: Icons.room_service, label: 'בקשות',     screen: const GuestRequestsListScreen()),
+      (icon: Icons.shopping_bag, label: 'הזמנות',    screen: const AmenityOrdersListScreen()),
       (icon: Icons.star,         label: 'משובים',    screen: const GuestFeedbackScreen()),
       (icon: Icons.bar_chart,    label: l.analytics, screen: const AnalyticsScreen()),
       (icon: Icons.people,       label: l.users,     screen: const UsersScreen()),

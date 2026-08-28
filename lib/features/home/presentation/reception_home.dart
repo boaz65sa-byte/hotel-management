@@ -6,6 +6,7 @@ import 'package:hotel_app/features/rooms/presentation/rooms_grid_screen.dart';
 import 'package:hotel_app/features/tickets/presentation/tickets_list_screen.dart';
 import 'package:hotel_app/features/profile/presentation/profile_screen.dart';
 import 'package:hotel_app/features/guest_requests/presentation/guest_requests_list.dart';
+import 'package:hotel_app/features/amenity_orders/presentation/amenity_orders_list_screen.dart';
 
 class ReceptionHomeScreen extends ConsumerStatefulWidget {
   const ReceptionHomeScreen({super.key});
@@ -23,6 +24,7 @@ class _ReceptionHomeScreenState extends ConsumerState<ReceptionHomeScreen> {
       (icon: Icons.hotel,            label: l.rooms,         screen: const RoomsGridScreen()),
       (icon: Icons.confirmation_num, label: l.myTickets,     screen: const TicketsListScreen()),
       (icon: Icons.room_service,     label: 'בקשות אורחים', screen: const GuestRequestsListScreen()),
+      (icon: Icons.shopping_bag,     label: 'הזמנות',       screen: const AmenityOrdersListScreen()),
       (icon: Icons.person,           label: l.profile,       screen: const ProfileScreen()),
     ];
     return Scaffold(
