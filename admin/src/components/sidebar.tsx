@@ -58,6 +58,11 @@ export function Sidebar({ viewer }: { viewer: SidebarViewer }) {
       label: lang === 'he' ? 'משובים' : 'Feedback',
       icon: '⭐',
     },
+    {
+      href: '/dashboard/security',
+      label: lang === 'he' ? 'אבטחת חשבון' : 'Account security',
+      icon: '🔐',
+    },
   ]
 
   const hotelScopedNav: NavDef[] = viewer.hotelId
@@ -88,6 +93,11 @@ export function Sidebar({ viewer }: { viewer: SidebarViewer }) {
           href: '/dashboard/guest-feedback',
           label: lang === 'he' ? 'משובים' : 'Feedback',
           icon: '⭐',
+        },
+        {
+          href: '/dashboard/security',
+          label: lang === 'he' ? 'אבטחת חשבון' : 'Account security',
+          icon: '🔐',
         },
       ]
     : [overview]
