@@ -17,7 +17,8 @@ export default async function LogsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Audit Logs (last 200)</h1>
+      <h1 className="text-2xl font-bold mb-6">Ticket Activity (last 200)</h1>
+      <p className="text-sm text-gray-500 mb-4">Status changes and comments on maintenance tickets — not a general admin action log.</p>
       <div className="bg-white rounded-xl border overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b">
