@@ -14,7 +14,11 @@ Deno.serve(async (req) => {
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    // Legacy keys are being disabled. Prefer the new SUPABASE_SECRET_KEYS
+    // (a JSON map, key name isn't guaranteed to be "service_role"), falling
+    // back to the old plain-string var so this keeps working either way.
+    Object.values(JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') || '{}'))[0] as string
+      ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   )
 
   const { data: { user }, error: authError } = await supabase.auth.getUser(

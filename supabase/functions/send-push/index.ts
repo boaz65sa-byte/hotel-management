@@ -197,7 +197,12 @@ Deno.serve(async (req) => {
       // ── Ticket assigned to specific user ─────────────────────────────────
       case 'ticket_assigned': {
         const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-        const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+        // Legacy keys are being disabled. Prefer the new SUPABASE_SECRET_KEYS
+        // (a JSON map, key name isn't guaranteed to be "service_role"),
+        // falling back to the old plain-string var either way.
+        const supabaseKey =
+          Object.values(JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') || '{}'))[0] as string
+          ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
         const ticketRes   = await fetch(
           `${supabaseUrl}/rest/v1/tickets?id=eq.${record.ticket_id}&select=title`,
           { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
