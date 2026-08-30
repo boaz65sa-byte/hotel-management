@@ -39,6 +39,7 @@ const _deptIcons = {
   'reception':   '🛎️',
   'security':    '🔒',
   'housekeeping':'🧹',
+  'kitchen':     '🍳',
 };
 
 class TicketDetailScreen extends ConsumerWidget {

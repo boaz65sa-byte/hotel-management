@@ -112,6 +112,7 @@ class _QuickTicketDialogState extends ConsumerState<QuickTicketDialog> {
                 DropdownMenuItem(value: 'housekeeping', child: Text('🛏️ חדרניות')),
                 DropdownMenuItem(value: 'reception', child: Text('🛎️ קבלה')),
                 DropdownMenuItem(value: 'security', child: Text('🛡️ אבטחה')),
+                DropdownMenuItem(value: 'kitchen', child: Text('🍳 מטבח')),
               ],
               onChanged: (v) {
                 if (v != null) setState(() => _dept = v);

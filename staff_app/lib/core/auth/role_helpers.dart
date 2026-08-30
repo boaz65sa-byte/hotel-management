@@ -4,6 +4,7 @@ const kExportRoles = {
   'maintenance_manager',
   'housekeeping_manager',
   'security_manager',
+  'kitchen_manager',
   'ceo',
   'hotel_admin',
   'super_admin',

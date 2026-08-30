@@ -4,7 +4,8 @@ enum TicketStatus { open, inProgress, pendingApproval, resolved, closed }
 enum UserRole {
   superAdmin, ceo, hotelAdmin, receptionManager, maintenanceManager,
   housekeepingManager, housekeeping, securityManager, deputyReception,
-  receptionist, securityGuard, maintenanceTech, repairman;
+  receptionist, securityGuard, maintenanceTech, repairman,
+  kitchenManager, kitchenStaff;
 
   static UserRole fromString(String s) {
     final camel = _toCamel(s);
@@ -20,7 +21,7 @@ enum UserRole {
 
   static const _managerRoles = [
     superAdmin, ceo, hotelAdmin, receptionManager, maintenanceManager,
-    housekeepingManager, securityManager,
+    housekeepingManager, securityManager, kitchenManager,
   ];
 
   bool get canClaimAndUpdate => this != UserRole.receptionist;
@@ -36,6 +37,8 @@ enum UserRole {
     if (this == UserRole.maintenanceTech ||
         this == UserRole.repairman ||
         this == UserRole.maintenanceManager) return 'maintenance';
+    if (this == UserRole.kitchenManager ||
+        this == UserRole.kitchenStaff) return 'kitchen';
     return 'reception';
   }
 }

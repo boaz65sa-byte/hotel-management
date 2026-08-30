@@ -248,6 +248,7 @@ class TicketRepository {
       'reception': ['reception_manager', 'deputy_reception', 'receptionist'],
       'security': ['security_manager', 'security_guard'],
       'housekeeping': ['housekeeping_manager', 'housekeeping'],
+      'kitchen': ['kitchen_manager', 'kitchen_staff'],
     };
     final roles = deptRoles[dept] ?? [];
     if (roles.isEmpty) return [];

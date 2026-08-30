@@ -12,12 +12,16 @@ const _roleToDept = {
   'receptionist':          'reception',
   'reception_manager':     'reception',
   'hotel_admin':           'reception',
+  'kitchen':               'kitchen',
+  'kitchen_manager':       'kitchen',
+  'kitchen_staff':         'kitchen',
 };
 
 const _managerRoles = {
   'ceo',
   'reception_manager', 'hotel_admin', 'super_admin',
   'housekeeping_manager', 'maintenance_manager', 'security_manager',
+  'kitchen_manager',
 };
 
 class PushService {

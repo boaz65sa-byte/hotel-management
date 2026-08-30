@@ -38,6 +38,9 @@ const ROLE_TO_DEPT: Record<string, string> = {
   receptionist:         'reception',
   reception_manager:    'reception',
   hotel_admin:          'reception',
+  kitchen:              'kitchen',
+  kitchen_manager:      'kitchen',
+  kitchen_staff:        'kitchen',
 }
 
 interface OneSignalFilter {

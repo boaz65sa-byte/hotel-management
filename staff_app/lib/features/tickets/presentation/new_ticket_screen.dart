@@ -16,6 +16,7 @@ const _deptMeta = {
   'reception':   (icon: '🛎️', label: 'קבלה'),
   'security':    (icon: '🔒', label: 'ביטחון'),
   'housekeeping':(icon: '🧹', label: 'משק בית'),
+  'kitchen':     (icon: '🍳', label: 'מטבח'),
 };
 
 const _priorities = [

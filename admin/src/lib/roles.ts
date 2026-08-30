@@ -3,6 +3,7 @@
 //   supabase/migrations/20260322000002_users.sql
 //   supabase/migrations/20260405000001_hotel_admin_role.sql (hotel_admin)
 //   supabase/migrations/20260514000002_software_manager_role.sql (software_manager)
+//   supabase/migrations/20260830000002_kitchen_department_enum.sql (kitchen_manager, kitchen_staff)
 //
 // ──────────────────────────────────────────────────────────────────────
 // Role hierarchy (decided 2026-05-14):
@@ -81,6 +82,12 @@ export const ROLES: readonly Role[] = [
     icon:  '🛡️',
     tier:  'dept_manager',
   },
+  {
+    value: 'kitchen_manager',
+    label: 'מנהל מטבח',
+    icon:  '🍳',
+    tier:  'dept_manager',
+  },
 
   // ─── ⚪ Operational staff ─────────────────────────────────────────
   {
@@ -111,6 +118,12 @@ export const ROLES: readonly Role[] = [
     value: 'repairman',
     label: 'תיקונאי',
     icon:  '🪛',
+    tier:  'staff',
+  },
+  {
+    value: 'kitchen_staff',
+    label: 'עובד מטבח',
+    icon:  '👨‍🍳',
     tier:  'staff',
   },
 ] as const
