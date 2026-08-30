@@ -60,7 +60,7 @@
 
 ## 🚀 לעדכן את Staff App אחרי שינויי קוד
 
-1. `cd /Users/boazsaada/manegmant\ resapceon && flutter build web --release`
+1. `cd staff_app && flutter build web --release`
 2. פתח <https://app.netlify.com/projects/transcendent-mooncake-71c5b7/deploys>
 3. גרור את התיקייה `build/web` אל "Drag and drop your project folder here to deploy new changes"
 4. חכה ל-Published (כ-30 שניות)

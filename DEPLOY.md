@@ -6,7 +6,7 @@ This repo is a multi-target project. Each layer ships to a different host.
 |-------|------|------|-------|
 | Admin Panel | `admin/` | **Vercel** | Next.js 16 — monorepo config in `vercel.json` |
 | Guest PWA | `hotel_guest_app/` | **Netlify** | already live at `exquisite-cocada-7966bd.netlify.app` |
-| Staff App | `lib/` (root Flutter) | Android Play Store / iOS App Store | mobile build, not a hosted website |
+| Staff App | `staff_app/` | Android Play Store / iOS App Store | mobile build, not a hosted website |
 | Backend | `supabase/` | **Supabase** | migrations + edge functions + auth + storage |
 
 ---
@@ -142,7 +142,7 @@ Before redeploying, replace `YOUR_ONESIGNAL_APP_ID` in `hotel_guest_app/web/inde
 ## 4. Staff App → Mobile Stores
 
 ```bash
-cd "/Users/boazsaada/manegmant resapceon"
+cd staff_app
 
 # Android
 flutter build appbundle --release
