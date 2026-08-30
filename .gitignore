@@ -28,3 +28,10 @@ android/.gradle/
 android/local.properties
 android/app/google-services.json
 .superpowers/
+
+# iOS Xcode-generated SwiftPM resolution cache
+ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+ios/Runner.xcworkspace/xcshareddata/swiftpm/
+
+# Netlify CLI local site-link state (per-machine, not shared config)
+.netlify/
