@@ -19,9 +19,24 @@ final allGuestRequestsProvider = StreamProvider<List<GuestRequest>>((ref) {
 final myDeptRequestsProvider = StreamProvider<List<GuestRequest>>((ref) {
   final user = ref.watch(currentUserProvider);
   final hotelId = user?.appMetadata['hotel_id']?.toString();
+  // Auth hasn't resolved yet — Stream.empty() keeps the UI in its loading
+  // state, and this provider re-runs once currentUserProvider emits the user.
+  if (hotelId == null) return const Stream.empty();
+
   final role = (user?.appMetadata['role']?.toString()) ?? '';
   final dept = _roleToDept(role);
-  if (hotelId == null || dept == null) return const Stream.empty();
+  // Role claim missing or unrecognised. This is terminal — currentUserProvider
+  // won't change again, so the provider never re-runs. Returning Stream.empty()
+  // here closed the stream without ever emitting, which leaves a StreamProvider
+  // in AsyncLoading forever: the "Requests tab spins and never loads" bug.
+  // Surface it as an error so the screen can say something instead of hanging.
+  if (dept == null) {
+    return Stream.error(
+      StateError('לא ניתן לזהות מחלקה עבור התפקיד "$role"'),
+      StackTrace.current,
+    );
+  }
+
   return ref.watch(guestRequestRepositoryProvider).streamMyDept(hotelId, dept);
 });
 
