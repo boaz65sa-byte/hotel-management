@@ -60,7 +60,7 @@ class _GuestFeedbackScreenState extends ConsumerState<GuestFeedbackScreen> {
           ),
         ),
         actions: [
-          if (canExportData(ref.watch(authRepositoryProvider).role)) ...[
+          if (canExportData(ref.watch(currentRoleProvider))) ...[
             if (_exporting)
               const Padding(
                 padding: EdgeInsets.all(12),

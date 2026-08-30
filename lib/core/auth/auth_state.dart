@@ -15,3 +15,12 @@ final currentUserProvider = Provider<User?>((ref) {
     orElse: () => null,
   );
 });
+
+/// Role from the JWT's app_metadata — same source as `AuthRepository.role`,
+/// but derived through Riverpod so widgets don't have to reach into the
+/// `Supabase.instance` singleton from inside `build()`. Reading the singleton
+/// directly made those widgets untestable: a widget test that overrides its
+/// providers still blew up with "You must initialize the supabase instance".
+final currentRoleProvider = Provider<String?>((ref) {
+  return ref.watch(currentUserProvider)?.appMetadata['role'] as String?;
+});

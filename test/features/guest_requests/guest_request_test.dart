@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hotel_app/core/auth/auth_state.dart';
 import 'package:hotel_app/features/guest_requests/domain/guest_request_model.dart';
 import 'package:hotel_app/features/guest_requests/presentation/guest_request_card.dart';
 import 'package:hotel_app/features/guest_requests/presentation/guest_requests_list.dart';
@@ -154,6 +155,9 @@ void main() {
       await tester.pumpWidget(ProviderScope(
         overrides: [
           allGuestRequestsProvider.overrideWith((_) => Stream.value(requests)),
+          // Without this the screen resolves the role through the Supabase
+          // singleton, which no widget test can initialise.
+          currentRoleProvider.overrideWithValue('receptionist'),
         ],
         child: const MaterialApp(home: GuestRequestsListScreen()),
       ));
@@ -166,6 +170,7 @@ void main() {
       await tester.pumpWidget(ProviderScope(
         overrides: [
           allGuestRequestsProvider.overrideWith((_) => Stream.value([])),
+          currentRoleProvider.overrideWithValue('receptionist'),
         ],
         child: const MaterialApp(home: GuestRequestsListScreen()),
       ));

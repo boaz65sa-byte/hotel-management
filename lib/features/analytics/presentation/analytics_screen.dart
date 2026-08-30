@@ -30,7 +30,7 @@ class AnalyticsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final role = ref.watch(authRepositoryProvider).role;
+    final role = ref.watch(currentRoleProvider);
     final isManager = _isManager(role);
     final cs = Theme.of(context).colorScheme;
 
