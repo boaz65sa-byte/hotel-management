@@ -53,7 +53,7 @@ class AppTheme {
       elevation: 0,
       centerTitle: false,
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: Colors.white,
       elevation: 1,
       shadowColor: const Color(0x1FEA580C),
@@ -148,7 +148,7 @@ class AppTheme {
       elevation: 0,
       centerTitle: false,
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: const Color(0xFF0F1F3D),
       elevation: 4,
       shadowColor: const Color(0x40C9A84C),
