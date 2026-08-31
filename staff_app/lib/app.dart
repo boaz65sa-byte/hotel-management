@@ -24,6 +24,7 @@ class HotelApp extends ConsumerWidget {
       onPointerDown: (_) =>
           ref.read(sessionTimeoutManagerProvider).recordActivity(),
       child: MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       routerConfig: router,
       theme: theme,
       locale: locale,

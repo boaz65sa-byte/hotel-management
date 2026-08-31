@@ -66,6 +66,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Hotel Service uses the camera to attach photos to maintenance tickets.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Hotel Service accesses the photo library to attach photos to maintenance tickets.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
