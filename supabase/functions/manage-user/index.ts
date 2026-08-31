@@ -17,6 +17,7 @@ const managerRoles = [
   'maintenance_manager',
   'housekeeping_manager',
   'security_manager',
+  'kitchen_manager',
   'super_admin',
 ]
 

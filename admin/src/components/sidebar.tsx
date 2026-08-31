@@ -2,9 +2,11 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLang } from '@/lib/i18n'
+import { roleLabel } from '@/lib/roles'
 
 export type SidebarViewer = {
   isSuperAdmin: boolean
+  role?: string
   hotelId: string | null
   hotelName?: string
   displayName: string
@@ -114,10 +116,14 @@ export function Sidebar({ viewer }: { viewer: SidebarViewer }) {
 
   return (
     <aside className="w-56 bg-gray-900 text-white min-h-screen p-4 flex flex-col">
-      <div className="text-xl font-bold mb-2 px-2">{branding}</div>
-      <div className="text-xs text-gray-400 px-2 mb-6 truncate">
+      <div className="text-xl font-bold mb-1 px-2">{branding}</div>
+      <div className="text-xs text-gray-400 px-2 mb-1 truncate">
         {viewer.displayName.replace(/[<>'"]+/g, '')}
       </div>
+      {!viewer.isSuperAdmin && viewer.role && (
+        <div className="text-xs text-gray-500 px-2 mb-6">{roleLabel(viewer.role)}</div>
+      )}
+      {viewer.isSuperAdmin && <div className="mb-6" />}
       <nav className="space-y-1 flex-1">
         {nav.map((item) => {
           const active =

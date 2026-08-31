@@ -33,8 +33,9 @@ Deno.serve(async (req) => {
     .eq('id', user.id)
     .single()
 
-  const managerRoles = ['ceo', 'reception_manager', 'maintenance_manager',
-                        'housekeeping_manager', 'security_manager', 'super_admin']
+  const managerRoles = ['ceo', 'software_manager', 'hotel_admin', 'reception_manager',
+                        'maintenance_manager', 'housekeeping_manager', 'security_manager',
+                        'kitchen_manager', 'super_admin']
   if (!profile || !managerRoles.includes(profile.role)) {
     return new Response('Forbidden', { status: 403 })
   }

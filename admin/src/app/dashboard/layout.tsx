@@ -26,6 +26,7 @@ export default async function DashboardLayout({
         <Sidebar
           viewer={{
             isSuperAdmin: viewer.isSuperAdmin,
+            role: viewer.role,
             hotelId: viewer.hotelId,
             hotelName: scopedHotelName,
             displayName: viewer.fullName ?? viewer.email ?? 'משתמש',
