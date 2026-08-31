@@ -22,3 +22,10 @@ final deptTicketsProvider = FutureProvider.family<List<Ticket>, String>((ref, de
 final roomTicketsProvider = FutureProvider.family<List<Ticket>, String>((ref, roomId) async {
   return ref.watch(ticketRepoProvider).fetchForRoom(roomId);
 });
+
+final disabledDepartmentsProvider = FutureProvider<Set<String>>((ref) async {
+  final user = ref.watch(currentUserProvider);
+  final hotelId = user?.appMetadata['hotel_id'] as String?;
+  if (hotelId == null) return const {};
+  return ref.watch(ticketRepoProvider).fetchDisabledDepartments(hotelId);
+});

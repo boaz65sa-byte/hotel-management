@@ -5,6 +5,14 @@ import 'package:hotel_app/core/auth/auth_state.dart';
 import 'package:hotel_app/features/rooms/domain/room_model.dart';
 import 'package:hotel_app/features/tickets/providers/tickets_provider.dart';
 
+const _quickDeptOptions = [
+  (value: 'maintenance',  icon: '🔧', label: 'תחזוקה'),
+  (value: 'housekeeping', icon: '🛏️', label: 'חדרניות'),
+  (value: 'reception',    icon: '🛎️', label: 'קבלה'),
+  (value: 'security',     icon: '🛡️', label: 'אבטחה'),
+  (value: 'kitchen',      icon: '🍳', label: 'מטבח'),
+];
+
 /// Compact ticket-creation dialog reachable from a long-press on a room tile.
 /// Saves a few taps vs. drilling into the room detail → "+ ticket" flow.
 class QuickTicketDialog extends ConsumerStatefulWidget {
@@ -76,6 +84,12 @@ class _QuickTicketDialogState extends ConsumerState<QuickTicketDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final disabledDepts = ref.watch(disabledDepartmentsProvider).valueOrNull ?? const {};
+    final deptOptions =
+        _quickDeptOptions.where((d) => !disabledDepts.contains(d.value)).toList();
+    if (!deptOptions.any((d) => d.value == _dept) && deptOptions.isNotEmpty) {
+      _dept = deptOptions.first.value;
+    }
     return AlertDialog(
       title: Text('קריאה מהירה — חדר ${widget.room.roomNumber}'),
       content: SingleChildScrollView(
@@ -107,13 +121,12 @@ class _QuickTicketDialogState extends ConsumerState<QuickTicketDialog> {
                 labelText: 'מחלקה',
                 border: OutlineInputBorder(),
               ),
-              items: const [
-                DropdownMenuItem(value: 'maintenance', child: Text('🔧 תחזוקה')),
-                DropdownMenuItem(value: 'housekeeping', child: Text('🛏️ חדרניות')),
-                DropdownMenuItem(value: 'reception', child: Text('🛎️ קבלה')),
-                DropdownMenuItem(value: 'security', child: Text('🛡️ אבטחה')),
-                DropdownMenuItem(value: 'kitchen', child: Text('🍳 מטבח')),
-              ],
+              items: deptOptions
+                  .map((d) => DropdownMenuItem(
+                        value: d.value,
+                        child: Text('${d.icon} ${d.label}'),
+                      ))
+                  .toList(),
               onChanged: (v) {
                 if (v != null) setState(() => _dept = v);
               },

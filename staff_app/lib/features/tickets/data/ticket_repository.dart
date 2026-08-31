@@ -28,6 +28,20 @@ class TicketRepository {
     return (res as List).map((j) => Ticket.fromJson(j as Map<String, dynamic>)).toList();
   }
 
+  /// Departments the hotel's super admin has turned off (opt-out list —
+  /// see hotel_ticket_departments_disabled / DepartmentsManager in admin).
+  Future<Set<String>> fetchDisabledDepartments(String hotelId) async {
+    try {
+      final data = await supabase
+          .from('hotel_ticket_departments_disabled')
+          .select('department')
+          .eq('hotel_id', hotelId);
+      return (data as List).map((j) => j['department'] as String).toSet();
+    } catch (_) {
+      return const {};
+    }
+  }
+
   Future<List<Ticket>> fetchForDept(String dept) async {
     final res = await supabase
       .from('tickets')

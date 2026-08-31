@@ -8,6 +8,7 @@ import 'package:hotel_app/features/tickets/domain/ticket_status.dart';
 import 'package:hotel_app/core/supabase/supabase_client.dart';
 import 'package:hotel_app/features/rooms/providers/rooms_provider.dart';
 import '../data/ticket_repository.dart';
+import '../providers/tickets_provider.dart';
 import 'package:hotel_app/core/connectivity/connectivity_service.dart';
 
 // ── Static maps ───────────────────────────────────────────────────────────────
@@ -54,7 +55,9 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
     final user = ref.watch(currentUserProvider);
     final role = UserRole.fromString(
         (user?.appMetadata['role'] as String?) ?? 'receptionist');
-    final availableDepts = allowedDepts(role);
+    final disabledDepts = ref.watch(disabledDepartmentsProvider).valueOrNull ?? const {};
+    final availableDepts =
+        allowedDepts(role).where((d) => !disabledDepts.contains(d)).toList();
     final roomsAsync = ref.watch(roomsProvider);
 
     final isEmergency = _priority == 'urgent';
