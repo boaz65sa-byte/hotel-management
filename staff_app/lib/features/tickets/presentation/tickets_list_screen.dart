@@ -25,18 +25,26 @@ const _statusLabels = {
 const _priorityOrder = {'urgent': 0, 'high': 1, 'normal': 2, 'low': 3};
 
 class TicketsListScreen extends ConsumerStatefulWidget {
-  const TicketsListScreen({super.key});
+  final String? initialFilter;
+  final bool onlyOverdue;
+  const TicketsListScreen({
+    super.key,
+    this.initialFilter,
+    this.onlyOverdue = false,
+  });
 
   @override
   ConsumerState<TicketsListScreen> createState() => _TicketsListScreenState();
 }
 
 class _TicketsListScreenState extends ConsumerState<TicketsListScreen> {
-  String _filter = 'הכל';
-  _SortOption _sort = _SortOption.newest;
+  late String _filter = widget.initialFilter ?? 'הכל';
+  late _SortOption _sort =
+      widget.onlyOverdue ? _SortOption.sla : _SortOption.newest;
 
   List<Ticket> _apply(List<Ticket> tickets) {
     var list = tickets.where((t) {
+      if (widget.onlyOverdue && !t.isOverSla) return false;
       if (_filter == 'הכל') return true;
       if (_filter == 'pending_close') return t.pendingClose;
       return t.status == _filter;

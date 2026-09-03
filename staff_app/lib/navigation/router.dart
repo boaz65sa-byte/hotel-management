@@ -7,6 +7,7 @@ import 'package:hotel_app/features/home/presentation/home_screen.dart';
 import 'package:hotel_app/features/tickets/presentation/ticket_detail_screen.dart';
 import 'package:hotel_app/features/tickets/presentation/ticket_chat_screen.dart';
 import 'package:hotel_app/features/tickets/presentation/new_ticket_screen.dart';
+import 'package:hotel_app/features/tickets/presentation/tickets_list_screen.dart';
 import 'package:hotel_app/features/rooms/presentation/room_detail_screen.dart';
 import 'package:hotel_app/features/rooms/presentation/room_management_screen.dart';
 import 'package:hotel_app/features/users/presentation/new_user_screen.dart';
@@ -34,6 +35,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       }),
       GoRoute(path: '/', builder: (_, __) => const HomeScreen()),
       GoRoute(path: '/tickets/new', builder: (_, __) => const NewTicketScreen()),
+      GoRoute(
+        path: '/tickets',
+        builder: (_, state) => TicketsListScreen(
+          initialFilter: state.uri.queryParameters['filter'],
+          onlyOverdue: state.uri.queryParameters['overdue'] == 'true',
+        ),
+      ),
       GoRoute(
         path: '/tickets/:id',
         builder: (_, state) => TicketDetailScreen(ticketId: state.pathParameters['id']!),
