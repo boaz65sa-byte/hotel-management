@@ -102,6 +102,14 @@ export async function setupHotelAction(input: WizardInput): Promise<WizardResult
   const hotelId = hotelRow.id
   let roomsCreated = 0
 
+  // 1a. Seed the 3 system guest-request categories, same as the backfill
+  // this table's migration ran for pre-existing hotels.
+  await supabaseAdmin.from('hotel_request_categories').insert([
+    { hotel_id: hotelId, key: 'housekeeping', label: 'חדרניות', icon: '🛏️', is_system: true, sort_order: 1 },
+    { hotel_id: hotelId, key: 'maintenance',  label: 'תחזוקה',  icon: '🔧', is_system: true, sort_order: 2 },
+    { hotel_id: hotelId, key: 'reception',    label: 'קבלה',    icon: '🛎️', is_system: true, sort_order: 3 },
+  ])
+
   // 1b. Redeem the license against the new hotel (atomic, guards against a
   // race between two admins using the same code).
   const { error: redeemErr } = await supabaseAdmin.rpc('redeem_hotel_license', {

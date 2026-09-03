@@ -3,6 +3,7 @@ import 'package:hotel_guest_app/core/session.dart';
 import 'package:hotel_guest_app/data/guest_repository.dart';
 import 'package:hotel_guest_app/domain/guest_request.dart';
 import 'package:hotel_guest_app/domain/amenity_item.dart';
+import 'package:hotel_guest_app/domain/request_category.dart';
 
 final guestRepositoryProvider =
     Provider<GuestRepository>((_) => GuestRepository());
@@ -35,6 +36,14 @@ final disabledRequestTilesProvider = FutureProvider<Set<String>>((ref) async {
   final session = await ref.watch(sessionProvider.future);
   if (session == null) return const {};
   return ref.read(guestRepositoryProvider).getDisabledRequestTiles(session.hotelId);
+});
+
+/// Per-hotel guest-request category catalog (the "new request" screen's
+/// top-level picker), configured by the super admin.
+final requestCategoriesProvider = FutureProvider<List<RequestCategory>>((ref) async {
+  final session = await ref.watch(sessionProvider.future);
+  if (session == null) return const [];
+  return ref.read(guestRepositoryProvider).getRequestCategories(session.hotelId);
 });
 
 /// Stream of this guest's requests.

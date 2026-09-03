@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hotel_guest_app/domain/request_category.dart';
 import 'package:hotel_guest_app/l10n/app_localizations.dart';
 import 'package:hotel_guest_app/providers/providers.dart';
 
@@ -79,11 +80,16 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
     super.dispose();
   }
 
-  List<(String, String)> _categories(AppLocalizations loc) => [
-    ('housekeeping', '🛏️ ${loc.categoryHousekeeping}'),
-    ('maintenance',  '🔧 ${loc.categoryMaintenance}'),
-    ('reception',    '🛎️ ${loc.categoryReception}'),
-  ];
+  // System categories keep their existing localized (multi-language) labels
+  // regardless of what's stored in the DB row — a hotel-authored custom
+  // category has no translation available, so it falls back to its raw
+  // label/icon as entered by the super admin.
+  String _labelFor(RequestCategory c, AppLocalizations loc) => switch (c.key) {
+    'housekeeping' => '${c.icon} ${loc.categoryHousekeeping}',
+    'maintenance'  => '${c.icon} ${loc.categoryMaintenance}',
+    'reception'    => '${c.icon} ${loc.categoryReception}',
+    _ => '${c.icon} ${c.label}',
+  };
 
   void _selectCategory(String category) {
     setState(() {
@@ -138,7 +144,12 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final categories = _categories(loc);
+    final categories = ref.watch(requestCategoriesProvider).valueOrNull ??
+        const [
+          RequestCategory(key: 'housekeeping', label: 'חדרניות', icon: '🛏️', isSystem: true),
+          RequestCategory(key: 'maintenance',  label: 'תחזוקה',  icon: '🔧', isSystem: true),
+          RequestCategory(key: 'reception',    label: 'קבלה',    icon: '🛎️', isSystem: true),
+        ];
     final disabledTiles =
         ref.watch(disabledRequestTilesProvider).valueOrNull ?? const {};
     final tiles = (_serviceTilesByCategory[_category] ?? const [])
@@ -174,25 +185,25 @@ class _NewRequestScreenState extends ConsumerState<NewRequestScreen> {
                 runSpacing: 10,
                 children: categories
                     .map((c) => GestureDetector(
-                          onTap: () => _selectCategory(c.$1),
+                          onTap: () => _selectCategory(c.key),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 12),
                             decoration: BoxDecoration(
-                              color: _category == c.$1
+                              color: _category == c.key
                                   ? const Color(0xFFC9A84C)
                                   : const Color(0xFF0F1F3D),
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: _category == c.$1
+                                color: _category == c.key
                                     ? const Color(0xFFC9A84C)
                                     : const Color(0xFF1E3A5F),
                               ),
                             ),
                             child: Text(
-                              c.$2,
+                              _labelFor(c, loc),
                               style: TextStyle(
-                                color: _category == c.$1
+                                color: _category == c.key
                                     ? Colors.black
                                     : const Color(0xFFE2E8F0),
                                 fontWeight: FontWeight.w600,

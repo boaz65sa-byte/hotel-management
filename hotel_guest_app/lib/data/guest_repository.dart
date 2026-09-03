@@ -1,6 +1,13 @@
 import 'package:hotel_guest_app/core/supabase_init.dart';
 import 'package:hotel_guest_app/domain/guest_request.dart';
 import 'package:hotel_guest_app/domain/amenity_item.dart';
+import 'package:hotel_guest_app/domain/request_category.dart';
+
+const _fallbackRequestCategories = [
+  RequestCategory(key: 'housekeeping', label: 'חדרניות', icon: '🛏️', isSystem: true),
+  RequestCategory(key: 'maintenance',  label: 'תחזוקה',  icon: '🔧', isSystem: true),
+  RequestCategory(key: 'reception',    label: 'קבלה',    icon: '🛎️', isSystem: true),
+];
 
 class HotelBranding {
   final String name;
@@ -111,6 +118,26 @@ class GuestRepository {
                 r.roomNumber == roomNumber && r.guestName == guestName)
             .toList()
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
+  }
+
+  /// Fetches the per-hotel guest-request category catalog (active only,
+  /// sorted). Falls back to the original 3 hardcoded categories on any
+  /// error so the "new request" screen always has something to show.
+  Future<List<RequestCategory>> getRequestCategories(String hotelId) async {
+    try {
+      final data = await supabase
+          .from('hotel_request_categories')
+          .select('key, label, icon, is_system')
+          .eq('hotel_id', hotelId)
+          .eq('is_active', true)
+          .order('sort_order');
+      final list = (data as List)
+          .map((j) => RequestCategory.fromJson(j as Map<String, dynamic>))
+          .toList();
+      return list.isEmpty ? _fallbackRequestCategories : list;
+    } catch (_) {
+      return _fallbackRequestCategories;
+    }
   }
 
   /// Submits a new guest request.
