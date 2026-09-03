@@ -68,7 +68,7 @@ class GuestRepository {
   Future<List<AmenityItem>> getAmenities(String hotelId, {String? category}) async {
     var query = supabase
         .from('hotel_amenities')
-        .select('id, category, name, description, price, currency')
+        .select('id, category, name, description, price, currency, image_url')
         .eq('hotel_id', hotelId)
         .eq('is_active', true);
     if (category != null) query = query.eq('category', category);

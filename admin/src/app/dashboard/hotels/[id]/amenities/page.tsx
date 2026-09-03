@@ -45,6 +45,7 @@ export default async function HotelAmenitiesPage({
 
     const priceRaw = (formData.get('price') as string)?.trim()
     const description = (formData.get('description') as string)?.trim()
+    const imageUrl = (formData.get('image_url') as string)?.trim()
 
     await supabaseAdmin.from('hotel_amenities').insert({
       hotel_id: id,
@@ -52,6 +53,7 @@ export default async function HotelAmenitiesPage({
       name,
       description: description || null,
       price: priceRaw ? Number(priceRaw) : null,
+      image_url: imageUrl || null,
     })
     revalidatePath(`/dashboard/hotels/${id}/amenities`)
   }

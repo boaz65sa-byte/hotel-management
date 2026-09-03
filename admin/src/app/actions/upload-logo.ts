@@ -10,8 +10,9 @@ const ALLOWED_MIME = new Set([
 ])
 const MAX_BYTES = 2 * 1024 * 1024
 
-export async function uploadLogoAction(
+async function uploadImage(
   fd: FormData,
+  bucket: string,
 ): Promise<{ ok: boolean; url?: string; error?: string }> {
   const file = fd.get('file')
   if (!(file instanceof File)) {
@@ -29,7 +30,7 @@ export async function uploadLogoAction(
   const bytes = new Uint8Array(await file.arrayBuffer())
 
   const { error: upErr } = await supabaseAdmin.storage
-    .from('hotel-logos')
+    .from(bucket)
     .upload(path, bytes, {
       contentType: file.type,
       upsert: false,
@@ -39,6 +40,18 @@ export async function uploadLogoAction(
     return { ok: false, error: upErr.message }
   }
 
-  const { data } = supabaseAdmin.storage.from('hotel-logos').getPublicUrl(path)
+  const { data } = supabaseAdmin.storage.from(bucket).getPublicUrl(path)
   return { ok: true, url: data.publicUrl }
+}
+
+export async function uploadLogoAction(
+  fd: FormData,
+): Promise<{ ok: boolean; url?: string; error?: string }> {
+  return uploadImage(fd, 'hotel-logos')
+}
+
+export async function uploadAmenityImageAction(
+  fd: FormData,
+): Promise<{ ok: boolean; url?: string; error?: string }> {
+  return uploadImage(fd, 'hotel-amenities')
 }

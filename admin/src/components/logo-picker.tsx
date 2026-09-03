@@ -2,16 +2,26 @@
 import { useState, useRef } from 'react'
 import { uploadLogoAction } from '@/app/actions/upload-logo'
 
+type UploadResult = { ok: boolean; url?: string; error?: string }
+
 type Props = {
   value: string | null
   onChange: (url: string | null) => void
   hiddenInputName?: string
+  uploadAction?: (fd: FormData) => Promise<UploadResult>
+  placeholderIcon?: string
 }
 
 const MAX_BYTES = 2 * 1024 * 1024 // 2 MB
 const ACCEPT = 'image/png,image/jpeg,image/webp,image/svg+xml'
 
-export function LogoPicker({ value, onChange, hiddenInputName = 'logo_url' }: Props) {
+export function LogoPicker({
+  value,
+  onChange,
+  hiddenInputName = 'logo_url',
+  uploadAction = uploadLogoAction,
+  placeholderIcon = '🏨',
+}: Props) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement | null>(null)
@@ -30,7 +40,7 @@ export function LogoPicker({ value, onChange, hiddenInputName = 'logo_url' }: Pr
     try {
       const fd = new FormData()
       fd.append('file', file)
-      const res = await uploadLogoAction(fd)
+      const res = await uploadAction(fd)
       if (!res.ok || !res.url) {
         setError(res.error ?? 'שגיאה בהעלאה')
         return
@@ -53,7 +63,7 @@ export function LogoPicker({ value, onChange, hiddenInputName = 'logo_url' }: Pr
             // eslint-disable-next-line @next/next/no-img-element
             <img src={value} alt="Logo" className="h-full w-full object-cover" />
           ) : (
-            <span className="text-3xl text-gray-300">🏨</span>
+            <span className="text-3xl text-gray-300">{placeholderIcon}</span>
           )}
         </div>
 
