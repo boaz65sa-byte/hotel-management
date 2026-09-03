@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { ROLES, type Role } from '@/lib/roles'
 
 type Hotel = { id: string; name: string }
+type Department = { id: string; key: string; label: string; icon: string }
 
 const TIER_HEADERS: Record<Role['tier'], string> = {
   super_admin:  '🟣 פלטפורמה',
@@ -22,10 +23,14 @@ export default function NewUserClient({ lockedHotelId }: { lockedHotelId?: strin
     password: '',
     role: 'ceo',
     hotel_id: lockedHotelId ?? '',
+    department_id: '',
   })
   const [hotels, setHotels] = useState<Hotel[]>([])
+  const [departments, setDepartments] = useState<Department[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  const isCustomDeptRole = form.role === 'custom_dept_manager' || form.role === 'custom_dept_staff'
 
   useEffect(() => {
     if (lockedHotelId) {
@@ -39,6 +44,18 @@ export default function NewUserClient({ lockedHotelId }: { lockedHotelId?: strin
       .then((data) => setHotels(Array.isArray(data) ? data : []))
       .catch(() => setHotels([]))
   }, [])
+
+  const effectiveHotelId = lockedHotelId ?? form.hotel_id
+  useEffect(() => {
+    if (!isCustomDeptRole || !effectiveHotelId) {
+      setDepartments([])
+      return
+    }
+    fetch(`/api/hotel-departments?hotel_id=${effectiveHotelId}`)
+      .then((r) => r.json())
+      .then((data) => setDepartments(Array.isArray(data) ? data : []))
+      .catch(() => setDepartments([]))
+  }, [isCustomDeptRole, effectiveHotelId])
 
   const grouped = useMemo(() => {
     const m = new Map<Role['tier'], Role[]>()
@@ -58,13 +75,22 @@ export default function NewUserClient({ lockedHotelId }: { lockedHotelId?: strin
       setError('בחרו מלון')
       return
     }
+    if (isCustomDeptRole && !form.department_id) {
+      setError('בחרו מחלקה מותאמת')
+      return
+    }
     setLoading(true)
     setError('')
     try {
       const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'create', ...form, hotel_id }),
+        body: JSON.stringify({
+          action: 'create',
+          ...form,
+          hotel_id,
+          department_id: isCustomDeptRole ? form.department_id : null,
+        }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'שגיאה')
@@ -136,6 +162,25 @@ export default function NewUserClient({ lockedHotelId }: { lockedHotelId?: strin
             <p className="text-xs text-gray-500 mt-1">{currentRole.description}</p>
           )}
         </div>
+
+        {isCustomDeptRole && (
+          <div>
+            <label className="block text-sm font-medium mb-1">מחלקה מותאמת *</label>
+            <select required className="w-full border rounded-lg px-3 py-2 text-sm bg-white"
+              value={form.department_id}
+              onChange={(e) => setForm((f) => ({ ...f, department_id: e.target.value }))}>
+              <option value="">בחרו מחלקה…</option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>{d.icon} {d.label}</option>
+              ))}
+            </select>
+            {departments.length === 0 && (
+              <p className="text-xs text-amber-600 mt-1">
+                אין עדיין מחלקות מותאמות למלון זה — צרו אחת בעמוד המלון קודם.
+              </p>
+            )}
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium mb-1">מלון *</label>

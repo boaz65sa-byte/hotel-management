@@ -186,7 +186,7 @@ class _TicketDetailView extends StatelessWidget {
                           filled: true,
                         ),
                         _HeroChip(
-                          label: '$deptIcon ${ticket.assignedDept}',
+                          label: '$deptIcon ${ticket.assignedDept ?? "מחלקה מותאמת"}',
                           color: const Color(0xFF2563EB),
                           filled: false,
                         ),

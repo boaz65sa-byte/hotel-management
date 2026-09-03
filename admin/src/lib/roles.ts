@@ -88,6 +88,13 @@ export const ROLES: readonly Role[] = [
     icon:  '🍳',
     tier:  'dept_manager',
   },
+  {
+    value:       'custom_dept_manager',
+    label:       'מנהל מחלקה מותאמת',
+    icon:        '🏷️',
+    tier:        'dept_manager',
+    description: 'מנהל מחלקה שנוצרה עבור המלון הזה בלבד (לא אחת מ-5 המחלקות המובנות). יש לבחור את המחלקה הספציפית.',
+  },
 
   // ─── ⚪ Operational staff ─────────────────────────────────────────
   {
@@ -125,6 +132,13 @@ export const ROLES: readonly Role[] = [
     label: 'עובד מטבח',
     icon:  '👨‍🍳',
     tier:  'staff',
+  },
+  {
+    value:       'custom_dept_staff',
+    label:       'עובד מחלקה מותאמת',
+    icon:        '🏷️',
+    tier:        'staff',
+    description: 'עובד במחלקה שנוצרה עבור המלון הזה בלבד. יש לבחור את המחלקה הספציפית.',
   },
 ] as const
 

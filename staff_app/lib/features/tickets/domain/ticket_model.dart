@@ -4,7 +4,8 @@ class Ticket {
   final String hotelId;
   final String roomId;
   final String openedBy;
-  final String assignedDept;
+  final String? assignedDept;
+  final String? customDepartmentId;
   final String? claimedBy;
   final String? assignedTo;
   final String title;
@@ -33,7 +34,8 @@ class Ticket {
     required this.hotelId,
     required this.roomId,
     required this.openedBy,
-    required this.assignedDept,
+    this.assignedDept,
+    this.customDepartmentId,
     this.claimedBy,
     this.assignedTo,
     required this.title,
@@ -61,7 +63,8 @@ class Ticket {
     hotelId: j['hotel_id'] as String,
     roomId: j['room_id'] as String,
     openedBy: j['opened_by'] as String,
-    assignedDept: j['assigned_dept'] as String,
+    assignedDept: j['assigned_dept'] as String?,
+    customDepartmentId: j['custom_department_id'] as String?,
     claimedBy: j['claimed_by'] as String?,
     assignedTo: j['assigned_to'] as String?,
     title: j['title'] as String,

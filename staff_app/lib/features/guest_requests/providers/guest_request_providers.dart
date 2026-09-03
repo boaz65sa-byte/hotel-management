@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hotel_app/core/auth/auth_state.dart';
 import 'package:hotel_app/features/guest_requests/data/guest_request_repository.dart';
 import 'package:hotel_app/features/guest_requests/domain/guest_request_model.dart';
+import 'package:hotel_app/features/home/providers/custom_department_home_provider.dart';
 
 final guestRequestRepositoryProvider =
     Provider<GuestRequestRepository>((_) => GuestRequestRepository());
@@ -24,6 +25,26 @@ final myDeptRequestsProvider = StreamProvider<List<GuestRequest>>((ref) {
   if (hotelId == null) return const Stream.empty();
 
   final role = (user?.appMetadata['role']?.toString()) ?? '';
+
+  // Custom departments aren't in the fixed role->dept map below — their
+  // "department" is whatever hotel_departments.key the user was assigned
+  // (see custom_department_home_provider.dart), resolved live since it
+  // isn't in the JWT. Matches guest_requests.category by convention: a
+  // super admin who wants a custom department's guest requests routed
+  // here creates a hotel_request_categories row with the same key.
+  if (role == 'custom_dept_manager' || role == 'custom_dept_staff') {
+    return ref.watch(myCustomDepartmentProvider).when(
+      data: (dept) => dept == null
+          ? Stream.error(
+              StateError('לא נמצאה מחלקה מותאמת עבור המשתמש'),
+              StackTrace.current,
+            )
+          : ref.watch(guestRequestRepositoryProvider).streamMyDept(hotelId, dept.key),
+      loading: () => const Stream.empty(),
+      error: (e, st) => Stream.error(e, st),
+    );
+  }
+
   final dept = _roleToDept(role);
   // Role claim missing or unrecognised. This is terminal — currentUserProvider
   // won't change again, so the provider never re-runs. Returning Stream.empty()

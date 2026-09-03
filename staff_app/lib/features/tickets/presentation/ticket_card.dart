@@ -146,7 +146,7 @@ class TicketCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 6),
                             _Chip(
-                              label: ticket.assignedDept,
+                              label: ticket.assignedDept ?? 'מחלקה מותאמת',
                               color: const Color(0xFF2563EB),
                               filled: false,
                             ),

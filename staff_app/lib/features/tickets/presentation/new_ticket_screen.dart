@@ -7,6 +7,7 @@ import 'package:hotel_app/features/tickets/domain/routing_rules.dart';
 import 'package:hotel_app/features/tickets/domain/ticket_status.dart';
 import 'package:hotel_app/core/supabase/supabase_client.dart';
 import 'package:hotel_app/features/rooms/providers/rooms_provider.dart';
+import 'package:hotel_app/features/home/providers/custom_department_home_provider.dart';
 import '../data/ticket_repository.dart';
 import '../providers/tickets_provider.dart';
 import 'package:hotel_app/core/connectivity/connectivity_service.dart';
@@ -38,6 +39,7 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
   final _descCtrl  = TextEditingController();
   String? _selectedRoomId;
   String? _selectedDept;
+  CustomDepartment? _selectedCustomDept;
   String  _priority = 'normal';
   bool    _loading  = false;
   String? _error;
@@ -58,6 +60,11 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
     final disabledDepts = ref.watch(disabledDepartmentsProvider).valueOrNull ?? const {};
     final availableDepts =
         allowedDepts(role).where((d) => !disabledDepts.contains(d)).toList();
+    // Mirrors deptRoutingRules' intent ("managers + CEO + superAdmin can
+    // route to any dept") for the newer custom-department catalog too.
+    final customDepts = role.isManager
+        ? (ref.watch(hotelCustomDepartmentsProvider).valueOrNull ?? const [])
+        : const <CustomDepartment>[];
     final roomsAsync = ref.watch(roomsProvider);
 
     final isEmergency = _priority == 'urgent';
@@ -77,7 +84,16 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
             _DeptGrid(
               available: availableDepts,
               selected: _selectedDept,
-              onSelect: (d) => setState(() => _selectedDept = d),
+              onSelect: (d) => setState(() {
+                _selectedDept = d;
+                _selectedCustomDept = null;
+              }),
+              customDepts: customDepts,
+              selectedCustomDeptId: _selectedCustomDept?.id,
+              onSelectCustom: (d) => setState(() {
+                _selectedCustomDept = d;
+                _selectedDept = null;
+              }),
             ),
 
             const SizedBox(height: 16),
@@ -210,7 +226,7 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
       setState(() => _error = 'יש לבחור חדר');
       return;
     }
-    if (_selectedDept == null) {
+    if (_selectedDept == null && _selectedCustomDept == null) {
       setState(() => _error = 'יש לבחור מחלקה');
       return;
     }
@@ -236,7 +252,8 @@ class _NewTicketScreenState extends ConsumerState<NewTicketScreen> {
         hotelId: hotelId,
         roomId: _selectedRoomId!,
         openedBy: user.id,
-        assignedDept: _selectedDept!,
+        assignedDept: _selectedDept,
+        customDepartmentId: _selectedCustomDept?.id,
         title: _titleCtrl.text.trim(),
         description: _descCtrl.text.trim().isEmpty
             ? null
@@ -278,52 +295,76 @@ class _DeptGrid extends StatelessWidget {
   final List<String> available;
   final String? selected;
   final ValueChanged<String> onSelect;
-  const _DeptGrid(
-      {required this.available, required this.selected, required this.onSelect});
+  final List<CustomDepartment> customDepts;
+  final String? selectedCustomDeptId;
+  final ValueChanged<CustomDepartment> onSelectCustom;
+  const _DeptGrid({
+    required this.available,
+    required this.selected,
+    required this.onSelect,
+    this.customDepts = const [],
+    this.selectedCustomDeptId,
+    required this.onSelectCustom,
+  });
 
   @override
   Widget build(BuildContext context) {
     final cs    = Theme.of(context).colorScheme;
     final depts = _deptMeta.keys.where(available.contains).toList();
 
+    Widget tile({required String icon, required String label, required bool isSelect, required VoidCallback onTap}) {
+      return GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelect ? cs.primaryContainer : cs.surface,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isSelect ? cs.primary : cs.outline,
+              width: isSelect ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(icon, style: const TextStyle(fontSize: 16)),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: isSelect ? cs.onPrimaryContainer : cs.onSurface,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: depts.map((d) {
-        final meta     = _deptMeta[d]!;
-        final isSelect = selected == d;
-        return GestureDetector(
-          onTap: () => onSelect(d),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: isSelect ? cs.primaryContainer : cs.surface,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: isSelect ? cs.primary : cs.outline,
-                width: isSelect ? 2 : 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(meta.icon, style: const TextStyle(fontSize: 16)),
-                const SizedBox(width: 6),
-                Text(
-                  meta.label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: isSelect ? cs.onPrimaryContainer : cs.onSurface,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
+      children: [
+        ...depts.map((d) {
+          final meta = _deptMeta[d]!;
+          return tile(
+            icon: meta.icon,
+            label: meta.label,
+            isSelect: selected == d,
+            onTap: () => onSelect(d),
+          );
+        }),
+        ...customDepts.map((d) => tile(
+              icon: d.icon,
+              label: d.label,
+              isSelect: selectedCustomDeptId == d.id,
+              onTap: () => onSelectCustom(d),
+            )),
+      ],
     );
   }
 }

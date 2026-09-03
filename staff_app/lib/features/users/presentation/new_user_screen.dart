@@ -18,6 +18,8 @@ const _roles = [
   ('security_guard', 'Security Guard'),
   ('maintenance_tech', 'Maintenance Tech'),
   ('repairman', 'Repairman'),
+  ('custom_dept_manager', 'Custom Department Manager'),
+  ('custom_dept_staff', 'Custom Department Staff'),
 ];
 
 class NewUserScreen extends ConsumerStatefulWidget {
@@ -32,6 +34,22 @@ class _State extends ConsumerState<NewUserScreen> {
   final _nameCtrl = TextEditingController();
   String _role = 'receptionist';
   bool _loading = false;
+  String? _departmentId;
+  List<({String id, String label, String icon})> _departments = [];
+
+  bool get _isCustomDeptRole => _role == 'custom_dept_manager' || _role == 'custom_dept_staff';
+
+  @override
+  void initState() {
+    super.initState();
+    final user = ref.read(currentUserProvider);
+    final hotelId = user?.appMetadata['hotel_id'] as String?;
+    if (hotelId != null) {
+      UsersRepository().fetchCustomDepartments(hotelId).then((d) {
+        if (mounted) setState(() => _departments = d);
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -42,6 +60,11 @@ class _State extends ConsumerState<NewUserScreen> {
 
   Future<void> _invite() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_isCustomDeptRole && _departmentId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Select a department')));
+      return;
+    }
     final user = ref.read(currentUserProvider)!;
     final hotelId = user.appMetadata['hotel_id'] as String;
     setState(() => _loading = true);
@@ -51,6 +74,7 @@ class _State extends ConsumerState<NewUserScreen> {
         fullName: _nameCtrl.text.trim(),
         role: _role,
         hotelId: hotelId,
+        departmentId: _isCustomDeptRole ? _departmentId : null,
       );
       if (mounted) {
         ref.invalidate(usersProvider);
@@ -100,8 +124,27 @@ class _State extends ConsumerState<NewUserScreen> {
               items: _roles
                 .map((r) => DropdownMenuItem(value: r.$1, child: Text(r.$2)))
                 .toList(),
-              onChanged: (v) => setState(() => _role = v!),
+              onChanged: (v) => setState(() { _role = v!; _departmentId = null; }),
             ),
+            if (_isCustomDeptRole) ...[
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: _departmentId,
+                decoration: const InputDecoration(labelText: 'Department *'),
+                items: _departments
+                  .map((d) => DropdownMenuItem(value: d.id, child: Text('${d.icon} ${d.label}')))
+                  .toList(),
+                onChanged: (v) => setState(() => _departmentId = v),
+              ),
+              if (_departments.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(top: 4),
+                  child: Text(
+                    'No custom departments yet — create one in the admin panel first.',
+                    style: TextStyle(fontSize: 12, color: Colors.orange),
+                  ),
+                ),
+            ],
             const SizedBox(height: 24),
             FilledButton(
               onPressed: _loading ? null : _invite,

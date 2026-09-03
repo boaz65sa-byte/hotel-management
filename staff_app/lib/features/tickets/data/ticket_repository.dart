@@ -66,21 +66,27 @@ class TicketRepository {
   }
 
   /// Open a new ticket. Works offline — queued if no connection.
+  /// Exactly one of `assignedDept` (one of the 5 fixed departments) or
+  /// `customDepartmentId` (a hotel_departments row) must be given.
   Future<void> openTicket({
     required String hotelId,
     required String roomId,
     required String openedBy,
-    required String assignedDept,
+    String? assignedDept,
+    String? customDepartmentId,
     required String title,
     String? description,
     String priority = 'normal',
     DateTime? slaDeadline,
   }) async {
+    assert((assignedDept == null) != (customDepartmentId == null),
+        'exactly one of assignedDept/customDepartmentId is required');
     final payload = {
       'hotel_id': hotelId,
       'room_id': roomId,
       'opened_by': openedBy,
       'assigned_dept': assignedDept,
+      'custom_department_id': customDepartmentId,
       'title': title,
       'description': description,
       'priority': priority,
@@ -255,8 +261,24 @@ class TicketRepository {
         .order('created_at');
   }
 
-  /// Fetch available staff for a department
-  Future<List<Map<String, dynamic>>> fetchDeptStaff(String dept) async {
+  /// Fetch available staff for a department — either one of the 5 fixed
+  /// dept_name departments (pass `dept`) or a custom department (pass
+  /// `customDepartmentId`, which takes priority since custom-department
+  /// tickets have assigned_dept = NULL).
+  Future<List<Map<String, dynamic>>> fetchDeptStaff(
+    String? dept, {
+    String? customDepartmentId,
+  }) async {
+    if (customDepartmentId != null) {
+      final res = await supabase
+          .from('users')
+          .select('id, full_name, role, is_active')
+          .eq('department_id', customDepartmentId)
+          .inFilter('role', ['custom_dept_manager', 'custom_dept_staff'])
+          .eq('is_active', true);
+      return (res as List).cast<Map<String, dynamic>>();
+    }
+
     final deptRoles = <String, List<String>>{
       'maintenance': ['maintenance_manager', 'maintenance_tech', 'repairman'],
       'reception': ['reception_manager', 'deputy_reception', 'receptionist'],
@@ -264,7 +286,7 @@ class TicketRepository {
       'housekeeping': ['housekeeping_manager', 'housekeeping'],
       'kitchen': ['kitchen_manager', 'kitchen_staff'],
     };
-    final roles = deptRoles[dept] ?? [];
+    final roles = dept != null ? (deptRoles[dept] ?? []) : <String>[];
     if (roles.isEmpty) return [];
     final res = await supabase
         .from('users')

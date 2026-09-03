@@ -35,14 +35,17 @@ Deno.serve(async (req) => {
 
   const managerRoles = ['ceo', 'software_manager', 'hotel_admin', 'reception_manager',
                         'maintenance_manager', 'housekeeping_manager', 'security_manager',
-                        'kitchen_manager', 'super_admin']
+                        'kitchen_manager', 'custom_dept_manager', 'super_admin']
   if (!profile || !managerRoles.includes(profile.role)) {
     return new Response('Forbidden', { status: 403 })
   }
 
-  const { email, full_name, role, hotel_id } = await req.json()
+  const { email, full_name, role, hotel_id, department_id } = await req.json()
   if (!email || !full_name || !role || !hotel_id) {
     return new Response('Missing fields', { status: 400 })
+  }
+  if ((role === 'custom_dept_manager' || role === 'custom_dept_staff') && !department_id) {
+    return new Response('department_id is required for a custom-department role', { status: 400 })
   }
 
   // Hotel managers can only invite users to their own hotel
@@ -71,6 +74,7 @@ Deno.serve(async (req) => {
     full_name,
     email,
     role,
+    department_id: department_id ?? null,
     is_active: true,
   }, { onConflict: 'id' })
 

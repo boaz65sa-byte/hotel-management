@@ -18,6 +18,7 @@ const managerRoles = [
   'housekeeping_manager',
   'security_manager',
   'kitchen_manager',
+  'custom_dept_manager',
   'super_admin',
 ]
 
@@ -56,10 +57,13 @@ Deno.serve(async (req) => {
 
   // ── CREATE ──────────────────────────────────────────────────
   if (action === 'create') {
-    const { email, full_name, password, role, hotel_id } = body
+    const { email, full_name, password, role, hotel_id, department_id } = body
 
     if (!email || !full_name || !password || !role || !hotel_id) {
       return json({ error: 'Missing fields' }, 400)
+    }
+    if ((role === 'custom_dept_manager' || role === 'custom_dept_staff') && !department_id) {
+      return json({ error: 'department_id is required for a custom-department role' }, 400)
     }
 
     if (role === 'super_admin' && !isSuperAdmin) {
@@ -87,6 +91,7 @@ Deno.serve(async (req) => {
       full_name,
       email,
       role,
+      department_id: department_id ?? null,
       is_active: true,
     }, { onConflict: 'id' })
 
@@ -95,7 +100,7 @@ Deno.serve(async (req) => {
 
   // ── UPDATE ──────────────────────────────────────────────────
   if (action === 'update') {
-    const { user_id, full_name, role, hotel_id, is_active, password } = body
+    const { user_id, full_name, role, hotel_id, department_id, is_active, password } = body
 
     if (!user_id) return json({ error: 'user_id required' }, 400)
 
@@ -121,6 +126,7 @@ Deno.serve(async (req) => {
       updates.role = role
     }
     if (hotel_id  !== undefined && isSuperAdmin) updates.hotel_id = hotel_id
+    if (department_id !== undefined) updates.department_id = department_id
     if (is_active !== undefined) updates.is_active  = is_active
 
     await supabase.from('users').update(updates).eq('id', user_id)

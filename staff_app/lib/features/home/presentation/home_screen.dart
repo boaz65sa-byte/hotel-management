@@ -7,6 +7,7 @@ import 'package:hotel_app/features/home/presentation/reception_home.dart';
 import 'package:hotel_app/features/home/presentation/maintenance_home.dart';
 import 'package:hotel_app/features/home/presentation/manager_home.dart';
 import 'package:hotel_app/features/home/presentation/kitchen_home.dart';
+import 'package:hotel_app/features/home/presentation/custom_department_home.dart';
 import 'package:hotel_app/features/housekeeping/presentation/housekeeping_manager_screen.dart';
 import 'package:hotel_app/features/housekeeping/presentation/housekeeping_staff_screen.dart';
 
@@ -24,6 +25,7 @@ class HomeScreen extends ConsumerWidget {
       'housekeeping_staff'   => const HousekeepingStaffScreen(),
       'maintenance'          => const MaintenanceHomeScreen(),
       'kitchen'              => const KitchenHomeScreen(),
+      'custom_department'    => const CustomDepartmentHomeScreen(),
       'manager'              => const ManagerHomeScreen(),
       _                      => const ReceptionHomeScreen(),
     };

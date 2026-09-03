@@ -5,7 +5,7 @@ enum UserRole {
   superAdmin, ceo, hotelAdmin, receptionManager, maintenanceManager,
   housekeepingManager, housekeeping, securityManager, deputyReception,
   receptionist, securityGuard, maintenanceTech, repairman,
-  kitchenManager, kitchenStaff;
+  kitchenManager, kitchenStaff, customDeptManager, customDeptStaff;
 
   static UserRole fromString(String s) {
     final camel = _toCamel(s);
@@ -21,7 +21,7 @@ enum UserRole {
 
   static const _managerRoles = [
     superAdmin, ceo, hotelAdmin, receptionManager, maintenanceManager,
-    housekeepingManager, securityManager, kitchenManager,
+    housekeepingManager, securityManager, kitchenManager, customDeptManager,
   ];
 
   bool get canClaimAndUpdate => this != UserRole.receptionist;
@@ -39,6 +39,8 @@ enum UserRole {
         this == UserRole.maintenanceManager) return 'maintenance';
     if (this == UserRole.kitchenManager ||
         this == UserRole.kitchenStaff) return 'kitchen';
+    if (this == UserRole.customDeptManager ||
+        this == UserRole.customDeptStaff) return 'custom_department';
     return 'reception';
   }
 }

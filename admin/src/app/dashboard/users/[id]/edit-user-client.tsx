@@ -15,8 +15,9 @@ export default function EditUserClient({
 }) {
   const router = useRouter()
   const { id } = useParams<{ id: string }>()
-  const [form, setForm] = useState({ full_name: '', role: '', hotel_id: '', is_active: true })
+  const [form, setForm] = useState({ full_name: '', role: '', hotel_id: '', department_id: '', is_active: true })
   const [hotels, setHotels] = useState<{ id: string; name: string }[]>([])
+  const [departments, setDepartments] = useState<{ id: string; key: string; label: string; icon: string }[]>([])
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
@@ -52,10 +53,24 @@ export default function EditUserClient({
         full_name: user.full_name ?? '',
         role: user.role ?? '',
         hotel_id: user.hotel_id ?? '',
+        department_id: user.department_id ?? '',
         is_active: Boolean(user.is_active),
       })
     })
   }, [id])
+
+  const isCustomDeptRole = form.role === 'custom_dept_manager' || form.role === 'custom_dept_staff'
+
+  useEffect(() => {
+    if (!isCustomDeptRole || !form.hotel_id) {
+      setDepartments([])
+      return
+    }
+    fetch(`/api/hotel-departments?hotel_id=${form.hotel_id}`)
+      .then((r) => r.json())
+      .then((data) => setDepartments(Array.isArray(data) ? data : []))
+      .catch(() => setDepartments([]))
+  }, [isCustomDeptRole, form.hotel_id])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -68,11 +83,18 @@ export default function EditUserClient({
 
     setLoading(true)
     try {
+      if (isCustomDeptRole && !form.department_id) {
+        setError('בחרו מחלקה מותאמת')
+        setLoading(false)
+        return
+      }
+
       const payload: Record<string, unknown> = {
         action: 'update',
         user_id: id,
         full_name: form.full_name,
         role: form.role,
+        department_id: isCustomDeptRole ? form.department_id : null,
         is_active: form.is_active,
       }
       if (isSuperAdmin) payload.hotel_id = form.hotel_id
@@ -158,6 +180,19 @@ export default function EditUserClient({
             ))}
           </select>
         </div>
+        {isCustomDeptRole && (
+          <div>
+            <label className="block text-sm font-medium mb-1">מחלקה מותאמת</label>
+            <select className="w-full border rounded-lg px-3 py-2 text-sm bg-white"
+              value={form.department_id}
+              onChange={(e) => setForm((f) => ({ ...f, department_id: e.target.value }))}>
+              <option value="">בחרו מחלקה…</option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>{d.icon} {d.label}</option>
+              ))}
+            </select>
+          </div>
+        )}
         <div>
           <label className="block text-sm font-medium mb-1">Hotel</label>
           <select

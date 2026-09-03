@@ -24,9 +24,31 @@ class UsersRepository {
     required String fullName,
     required String role,
     required String hotelId,
+    String? departmentId,
   }) async {
     await supabase.functions.invoke('invite-user', body: {
       'email': email, 'full_name': fullName, 'role': role, 'hotel_id': hotelId,
+      if (departmentId != null) 'department_id': departmentId,
     });
+  }
+
+  /// Every active custom department for a hotel, for the invite screen's
+  /// department picker (only relevant for custom_dept_manager/staff).
+  Future<List<({String id, String label, String icon})>> fetchCustomDepartments(
+    String hotelId,
+  ) async {
+    final res = await supabase
+        .from('hotel_departments')
+        .select('id, label, icon')
+        .eq('hotel_id', hotelId)
+        .eq('is_active', true)
+        .order('label');
+    return (res as List)
+        .map((j) => (
+              id: j['id'] as String,
+              label: j['label'] as String,
+              icon: j['icon'] as String? ?? '🏷️',
+            ))
+        .toList();
   }
 }

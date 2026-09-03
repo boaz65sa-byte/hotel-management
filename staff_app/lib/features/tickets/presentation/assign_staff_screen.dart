@@ -29,7 +29,10 @@ class _AssignStaffScreenState extends ConsumerState<AssignStaffScreen> {
 
   Future<void> _loadStaff() async {
     final repo = ref.read(ticketRepoProvider);
-    final staff = await repo.fetchDeptStaff(widget.ticket.assignedDept);
+    final staff = await repo.fetchDeptStaff(
+      widget.ticket.assignedDept,
+      customDepartmentId: widget.ticket.customDepartmentId,
+    );
     if (mounted) {
       setState(() { _staff = staff; _staffLoading = false; });
     }
@@ -107,7 +110,7 @@ class _AssignStaffScreenState extends ConsumerState<AssignStaffScreen> {
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 4),
                               child: Text(
-                                'עובדים זמינים — ${widget.ticket.assignedDept}',
+                                'עובדים זמינים — ${widget.ticket.assignedDept ?? "מחלקה מותאמת"}',
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
