@@ -35,6 +35,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         brandingAsync.valueOrNull?.amenitiesOrderingEnabled ?? false;
     final guidedMenuEnabled =
         brandingAsync.valueOrNull?.guidedMenuEnabled ?? false;
+    final guestFeedbackEnabled =
+        brandingAsync.valueOrNull?.guestFeedbackEnabled ?? true;
 
     return sessionAsync.when(
       loading: () => const Scaffold(
@@ -89,7 +91,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 // Feedback banner
-                if (session.shouldShowFeedback)
+                if (session.shouldShowFeedback && guestFeedbackEnabled)
                   GestureDetector(
                     onTap: () => context.push('/feedback'),
                     child: Container(

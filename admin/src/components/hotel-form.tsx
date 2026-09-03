@@ -11,7 +11,8 @@ type Hotel = { id?: string; name: string; subscription_plan: string
                stay_threshold?: number
                guest_pwa_url?: string | null
                logo_url?: string | null
-               enabled_features?: EnabledFeatures | null }
+               enabled_features?: EnabledFeatures | null
+               guest_feedback_enabled?: boolean }
 
 const DEFAULT_FEATURES: EnabledFeatures = { amenities_ordering: false, guided_menu: false }
 
@@ -28,6 +29,7 @@ export function HotelForm({
   const [data, setData] = useState({
     ...hotel,
     enabled_features: hotel.enabled_features ?? DEFAULT_FEATURES,
+    guest_feedback_enabled: hotel.guest_feedback_enabled ?? true,
   })
   const router = useRouter()
 
@@ -182,8 +184,27 @@ export function HotelForm({
                 <span className="text-sm">{label}</span>
               </label>
             ))}
+            <label className="flex items-center gap-3 cursor-pointer select-none">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={data.guest_feedback_enabled}
+                onClick={() => setData({...data, guest_feedback_enabled: !data.guest_feedback_enabled})}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${
+                  data.guest_feedback_enabled ? 'bg-blue-600' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                    data.guest_feedback_enabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+              <span className="text-sm">שאלון ומשוב לאורח (banner במסך הבית)</span>
+            </label>
           </div>
           <input type="hidden" name="enabled_features" value={JSON.stringify(data.enabled_features)} />
+          <input type="hidden" name="guest_feedback_enabled" value={data.guest_feedback_enabled ? 'on' : 'off'} />
         </div>
       )}
 

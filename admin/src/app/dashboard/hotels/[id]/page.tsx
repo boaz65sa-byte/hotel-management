@@ -91,6 +91,7 @@ export default async function EditHotelPage({ params }: { params: Promise<{ id: 
           guest_pwa_url: hotel.guest_pwa_url ?? null,
           logo_url: hotel.logo_url ?? null,
           enabled_features: hotel.enabled_features ?? null,
+          guest_feedback_enabled: hotel.guest_feedback_enabled ?? true,
         }}
         action={boundUpdate}
         variant={viewer.isSuperAdmin ? 'super' : 'hotel'}

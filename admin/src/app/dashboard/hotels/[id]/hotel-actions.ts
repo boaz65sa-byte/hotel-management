@@ -43,6 +43,8 @@ export async function updateHotelScoped(hotelId: string, fd: FormData) {
         // malformed — leave enabled_features untouched rather than corrupt it
       }
     }
+
+    payload.guest_feedback_enabled = fd.get('guest_feedback_enabled') === 'on'
   }
 
   await supabaseAdmin.from('hotels').update(payload).eq('id', hotelId)

@@ -6,10 +6,12 @@ class HotelBranding {
   final String name;
   final String? logoUrl;
   final Map<String, dynamic> enabledFeatures;
+  final bool guestFeedbackEnabled;
   const HotelBranding({
     required this.name,
     this.logoUrl,
     this.enabledFeatures = const {},
+    this.guestFeedbackEnabled = true,
   });
 
   bool get amenitiesOrderingEnabled => enabledFeatures['amenities_ordering'] == true;
@@ -36,6 +38,7 @@ class GuestRepository {
         enabledFeatures: features is Map
             ? Map<String, dynamic>.from(features)
             : const {},
+        guestFeedbackEnabled: row['guest_feedback_enabled'] as bool? ?? true,
       );
     } catch (_) {
       return null;
